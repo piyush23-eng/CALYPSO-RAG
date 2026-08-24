@@ -92,34 +92,63 @@ def structure_gate_content(raw_text: str, subject_hint: Optional[str] = None, so
     return "\n".join(output_sections)
 
 
+def process_single_pdf(pdf_path: Path, output_dir: Path, subject_hint: Optional[str] = None):
+    """Processes a single PDF file and saves formatted markdown."""
+    raw_text = extract_text_from_pdf(pdf_path)
+    if not raw_text.strip():
+        print(f"⚠️ Warning: No text could be extracted from {pdf_path.name}")
+        return
+
+    print(f"✅ Extracted {len(raw_text)} characters from {pdf_path.name}")
+    markdown_content = structure_gate_content(raw_text, subject_hint=subject_hint, source_filename=pdf_path.name)
+
+    out_filename = pdf_path.stem.lower().replace(" ", "_").replace("-", "_") + "_pyqs.md"
+    out_path = output_dir / out_filename
+    out_path.write_text(markdown_content, encoding="utf-8")
+    print(f"   📁 Saved -> {out_path}")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Ingest GATE CS PDF files into CALYPSO-RAG knowledge base")
-    parser.add_argument("--pdf", type=str, required=True, help="Path to the PDF file")
-    parser.add_argument("--subject", type=str, default="Computer Science", help="Optional subject name (e.g. 'Operating Systems', 'Computer Networks')")
+    parser = argparse.ArgumentParser(description="Ingest GATE CS PDF files or folders into CALYPSO-RAG knowledge base")
+    parser.add_argument("--pdf", type=str, default=None, help="Path to a single PDF file")
+    parser.add_argument("--folder", type=str, default=None, help="Path to a folder containing multiple PDFs (e.g. 1991-2005 PYQs)")
+    parser.add_argument("--subject", type=str, default="Computer Science", help="Optional default subject name")
     parser.add_argument("--output_dir", type=str, default="./data/raw", help="Output directory for generated Markdown (default: ./data/raw)")
     args = parser.parse_args()
 
-    pdf_path = Path(args.pdf)
-    if not pdf_path.exists():
-        print(f"❌ PDF file not found: {pdf_path}")
-        sys.exit(1)
-
-    # 1. Extract text
-    raw_text = extract_text_from_pdf(pdf_path)
-    print(f"✅ Extracted {len(raw_text)} characters from {pdf_path.name}")
-
-    # 2. Structure into Markdown
-    markdown_content = structure_gate_content(raw_text, subject_hint=args.subject, source_filename=pdf_path.name)
-
-    # 3. Save to data/raw/
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_filename = pdf_path.stem.lower().replace(" ", "_").replace("-", "_") + "_pyqs.md"
-    out_path = out_dir / out_filename
 
-    out_path.write_text(markdown_content, encoding="utf-8")
-    print(f"\n🎉 Successfully created Markdown corpus file:")
-    print(f"   📁 {out_path}")
+    if args.folder:
+        folder_path = Path(args.folder)
+        if not folder_path.exists():
+            print(f"❌ Folder not found: {folder_path}")
+            sys.exit(1)
+
+        pdf_files = sorted(list(folder_path.glob("*.pdf")) + list(folder_path.glob("**/*.pdf")))
+        if not pdf_files:
+            print(f"❌ No .pdf files found in {folder_path}")
+            sys.exit(1)
+
+        print(f"🚀 Found {len(pdf_files)} PDF files in '{folder_path.name}' to ingest:")
+        for p in pdf_files:
+            print(f" - {p.name}")
+        print("="*60)
+
+        for p in pdf_files:
+            process_single_pdf(p, out_dir, subject_hint=args.subject)
+
+    elif args.pdf:
+        pdf_path = Path(args.pdf)
+        if not pdf_path.exists():
+            print(f"❌ PDF file not found: {pdf_path}")
+            sys.exit(1)
+        process_single_pdf(pdf_path, out_dir, subject_hint=args.subject)
+    else:
+        print("❌ Please provide either --pdf <file.pdf> or --folder <path/to/folder>")
+        sys.exit(1)
+
+    print(f"\n🎉 All PDFs successfully processed and saved to {out_dir}!")
     print(f"\n👉 Next Steps to Train & Index:")
     print(f"   1. python scripts/build_index.py")
     print(f"   2. python scripts/prepare_training_data.py")
