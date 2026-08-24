@@ -100,8 +100,8 @@ CALYPSO-RAG was evaluated across **20 handcrafted benchmark questions** covering
 ### 1. Prerequisites & Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/calypso-rag.git
-cd calypso-rag
+git clone https://github.com/piyush23-eng/CALYPSO-RAG.git
+cd CALYPSO-RAG
 
 # Create and activate Python virtual environment
 python3 -m venv venv
