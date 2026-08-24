@@ -9,10 +9,17 @@ Usage:
 """
 
 import os
+import sys
 import argparse
+
+# Guard against broken torchvision binary in Google Colab Python 3.13 environment
+sys.modules['torchvision'] = None
+sys.modules['torchvision.io'] = None
+sys.modules['torchvision.ops'] = None
+sys.modules['torchvision.transforms'] = None
+
 import torch
 
-# Ensure accelerate and torch backend are initialized before transformers imports
 try:
     import accelerate
 except ImportError:
