@@ -128,14 +128,34 @@ Evaluates the full pipeline against all 20 benchmark questions and outputs resul
 python scripts/run_evaluation.py
 ```
 
-### 5. Launch the Interactive / Showcase Demo
+### 5. Launch the Web UI (Streamlit)
+```bash
+streamlit run app/app.py
+```
+
+### 6. Launch the Terminal Showcase / Interactive Demo
 ```bash
 # Multi-scenario showcase mode:
 python scripts/demo.py
 
-# Interactive question answering mode:
+# Interactive terminal mode:
 python scripts/demo.py --interactive
 ```
+
+---
+
+## 🌐 1-Click Cloud Deployment
+
+### Deploy to Streamlit Community Cloud (100% Free):
+1. Fork or push this repository to your GitHub.
+2. Go to [share.streamlit.io](https://share.streamlit.io/) and click **New app**.
+3. Select your repository `piyush23-eng/CALYPSO-RAG`, branch `main`, and main file path `app/app.py`.
+4. Click **Deploy!** 🚀
+
+### Deploy to Hugging Face Spaces (Streamlit SDK):
+1. Create a new Space on [Hugging Face Spaces](https://huggingface.co/spaces) with **Streamlit** SDK.
+2. Push this repo to your Space repository.
+3. Your live agentic RAG app will deploy automatically!
 
 ---
 
