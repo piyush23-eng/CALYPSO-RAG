@@ -244,11 +244,12 @@ def main():
 
     all_pairs = []
 
-    # 1. Extract from PYQ archive files
-    for md_file in sorted(raw_dir.glob("*_pyqs_*.md")):
+    # 1. Extract from all PYQ archive and ingested paper files
+    for md_file in sorted(raw_dir.glob("*pyqs*.md")):
         pairs = extract_qa_pairs_from_pyq_file(md_file)
-        print(f"Extracted {len(pairs)} QA pairs from {md_file.name}")
-        all_pairs.extend(pairs)
+        if pairs:
+            print(f"Extracted {len(pairs)} QA pairs from {md_file.name}")
+            all_pairs.extend(pairs)
 
     if (raw_dir / "gate_pyq_archive.md").exists():
         pairs = extract_qa_pairs_from_pyq_file(raw_dir / "gate_pyq_archive.md")
