@@ -47,7 +47,16 @@ class DualIndexManager:
 
     @property
     def collection(self):
-        if self._collection is None:
+        try:
+            if self._collection is None:
+                self._chroma_client = chromadb.PersistentClient(path=str(self.persist_dir))
+                self._collection = self._chroma_client.get_or_create_collection(
+                    name=self.collection_name,
+                    metadata={"hnsw:space": "cosine"}
+                )
+            # Quick check to ensure collection is valid
+            _ = self._collection.count()
+        except Exception:
             self._chroma_client = chromadb.PersistentClient(path=str(self.persist_dir))
             self._collection = self._chroma_client.get_or_create_collection(
                 name=self.collection_name,
