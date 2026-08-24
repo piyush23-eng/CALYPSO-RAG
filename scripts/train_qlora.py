@@ -12,7 +12,7 @@ import os
 import sys
 import argparse
 
-# Guard against broken multimodal packages in Google Colab environment
+# Guard against broken multimodal / outdated optional packages in Google Colab
 sys.modules['torchvision'] = None
 sys.modules['torchvision.io'] = None
 sys.modules['torchvision.ops'] = None
@@ -20,6 +20,7 @@ sys.modules['torchvision.transforms'] = None
 sys.modules['torchaudio'] = None
 sys.modules['torchaudio._extension'] = None
 sys.modules['torchaudio._extension.utils'] = None
+sys.modules['torchao'] = None
 
 import torch
 
