@@ -25,7 +25,7 @@ def build_knowledge_base(raw_dir: str = "./data/raw", processed_dir: str = "./da
     for f in files:
         print(f" - {f.name}")
 
-    chunker = TopicAwareChunker(max_chars=1200, min_chars=80, overlap_chars=100)
+    chunker = TopicAwareChunker(max_chars=2500, min_chars=80, overlap_chars=200)
     all_chunks: List[DocumentChunk] = []
 
     for file_path in files:
