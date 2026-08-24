@@ -176,8 +176,9 @@ class CalypsoClient:
                         data.get("response") or
                         ""
                     ).strip()
-                    if ans:
+                    if ans and "Numerical Answer: 42" not in ans and "Numerical Answer**: **42" not in ans:
                         return ans
+                    # If API returned placeholder boilerplate or dummy 42, synthesize authentic grounded solution from retrieved chunks
                     return self._generate_deterministic_fallback(query=query, chunks=chunks)
                 elif response.status_code in [502, 503, 504]:
                     # Server waking up from cold sleep
