@@ -129,20 +129,24 @@ def train_gate_model(
 
     # 6. Training Arguments
     os.makedirs(output_dir, exist_ok=True)
-    training_args = TrainingConfigClass(
-        output_dir=output_dir,
-        per_device_train_batch_size=batch_size,
-        gradient_accumulation_steps=gradient_accumulation_steps,
-        learning_rate=learning_rate,
-        num_train_epochs=num_epochs,
-        lr_scheduler_type="cosine",
-        warmup_ratio=0.05,
-        logging_steps=5,
-        fp16=use_cuda and not torch.cuda.is_bf16_supported(),
-        bf16=use_cuda and torch.cuda.is_bf16_supported(),
-        save_strategy="epoch",
-        report_to="none"
-    )
+    training_kwargs = {
+        "output_dir": output_dir,
+        "per_device_train_batch_size": batch_size,
+        "gradient_accumulation_steps": gradient_accumulation_steps,
+        "learning_rate": learning_rate,
+        "num_train_epochs": num_epochs,
+        "logging_steps": 1,
+        "fp16": use_cuda and not torch.cuda.is_bf16_supported(),
+        "bf16": use_cuda and torch.cuda.is_bf16_supported(),
+        "save_strategy": "epoch",
+        "report_to": "none"
+    }
+
+    try:
+        training_args = TrainingConfigClass(**training_kwargs)
+    except Exception:
+        from transformers import TrainingArguments
+        training_args = TrainingArguments(**training_kwargs)
 
     # 7. Supervised Fine-Tuning (SFTTrainer)
     trainer = SFTTrainer(
