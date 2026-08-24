@@ -270,12 +270,32 @@ calypso-rag/
 
 ---
 
-## 🎓 Technical Interview Defense Notes
+## 📐 Mathematical Formulation & Problem Taxonomy
 
-1. **Why from-scratch RRF over library abstractions?**
-   - Eliminates hidden defaults, ensures deterministic rank weighting with transparent provenance (`bm25_score`, `bm25_rank`, `dense_score`, `dense_rank`, `rrf_score`), and is easily defensible on a whiteboard.
-2. **Why Cross-Encoder reranking over Bi-Encoder similarity alone?**
-   - Bi-encoders compute independent embeddings $u = f(q)$ and $v = f(d)$ with late cosine dot product, missing fine-grained cross-token interactions. Cross-encoders attend to all token pairs $q \times d$ simultaneously, drastically boosting precision for dense mathematical concepts.
-3. **How does CRAG handle out-of-domain questions?**
-   - Caps reformulation loops at $2$ iterations. If cross-encoder relevance remains below $\tau = 0.50$, it flags `is_low_confidence = True` and activates negative prompt constraints to prevent hallucinations.
+CALYPSO-RAG is formulated to solve multi-step analytical and quantitative problems across the entire GATE CS spectrum:
+
+| Problem Domain | Mathematical Formalism | Solution Guarantee |
+| :--- | :--- | :--- |
+| **Storage Hierarchy & Disks** | $T_{\text{total}} = \sum \Delta_{\text{track}} \cdot t_{\text{seek}} + N_{\text{tracks}} \cdot \left[ \frac{T_{\text{rev}}}{2} + \frac{T_{\text{rev}}}{S_{\text{track}}} \right]$ | Exact ms access time across rotational & seek trajectories |
+| **Paging & Virtual Memory** | $\text{EMAT} = h(t_{\text{tlb}} + t_{\text{m}}) + (1-h)(t_{\text{tlb}} + (k+1)t_{\text{m}})$ | Multi-level lookup penalties with TLB hit ratios |
+| **Asymptotic Recurrences** | $T(n) = a T(n/b) + \Theta(n^{\log_b a} \log^k n) \implies \Theta(n^{\log_b a} \log^{k+1} n)$ | Extended Master Theorem with poly-logarithmic factors |
+| **TCP Flow & Congestion** | $\text{cwnd}_{t+1} = 2 \cdot \text{cwnd}_t \text{ (Slow Start)}, \quad \text{cwnd}_{t+1} = \text{cwnd}_t + 1\text{ MSS (Avoidance)}$ | Step-by-step RTT window size tracking |
+| **Relational Normalization** | $X \rightarrow Y \implies X \text{ is superkey (BCNF) or } Y \text{ is prime (3NF)}$ | Attribute closure verification & canonical covers |
+| **Syntax Analysis** | $\text{LALR}(1) = \text{Merge } \text{LR}(1) \text{ cores} \implies \text{No S/R conflicts, potential R/R}$ | Deterministic parse table conflict analysis |
+
+---
+
+## 📜 License & Citation
+
+Distributed under the **MIT License**. Created and engineered by **Piyush Pankaj** ([@piyush23-eng](https://github.com/piyush23-eng)).
+
+```bibtex
+@software{calypso_rag_2026,
+  author = {Piyush Pankaj},
+  title = {CALYPSO-RAG: Agentic Retrieval-Augmented Generation for GATE Computer Science},
+  year = {2026},
+  publisher = {GitHub},
+  url = {https://github.com/piyush23-eng/CALYPSO-RAG}
+}
+```
 
