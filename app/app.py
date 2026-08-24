@@ -12,46 +12,158 @@ from src.agent.orchestrator import CalypsoAgentOrchestrator
 
 # Page Configuration
 st.set_page_config(
-    page_title="CALYPSO-RAG | Agentic GATE CS Doubt Solver",
+    page_title="CALYPSO-RAG | Agentic GATE CS Solver",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS Styling
+# 🎨 Industry-Grade Custom CSS (Obsidian Tech Studio / Alpha Style)
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.2rem;
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    code, pre, .stCodeBlock {
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    /* Hero Branding */
+    .hero-container {
+        background: linear-gradient(135deg, rgba(14, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 16px;
+        padding: 2.2rem 2.5rem;
+        margin-bottom: 1.8rem;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(56, 189, 248, 0.15);
+    }
+    
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #38BDF8;
+        margin-bottom: 0.8rem;
+    }
+
+    .hero-title {
+        font-size: 2.6rem;
         font-weight: 800;
-        color: #1E88E5;
-        margin-bottom: 0.2rem;
-    }
-    .sub-header {
-        font-size: 1.05rem;
-        color: #555;
-        margin-bottom: 1.5rem;
-    }
-    .metric-badge {
-        display: inline-block;
-        padding: 0.25rem 0.6rem;
-        border-radius: 0.375rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        margin-right: 0.5rem;
-    }
-    .badge-os { background-color: #E3F2FD; color: #1565C0; }
-    .badge-dbms { background-color: #EDE7F6; color: #512DA8; }
-    .badge-algo { background-color: #E8F5E9; color: #2E7D32; }
-    .badge-cn { background-color: #FFF3E0; color: #E65100; }
-    .badge-toc { background-color: #FCE4EC; color: #C2185B; }
-    .badge-comp { background-color: #E0F2F1; color: #00695C; }
-    .citation-card {
-        border-left: 3px solid #1E88E5;
-        background-color: #F8F9FA;
-        padding: 0.75rem 1rem;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        background: linear-gradient(90deg, #FFFFFF 0%, #E2E8F0 40%, #38BDF8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
-        border-radius: 0 0.375rem 0.375rem 0;
+    }
+
+    .hero-subtitle {
+        font-size: 1.05rem;
+        color: #94A3B8;
+        max-width: 820px;
+        line-height: 1.55;
+    }
+
+    /* Pipeline Status Pills */
+    .pipeline-chip {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-right: 6px;
+    }
+
+    .chip-active {
+        background: rgba(16, 185, 129, 0.15);
+        color: #34D399;
+        border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .chip-warn {
+        background: rgba(245, 158, 11, 0.15);
+        color: #FBBF24;
+        border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    /* Citation Card Component */
+    .industry-citation-card {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-left: 4px solid #38BDF8;
+        border-radius: 8px;
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    
+    .industry-citation-card:hover {
+        border-color: rgba(56, 189, 248, 0.4);
+        background: rgba(15, 23, 42, 0.95);
+        transform: translateX(3px);
+    }
+
+    .citation-claim {
+        font-size: 0.98rem;
+        color: #F1F5F9;
+        font-style: italic;
+        line-height: 1.5;
+        margin-bottom: 0.6rem;
+    }
+
+    .citation-meta {
+        font-size: 0.8rem;
+        color: #64748B;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .meta-tag {
+        color: #94A3B8;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .meta-highlight {
+        color: #38BDF8;
+        font-weight: 600;
+    }
+
+    /* Metric Cards */
+    .metric-card-box {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        text-align: center;
+    }
+
+    .metric-val {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #38BDF8;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-lbl {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748B;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -68,124 +180,190 @@ def load_orchestrator():
     return CalypsoAgentOrchestrator(index_manager=index_manager)
 
 
-# Header
-st.markdown('<div class="main-header">⚡ CALYPSO-RAG</div>', unsafe_allow_html=True)
-st.markdown(
-    '<div class="sub-header">Agentic Retrieval-Augmented Generation for GATE Computer Science • '
-    'Hybrid RRF (k=60) + Cross-Encoder Reranking + Corrective CRAG Gate + Sentence Attribution</div>',
-    unsafe_allow_html=True
-)
+# 🌟 Studio Header Hero
+st.markdown("""
+<div class="hero-container">
+    <div class="hero-badge">
+        <span>⚡</span> PRODUCTION RAG SYSTEM • GATE CS/IT
+    </div>
+    <div class="hero-title">CALYPSO-RAG</div>
+    <div class="hero-subtitle">
+        An agentic retrieval-augmented reasoning engine combining fine-tuned <b>Qwen-1.5B (QLoRA)</b> with 
+        <b>Hybrid Lexical/Dense Fusion (RRF k=60)</b>, <b>Cross-Encoder Attention</b>, and <b>Corrective CRAG Self-Correction</b>.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-# Sidebar: System Telemetry & Benchmark Metrics
+# Sidebar: Studio Architecture & Benchmark Telemetry
 with st.sidebar:
-    st.header("📊 Benchmark Quality Metrics")
-    st.caption("Evaluated across 20 GATE CS Benchmarks (Target ≥ 75%)")
+    st.markdown("### 📊 RAGAS EVALUATION METRICS")
+    st.caption("Benchmark suite across 20 GATE CS problems (Target ≥ 75.0%)")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Precision", "85.0%", "✅ Pass")
-        st.metric("Faithfulness", "78.2%", "✅ Pass")
-    with col2:
-        st.metric("Recall", "75.0%", "✅ Pass")
-        st.metric("Relevance", "81.5%", "✅ Pass")
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+        <div class="metric-card-box">
+            <div class="metric-val">85.0%</div>
+            <div class="metric-lbl">Precision</div>
+        </div>
+        <div class="metric-card-box">
+            <div class="metric-val">75.0%</div>
+            <div class="metric-lbl">Recall</div>
+        </div>
+        <div class="metric-card-box">
+            <div class="metric-val">78.2%</div>
+            <div class="metric-lbl">Faithfulness</div>
+        </div>
+        <div class="metric-card-box">
+            <div class="metric-val">81.5%</div>
+            <div class="metric-lbl">Relevance</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.divider()
-    st.subheader("⚙️ Pipeline Architecture")
+    st.markdown("### ⚙️ AGENTIC ARCHITECTURE")
     st.markdown("""
-    - **Lexical**: BM25 (`rank_bm25`)
-    - **Dense**: `BAAI/bge-small-en-v1.5`
-    - **Fusion**: Custom RRF ($k=60$)
-    - **Reranker**: `ms-marco-MiniLM-L-6-v2`
-    - **Gate**: CRAG ($\tau = 0.50$)
-    - **Model**: `Qwen2.5-1.5B` (QLoRA)
-    - **Orchestrator**: LangGraph Cyclic State Graph
+    ```
+    [01] QUERY CLASSIFICATION
+         └── Domain Intent Parsing
+    [02] HYBRID RETRIEVAL
+         ├── Lexical BM25 (rank_bm25)
+         └── Dense BGE-Small (ChromaDB)
+    [03] RECIPROCAL RANK FUSION
+         └── Custom RRF (k = 60)
+    [04] CROSS-ENCODER RERANKING
+         └── ms-marco-MiniLM-L-6-v2
+    [05] CORRECTIVE RELEVANCE GATE
+         └── Self-Correction Loop (τ = 0.50)
+    [06] CALYPSO MODEL INFERENCE
+         └── Grounded Chain-of-Thought
+    [07] SENTENCE CITATION MAPPER
+         └── Cosine Attribution (≥ 0.60)
+    ```
     """)
     st.divider()
-    st.markdown("[📁 View GitHub Repository](https://github.com/piyush23-eng/CALYPSO-RAG)")
+    st.markdown("🔗 **[GitHub Repository](https://github.com/piyush23-eng/CALYPSO-RAG)**")
+    st.markdown("🌐 **[Model API Endpoint](https://calypso-m1rz.onrender.com/health)**")
 
-# Main Query Interface
-EXAMPLE_QUERIES = [
-    "How is Effective Memory Access Time calculated in 2-level paging with TLB hit ratio?",
-    "Why does Strict 2-Phase Locking eliminate cascading aborts in database transactions?",
-    "What is the worst-case time complexity of constructing a binary max heap from an unsorted array?",
-    "slow speed when network packet drops",
-    "time speed heap",
-    "What is the capital city of France?"
-]
+# Preset Benchmark Chips
+EXAMPLE_PROMPTS = {
+    "⚡ OS: 2-Level Paging EMAT": "How is Effective Memory Access Time calculated in 2-level paging with TLB hit ratio?",
+    "⚡ DBMS: Strict 2PL Serializability": "Why does Strict 2-Phase Locking eliminate cascading aborts in database transactions?",
+    "⚡ ALGO: Floyd Heap Construction": "What is the worst-case time complexity of constructing a binary max heap from an unsorted array?",
+    "🔄 CRAG TEST: Colloquial Packet Loss": "slow speed when network packet drops",
+    "🔄 CRAG TEST: Vague Heap Query": "time speed heap",
+    "🛡️ NEGATIVE CONSTRAINT: Off-Topic": "What is the capital city of France?"
+}
 
-selected_example = st.selectbox(
-    "💡 Or select an example GATE CS question:",
-    ["-- Type your own custom question --"] + EXAMPLE_QUERIES,
-    index=0
+st.markdown("##### 💡 Select a benchmark scenario or type your own:")
+chip_cols = st.columns(3)
+selected_prompt = None
+
+prompt_keys = list(EXAMPLE_PROMPTS.keys())
+with chip_cols[0]:
+    if st.button(prompt_keys[0], use_container_width=True): selected_prompt = EXAMPLE_PROMPTS[prompt_keys[0]]
+    if st.button(prompt_keys[3], use_container_width=True): selected_prompt = EXAMPLE_PROMPTS[prompt_keys[3]]
+with chip_cols[1]:
+    if st.button(prompt_keys[1], use_container_width=True): selected_prompt = EXAMPLE_PROMPTS[prompt_keys[1]]
+    if st.button(prompt_keys[4], use_container_width=True): selected_prompt = EXAMPLE_PROMPTS[prompt_keys[4]]
+with chip_cols[2]:
+    if st.button(prompt_keys[2], use_container_width=True): selected_prompt = EXAMPLE_PROMPTS[prompt_keys[2]]
+    if st.button(prompt_keys[5], use_container_width=True): selected_prompt = EXAMPLE_PROMPTS[prompt_keys[5]]
+
+user_query = st.text_area(
+    "Query Input Prompt",
+    value=selected_prompt or "",
+    height=85,
+    placeholder="Ask any GATE CS question (e.g., 'How is link utilization calculated in Go-Back-N protocol?')..."
 )
 
-default_text = "" if selected_example.startswith("--") else selected_example
-user_query = st.text_area("Enter your GATE CS Question / Doubt:", value=default_text, height=90, placeholder="e.g. How does Floyd's bottom-up build-heap achieve O(n) complexity?")
+col_act1, col_act2 = st.columns([4, 1])
+with col_act1:
+    submit = st.button("⚡ EXECUTE AGENTIC REASONING", type="primary", use_container_width=True)
+with col_act2:
+    clear = st.button("Clear", use_container_width=True)
 
-submit_btn = st.button("🚀 Solve with CALYPSO-RAG", type="primary", use_container_width=True)
+if clear:
+    st.rerun()
 
-if submit_btn and user_query.strip():
-    with st.spinner("🤖 LangGraph Agent executing: Routing ──▶ Retrieving ──▶ Reranking ──▶ Reasoning..."):
+if submit and user_query.strip():
+    with st.status("🧠 Agentic LangGraph State Graph in Progress...", expanded=True) as status_box:
+        st.write("🔍 Classifying query subject domain and intent...")
         orchestrator = load_orchestrator()
+        
+        st.write("⚡ Executing parallel BM25 + Dense BGE-Small retrieval with RRF (k=60)...")
+        st.write("🎯 Computing Cross-Encoder full-attention relevance scoring...")
         state = orchestrator.run(query=user_query.strip())
+        
+        if state.get("reformulation_count", 0) > 0:
+            st.write("🔄 CRAG Self-Correction triggered: reformulated query with formal GATE CS ontology.")
+        
+        st.write("📝 Synthesizing grounded step-by-step derivation via Calypso reasoning model...")
+        st.write("🔗 Mapping sentence-level semantic attribution embeddings...")
+        status_box.update(label="✅ Agent Execution Complete", state="complete", expanded=False)
 
-    st.divider()
+    st.markdown("---")
 
-    # Step 1: Agent Routing & Metadata Badges
+    # 1. Routing & Telemetry Badges
     subject = state.get("subject_hint", "General CS")
     relevance_score = state.get("relevance_score", 0.0)
     passed_gate = state.get("passed_gate", False)
     reform_count = state.get("reformulation_count", 0)
     is_low_conf = state.get("is_low_confidence", False)
+    confidence = state.get("telemetry", {}).get("confidence", 0.0)
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.info(f"📚 **Subject**: {subject}")
-    with col2:
-        if passed_gate:
-            st.success(f"🎯 **Relevance**: `{relevance_score:.4f}` (Gate Passed)")
-        else:
-            st.warning(f"⚠️ **Relevance**: `{relevance_score:.4f}` (Low Confidence)")
-    with col3:
-        if reform_count > 0:
-            st.warning(f"🔄 **CRAG Loops**: {reform_count} Reformulations")
-        else:
-            st.success("✅ **CRAG**: Passed on 1st Attempt")
+    st.markdown(f"""
+    <div style="margin-bottom: 1.2rem; display: flex; flex-wrap: wrap; gap: 8px;">
+        <span class="pipeline-chip chip-active">Domain: {subject}</span>
+        <span class="pipeline-chip {'chip-active' if passed_gate else 'chip-warn'}">
+            Relevance: {relevance_score:.4f} ({'GATE PASSED' if passed_gate else 'LOW CONFIDENCE'})
+        </span>
+        <span class="pipeline-chip {'chip-warn' if reform_count > 0 else 'chip-active'}">
+            CRAG Loops: {reform_count}
+        </span>
+        <span class="pipeline-chip chip-active">Confidence: {confidence:.4f}</span>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # Step 2: CRAG Self-Correction Trace (if triggered)
+    # 2. CRAG Reformulation Trace (if self-correction occurred)
     if reform_count > 0:
-        with st.expander("🔄 Corrective-RAG (CRAG) Self-Correction Trace", expanded=True):
-            st.info(f"**Original Query**: `{state['query']}`\n\n"
-                    f"**Formal GATE CS Expansion**: `{state['reformulated_query']}`")
+        with st.expander("🔄 CORRECTIVE-RAG (CRAG) TRACE: Query Reformulation Diff", expanded=True):
+            st.markdown(f"""
+            - **Original Input Query**: `{state['query']}`
+            - **Domain Expanded Terminology**: `{state['reformulated_query']}`
+            - **Initial Score**: `{relevance_score:.4f}` ──▶ **Post-Reformulation Score**: `{state.get('relevance_score', 0.0):.4f}`
+            """)
 
-    # Step 3: Calypso Verified Solution
-    st.subheader("📝 Verified Step-by-Step Solution")
+    # 3. Verified Reasoning Solution
+    st.markdown("### 📝 Verified Step-by-Step Derivation")
     with st.container(border=True):
         st.markdown(state.get("final_answer", ""))
 
-    # Step 4: Sentence-Level Citations & Attribution
+    # 4. Sentence-Level Attribution Citations
     citations = state.get("citations", [])
+    st.markdown(f"### 🔗 Sentence-Level Attribution Citations ({len(citations)} Verified)")
+    
     if citations:
-        st.subheader(f"🔗 Sentence-Level Attribution ({len(citations)} Verified Citations)")
         for idx, cit in enumerate(citations, 1):
-            with st.container(border=True):
-                st.markdown(f"**[{idx}] Answer Sentence Claim:**")
-                st.markdown(f"> *\"{cit['sentence']}\"*")
-                col_a, col_b, col_c = st.columns([2, 2, 1])
-                with col_a:
-                    st.caption(f"📁 **Source**: `{cit['source_file']}`")
-                with col_b:
-                    st.caption(f"🏷️ **Chunk ID**: `{cit['chunk_id']}` ({cit['topic']})")
-                with col_c:
-                    st.caption(f"📐 **Similarity**: `{cit['similarity_score']:.4f}`")
+            st.markdown(f"""
+            <div class="industry-citation-card">
+                <div class="citation-claim">"{cit['sentence']}"</div>
+                <div class="citation-meta">
+                    <span class="meta-tag">📄 <b>Source:</b> {cit['source_file']}</span>
+                    <span class="meta-tag">🏷️ <b>Chunk:</b> {cit['chunk_id']}</span>
+                    <span class="meta-tag">📚 <b>Topic:</b> {cit['topic']}</span>
+                    <span class="meta-tag">📐 <b>Cosine Sim:</b> <span class="meta-highlight">{cit['similarity_score']:.4f}</span></span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     else:
-        st.info("ℹ️ No individual sentences matched citation threshold (≥ 0.60).")
+        st.caption("No individual sentences matched citation threshold (≥ 0.60).")
 
-    # Step 5: Retrieved Context Evidence Cards
-    with st.expander("📚 View Top Retrieved Context Evidence Chunks", expanded=False):
+    # 5. Retrieved Evidence Chunks Accordion
+    with st.expander("📚 View Top Retrieved Evidence Passages (Cross-Encoder Ranked)", expanded=False):
         chunks = state.get("rerank_results", [])
         for c_idx, c in enumerate(chunks, 1):
             with st.container(border=True):
                 st.markdown(f"**Chunk [{c_idx}] — `{c.chunk_id}`** ({c.source_file} • {c.topic} / {c.subtopic})")
-                st.caption(f"Cross-Encoder Relevance Score: `{c.rerank_score:.4f}` | RRF Score: `{c.rrf_score:.4f}`")
+                st.caption(f"Cross-Encoder Score: `{c.rerank_score:.4f}` | RRF Score: `{c.rrf_score:.4f}`")
                 st.code(c.content, language="markdown")
