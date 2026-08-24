@@ -1,4 +1,4 @@
-# ⚡ CALYPSO-RAG: Agentic Retrieval-Augmented Generation for GATE Computer Science
+# CALYPSO-RAG: Retrieval-Augmented Generation & Reasoning for GATE Computer Science
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![LangGraph](https://img.shields.io/badge/orchestration-LangGraph-orange.svg)](https://github.com/langchain-ai/langgraph)
@@ -7,39 +7,45 @@
 [![FastAPI](https://img.shields.io/badge/backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
 [![QLoRA 4-bit](https://img.shields.io/badge/fine--tuning-QLoRA%204--bit-FFD21E.svg)](https://github.com/huggingface/peft)
 [![Tests](https://img.shields.io/badge/pytest-22%2F22%20passing-brightgreen.svg)]()
-[![RAGAS Score](https://img.shields.io/badge/RAGAS%20Composite-79.9%25-success.svg)]()
+[![RAGAS Score](https://img.shields.io/badge/RAGAS%20Composite-84.3%25-success.svg)]()
 
 ---
 
-## 💡 Why I Built CALYPSO-RAG
+## Overview
 
-When solving graduate-level engineering exams like **GATE Computer Science & Information Technology (CS/IT)**, general-purpose LLMs fail in two catastrophic ways:
-1. **Arithmetic & Boundary Hallucinations**: Models confidently guess numbers (e.g., hard disk seek trajectories, 2-level paging EMAT, or series sums $\sum \frac{h}{2^h}$) without calculating step-by-step invariants.
-2. **Semantic Drift in Technical Search**: Pure vector embeddings confuse similar-sounding terms (e.g., `Strict 2PL` vs `Rigorous 2PL` or `LR(0)` vs `SLR(1)` parsing conflicts) because acronyms collapse into similar vector spaces.
+Solving technical exam problems in **GATE Computer Science & Information Technology (CS/IT)** presents two core challenges for standard LLMs:
+1. **Mathematical & Boundary Hallucinations**: General models often approximate numerical constants and arithmetic without deriving step-by-step invariants (e.g., hard disk seek trajectories, 2-level paging EMAT, or series summations $\sum \frac{h}{2^h}$).
+2. **Semantic Dispersion on Technical Acronyms**: Dense embeddings alone can disperse queries containing concise acronyms and formulas (e.g., `Strict 2PL`, `LR(0)` vs `SLR(1)`, `ssthresh`, `3NF`).
 
-**CALYPSO-RAG** was engineered from the ground up to solve this. It combines a **4-bit QLoRA fine-tuned reasoning model (`Qwen2.5-1.5B-Instruct`)** with a custom **Hybrid BM25 + Dense ChromaDB retrieval engine**, **Reciprocal Rank Fusion (RRF $k=60$)**, a **Cross-Encoder reranker (`ms-marco-MiniLM-L-6-v2`)**, and an autonomous **LangGraph Corrective-RAG (CRAG)** state machine that audits retrieval confidence before generating step-by-step mathematical proofs with sentence-level citations.
+**CALYPSO-RAG** addresses these challenges through a modular system combining:
+- **4-bit QLoRA fine-tuned reasoning model** (`Qwen2.5-1.5B-Instruct`) trained on domain derivation schemas.
+- **Hybrid Retrieval**: Lexical BM25 (`rank_bm25`) + Dense Vector Search (`BAAI/bge-small-en-v1.5` in persistent ChromaDB).
+- **Reciprocal Rank Fusion (RRF $k=60$)**: Mathematical rank combination without score-scale distortion.
+- **Cross-Encoder Reranker** (`cross-encoder/ms-marco-MiniLM-L-6-v2`): Full cross-attention over candidate pairs.
+- **Corrective-RAG (CRAG) State Machine** built on **LangGraph**: Evaluates retrieval confidence ($\tau = 0.50$) and executes deterministic domain query reformulation when needed.
+- **Sentence-Level Citation Mapping**: Calculates semantic attribution cosine similarity for each generated claim.
 
 ---
 
-## 📸 Interface & System Preview
+## Interface & System Preview
 
-### 1. Minimal Editorial Hero & Dynamic Marquee Ticker
-*Clean typography-first interface with active topic retrieval acceleration and one-click benchmark presets:*
+### 1. Minimal Editorial Query Interface
+*Typography-focused interface with active topic retrieval acceleration and benchmark presets:*
 ![CALYPSO-RAG Hero Interface](docs/assets/hero_query_view.png)
 
-### 2. Step-by-Step Verified Solution & Hover-Reveal Evidence Cards
-*Mathematical KaTeX derivations backed by sentence-level semantic attribution tags and transparent retrieval trace logs:*
+### 2. Step-by-Step Solution with Evidence Provenance
+*KaTeX derivations accompanied by sentence-level semantic attribution tags and transparent retrieval trace logs:*
 ![CALYPSO-RAG Answer & Retrieval Trace](docs/assets/answer_trace_view.png)
 
-### 3. "The Numbers." (/evaluation) Empirical Benchmark Dashboard
-*Head-to-head comparison across Base Qwen vs Fine-Tuned QLoRA vs CALYPSO-RAG with 20-question benchmark audit:*
+### 3. Evaluation & Benchmark Audit Dashboard
+*Empirical comparison across Base Qwen vs Fine-Tuned QLoRA vs CALYPSO-RAG across the benchmark suite:*
 ![CALYPSO-RAG Benchmark Dashboard](docs/assets/evaluation_dashboard.png)
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
-CALYPSO-RAG is structured as a cyclic state machine built on **LangGraph**. The state graph executes subject classification, parallel hybrid retrieval, cross-encoder reranking, and dynamic threshold-based self-correction loops before generating step-by-step mathematical reasoning with citation provenance.
+CALYPSO-RAG is implemented as a state graph using **LangGraph**. The workflow executes subject classification, parallel hybrid retrieval, cross-encoder reranking, confidence validation, and optional query reformulation before generating solutions with sentence citations.
 
 ```mermaid
 flowchart TD
@@ -59,27 +65,87 @@ flowchart TD
 
 ---
 
-## 🔬 Core Engineering Highlights
+## Experiments & Empirical Rigor
 
-### 1. Parallel Hybrid Retrieval & Scratch-Built RRF ($k=60$)
-- **Lexical BM25 (`rank_bm25`)**: Captures exact formula variables, acronyms, and algorithmic notation.
-- **Dense Vector Search (`BAAI/bge-small-en-v1.5` in persistent ChromaDB)**: Captures conceptual semantics and thematic intent.
-- **Reciprocal Rank Fusion Equation**:
-  $$\text{RRF}(d) = \sum_{m \in \{\text{BM25}, \text{Dense}\}} \frac{1}{k + r_m(d)} \quad (k = 60)$$
-- **Cross-Encoder Full Attention (`cross-encoder/ms-marco-MiniLM-L-6-v2`)**: Evaluates token interaction pairs $q \times d$ simultaneously with sigmoid score normalization:
-  $$\text{Score}_{\text{norm}}(q, d) = \sigma(\text{logit}(q, d)) = \frac{1}{1 + e^{-\text{logit}(q, d)}}$$
+A comprehensive technical report covering all experiments, ablation studies, latency profiling, and training details is available in [**`docs/experiments.md`**](docs/experiments.md).
 
-#### Real-World Fusion Provenance:
-For query *"Consider a hard disk with a rotational speed of 15000 rpm... transfer data from 10 randomly located sectors in tracks 5, 12 and 7"*:
-- **BM25 Rank**: #1 (`BM25 Score: 229.71`)
-- **Dense Rank**: #1 (`Cosine Distance: 0.0861`)
-- **Fused RRF Score**: `0.0328`
-- **Cross-Encoder Score**: **`0.9944`** (Rank #1, Passed Gate on first attempt)
+### 1. Component Ablation Study (4 System Configurations)
+
+We evaluated the contribution of individual pipeline components across the benchmark test suite:
+
+| Configuration | Context Precision | Context Recall | Faithfulness | Answer Relevance | Composite Score | $\Delta$ vs Full System |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **a) Full System (Hybrid + Rerank + CRAG)** | **0.9500** | **0.8500** | **0.9029** | **0.9561** | **0.9147** | **Baseline** |
+| **b) Dense-Only Retrieval (No BM25/RRF)** | 0.9500 | 0.8500 | 0.9033 | 0.9589 | 0.9155 | `+0.0008` |
+| **c) Hybrid w/o Cross-Encoder Reranking** | 1.0000 | 0.8600 | 0.8955 | 0.9774 | 0.9332 | `+0.0185` |
+| **d) Hybrid + Rerank w/o CRAG Loop** | 0.9500 | 0.8500 | 0.9029 | 0.9561 | 0.9147 | `+0.0000` |
+
+*To reproduce: `python scripts/run_evaluation.py --ablation` (outputs saved to `data/eval/ablation_results.md`).*
 
 ---
 
-### 2. Corrective-RAG (CRAG) with Domain Expansion
-When students submit colloquial or underspecified queries (e.g. *"slow speed when network packet drops"*), the cross-encoder score drops below threshold $\tau = 0.50$. The system intercepts the workflow, expands the query using domain-specific ontology rules, and re-executes retrieval:
+### 2. Benchmark Dataset Scaling (20 vs 50 Questions)
+
+We expanded the benchmark from 20 to **50 verified questions** across all 10 GATE CS subjects proportionally:
+
+| Metric | 20-Question Set | 50-Question Set | $\Delta$ Shift | Notes |
+| :--- | :---: | :---: | :---: | :--- |
+| **Context Precision** | **0.9500** | **0.9533** | `+0.0033` | Consistently high precision across all subjects. |
+| **Context Recall** | **0.8500** | **0.6233** | `-0.2267` | Natural drop due to wider coverage of niche subtopics. |
+| **Faithfulness** | **0.9029** | **0.9030** | `+0.0001` | Generated statements remain firmly grounded. |
+| **Answer Relevance** | **0.9561** | **0.8927** | `-0.0634` | High semantic alignment across broader question styles. |
+| **Composite Score** | **0.9147** | **0.8431** | `-0.0716` | Robust 84.3% aggregate performance across 10 domains. |
+
+*To reproduce: `python scripts/run_evaluation.py --dataset_path ./data/eval/eval_dataset.json`.*
+
+---
+
+### 3. Per-Stage Latency Breakdown & Resource Footprint
+
+Execution latency was instrumented and profiled across the full 50-question benchmark:
+
+| Pipeline Stage | Mean (ms) | Median / p50 (ms) | p95 (ms) | Sample Count |
+| :--- | :---: | :---: | :---: | :---: |
+| **Classification** | **0.03** | 0.02 | 0.08 | 50 |
+| **Retrieval (BM25 + Dense)** | **58.32** | 38.25 | 83.35 | 50 |
+| **Cross-Encoder Reranking** | **442.75** | 109.34 | 575.30 | 50 |
+| **CRAG Reformulation** | **0.05** | 0.04 | 0.06 | 22 |
+| **LLM Generation** | **585.45** | 524.71 | 983.00 | 50 |
+| **Citation Mapping** | **142.98** | 139.94 | 184.09 | 50 |
+| **End-to-End Total** | **1235.86** | **1005.26** | **1497.35** | 50 |
+
+- **Hardware**: CPU Local Inference
+- **Peak Process Memory**: **566.03 MB RAM** (flat memory profile, zero leaks).
+- *To reproduce: `python scripts/profile_latency.py` (outputs saved to `data/eval/latency_report.md`).*
+
+---
+
+### 4. Fine-Tuning Specifications (4-Bit QLoRA)
+
+- **Base Model**: `Qwen/Qwen2.5-1.5B-Instruct`
+- **Training Dataset**: `data/train_gate_cs_dataset.jsonl` (30 ChatML samples, 80/20 train/val split).
+- **PEFT Method**: QLoRA (NF4 4-bit, Rank $r=16$, Alpha $\alpha=32$, Dropout $0.05$, 18.46M trainable params / 1.18%).
+- **Training Hyperparameters**: 4 epochs, effective batch size 8, learning rate $2 \times 10^{-4}$ with cosine decay.
+- **Loss Progression**:
+  - Epoch 1: Train $= 2.148$, Val $= 2.201$
+  - Epoch 2: Train $= 1.312$, Val $= 1.405$
+  - Epoch 3: Train $= 0.785$, Val $= 0.892$
+  - Epoch 4: Train $= \mathbf{0.418}$, Val $= \mathbf{0.634}$
+
+---
+
+## Technical Details
+
+### 1. Hybrid Retrieval & Reciprocal Rank Fusion ($k=60$)
+- **Lexical BM25 (`rank_bm25`)**: Preserves exact formula terms, variables, and acronyms.
+- **Dense Embeddings (`BAAI/bge-small-en-v1.5` in ChromaDB)**: Semantic matching over conceptual descriptions.
+- **RRF Formula**:
+  $$\text{RRF}(d) = \sum_{m \in \{\text{BM25}, \text{Dense}\}} \frac{1}{k + r_m(d)} \quad (k = 60)$$
+- **Cross-Encoder Attention (`cross-encoder/ms-marco-MiniLM-L-6-v2`)**: Evaluates token interaction pairs $q \times d$ simultaneously with sigmoid score normalization:
+  $$\text{Score}_{\text{norm}}(q, d) = \sigma(\text{logit}(q, d)) = \frac{1}{1 + e^{-\text{logit}(q, d)}}$$
+
+### 2. Corrective-RAG (CRAG) Reformulation
+When retrieval relevance drops below threshold $\tau = 0.50$, the system reformulates the query using ontology-guided technical terminology:
 
 ```
 [Original Query] "slow speed when network packet drops"
@@ -87,55 +153,37 @@ When students submit colloquial or underspecified queries (e.g. *"slow speed whe
   └── CRAG Interception: Triggering Domain Expansion (Method: domain_rule_expansion_hybrid)
   └── Rewritten Query: "slow speed when network packet drops TCP congestion control Slow Start Congestion Avoidance Fast Recovery cwnd ssthresh"
   └── Re-retrieved Context: networks_notes.md (TCP Congestion Control Algorithms)
-  └── Post-Reformulation Relevance: 0.9963  (PASSED ✅, Delta: +0.9826)
+  └── Post-Reformulation Relevance: 0.9963  (PASSED, Delta: +0.9826)
 ```
 
----
-
 ### 3. Sentence-Level Semantic Citation Mapping
-Instead of coarse document-level links, CALYPSO-RAG parses the generated response into individual claims and computes cosine similarity against retrieved chunk embeddings:
-- **Attribution Threshold**: $\ge 0.60$ cosine similarity with `bge-small-en-v1.5`.
-- **Negative Grounding Guarantee**: If retrieved evidence is insufficient, the system explicitly outputs *"The question is not covered in retrieved material"*, eliminating hallucinations.
+The generated response is split into candidate sentences and embedded using `bge-small-en-v1.5`. Sentences achieving $\ge 0.60$ cosine similarity with any retrieved chunk receive explicit provenance badges. If confidence is insufficient, negative grounding constraints prevent hallucinated output.
 
 ---
 
-## 📊 RAGAS Evaluation Results (20 GATE CS Benchmarks)
+## Limitations & Engineering Roadmap
 
-CALYPSO-RAG was evaluated across **20 handcrafted benchmark questions** covering Operating Systems, DBMS, Algorithms, Networks, Theory of Computation, and Compiler Design with gold-standard answers and keywords.
+1. **Benchmark Scale & Recall Coverage**:
+   - *Current State*: Scaling from 20 to 50 questions reduced Context Recall from 85.0% to 62.3% due to sparser representation of certain subtopics in the raw markdown notes.
+   - *Roadmap*: Expand the underlying corpus from 62 chunks to 250+ granular topic documents.
 
-| Metric | Target | Actual Score | Status | Definition |
-| :--- | :--- | :--- | :--- | :--- |
-| **Context Precision** | $\ge 0.75$ | **0.8500** (85.0%) | **✅ Passed** | Ratio of retrieved chunks that are relevant and high-confidence. |
-| **Context Recall** | $\ge 0.75$ | **0.7500** (75.0%) | **✅ Passed** | Ratio of gold-standard technical concepts present in retrieved context. |
-| **Faithfulness** | $\ge 0.75$ | **0.7815** (78.2%) | **✅ Passed** | Proportion of generated sentences backed by semantic source citations. |
-| **Answer Relevance** | $\ge 0.75$ | **0.8145** (81.5%) | **✅ Passed** | Dense semantic similarity between model response and ground truth. |
-| **Composite Overall** | $\ge 0.75$ | **0.7990** (79.9%) | **✅ Passed** | Unweighted mean across all 4 evaluation dimensions. |
+2. **CPU Inference Latency**:
+   - *Current State*: CPU inference takes ~1.0–1.5s per generation cycle (Cross-Encoder ~440 ms, generation ~585 ms).
+   - *Roadmap*: Deploying the fine-tuned adapter on an NVIDIA GPU using **vLLM** with PagedAttention or TensorRT-LLM to achieve sub-150ms latency.
 
-*Full per-question breakdown and metrics report available in [`data/eval/eval_summary.md`](data/eval/eval_summary.md) and [`data/eval/results.json`](data/eval/results.json).*
+3. **Multi-Modal Visual Reasoning (VQA)**:
+   - *Current State*: Diagrams (K-Maps, flip-flop schematics, DFA graphs) are transcribed into ASCII/LaTeX notation.
+   - *Roadmap*: Integrate a vision-language model (`Qwen2-VL-2B` or `InternVL`) for direct visual question processing.
 
----
-
-## ⚠️ Known Limitations & Engineering Roadmap
-
-Being transparent about technical trade-offs is core to solid engineering:
-
-1. **CPU Inference Latency vs GPU Tensor Parallelism**:
-   - *Current State*: Running 4-bit QLoRA on CPU takes ~1.0–1.5s per generation cycle.
-   - *Roadmap*: Deploying the fine-tuned adapter on an NVIDIA GPU using **vLLM** with PagedAttention or TensorRT-LLM to achieve sub-150ms token generation latency.
-
-2. **Multi-Modal Visual Question Answering (VQA)**:
-   - *Current State*: GATE CS problems containing digital logic circuits (K-Maps, Flip-Flops), pipeline space-time charts, or DFA state diagrams are currently transcribed into ASCII/LaTeX notation.
-   - *Roadmap*: Fine-tuning a multi-modal vision-language backbone (e.g. `Qwen2-VL-2B`) to ingest and parse architectural diagrams directly from scanned exam papers.
-
-3. **Automated Layout-Aware Document Ingestion**:
-   - *Current State*: The corpus uses structured Markdown files with clear topic and question boundaries (`## Question`).
-   - *Roadmap*: Integrating **Docling** or **Nougat** OCR pipelines to automatically extract tables, formulas, and questions from raw past-year PDF exam papers without manual curation.
+4. **Automated Layout-Aware Document Ingestion**:
+   - *Current State*: The corpus uses curated Markdown documents.
+   - *Roadmap*: Integrate **Docling** or **Nougat** OCR pipelines to parse raw past-year PDF exam papers directly.
 
 ---
 
-## 🚀 Quickstart & Reproduction Guide
+## Quickstart & Reproduction Guide
 
-### 1. Prerequisites & Installation
+### 1. Installation
 ```bash
 # Clone the repository
 git clone https://github.com/piyush23-eng/CALYPSO-RAG.git
@@ -149,191 +197,98 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Build the Dual Index
-Ingests markdown docs from `data/raw/` across all 10 GATE subjects (62 structured chunks) into BM25 and ChromaDB:
+### 2. Build Dual Index (BM25 + ChromaDB)
+Ingests markdown docs from `data/raw/` across all 10 GATE subjects (62 structured chunks):
 ```bash
 python scripts/build_index.py
 ```
 
-### 3. Run the Automated Test Suite (22 Tests)
+### 3. Run Automated Tests (22 Passing)
 ```bash
 pytest tests/ -v
 ```
 
-### 4. Run the Evaluation Harness
-Evaluates the full pipeline against all 20 benchmark questions and outputs results:
+### 4. Run Evaluation Suite & Experiments
 ```bash
+# 1. Run 50-Question Benchmark Evaluation
 python scripts/run_evaluation.py
+
+# 2. Run 4-Configuration Component Ablation Study
+python scripts/run_evaluation.py --ablation
+
+# 3. Run Per-Stage Latency and Resource Profiler
+python scripts/profile_latency.py
 ```
 
-### 5. Fine-Tune the Reasoning LLM on Real GATE CS Data (QLoRA)
-CALYPSO includes an end-to-end dataset extraction and 4-bit QLoRA fine-tuning pipeline:
+### 5. Fine-Tuning Pipeline (QLoRA)
 ```bash
-# 1. Extract ChatML instruction dataset from real 1990-2026 GATE CS archives
+# 1. Extract ChatML dataset from 1990-2026 GATE CS archives
 python scripts/prepare_training_data.py
 
-# 2. Run 4-Bit QLoRA Fine-Tuning (Requires CUDA GPU or run via Google Colab)
+# 2. Run 4-Bit QLoRA Fine-Tuning (Requires CUDA GPU or Google Colab)
 python scripts/train_qlora.py --epochs 4 --batch_size 2 --lr 2e-4
 ```
-*You can also open [`notebooks/train_calypso_qlora.ipynb`](notebooks/train_calypso_qlora.ipynb) in [Google Colab](https://colab.research.google.com/) for 1-click free T4 GPU training!*
+*A 1-click Google Colab notebook is available at [`notebooks/train_calypso_qlora.ipynb`](notebooks/train_calypso_qlora.ipynb).*
 
-### 6. Launch the Custom Editorial React + Tailwind Frontend & FastAPI Server
+### 6. Launch Application (FastAPI + React Frontend)
 ```bash
-# 1. Build the React production bundle (inside frontend/)
+# 1. Build React production bundle
 cd frontend && npm install && npm run build && cd ..
 
-# 2. Start the unified FastAPI backend server (serves API + static React frontend)
+# 2. Start unified FastAPI backend server (serves API + static frontend)
 uvicorn src.api.server:app --host 0.0.0.0 --port 8000
 ```
-*Open [http://localhost:8000](http://localhost:8000) in your browser!*
+*Open [http://localhost:8000](http://localhost:8000) in your browser.*
 
-### 7. Launch Vite Development Server (Hot Module Reloading)
-```bash
-# Terminal 1: Backend API
-uvicorn src.api.server:app --host 0.0.0.0 --port 8000
-
-# Terminal 2: Frontend Dev Server
-cd frontend && npm run dev
-```
-
-### 8. Launch the Terminal Showcase / Interactive Demo
+### 7. Interactive Terminal Demo
 ```bash
 # Multi-scenario showcase mode:
 python scripts/demo.py
 
-# Interactive terminal mode:
+# Interactive prompt mode:
 python scripts/demo.py --interactive
 ```
 
 ---
 
-## ⚡ Production Build & Serving Architecture
-
-CALYPSO-RAG uses a unified deployment design where the FastAPI backend serves both the REST API endpoints (`/api/query`, `/api/evaluation`, `/api/topics`) and mounts the compiled React + Vite frontend bundle directly at the root (`/`):
-
-1. **Frontend Compilation**: `cd frontend && npm install && npm run build` bundles TypeScript, Tailwind CSS, and KaTeX into optimized static assets in `frontend/dist/`.
-2. **Knowledge Ingestion**: `python scripts/build_index.py` constructs the persistent BM25 and ChromaDB dual indexes.
-3. **Unified Server**: `uvicorn src.api.server:app --host 0.0.0.0 --port 8000` serves the entire application as a single cohesive service.
-
----
-
-## 📂 Repository Structure
+## Repository Structure
 
 ```
 calypso-rag/
 ├── data/
-│   ├── raw/                              # Real GATE CS 1990-2026 archives & syllabus
-│   │   ├── algo_pyqs_1990_2026.md        # Algorithms PYQs (Floyd's Heap, Master Thm, DP)
-│   │   ├── algorithms_notes.md           # Algorithms Core Concepts
-│   │   ├── coa_math_pyqs_1990_2026.md    # COA & Math PYQs (Hard Disk, Pipelining, Cache, Bayes)
-│   │   ├── dbms_notes.md                 # DBMS Core Concepts
-│   │   ├── dbms_pyqs_1990_2026.md        # DBMS PYQs (Strict 2PL, Normalization, B+ Trees)
-│   │   ├── gate_cs_syllabus.md           # Complete GATE CS Syllabus
-│   │   ├── gate_pyq_archive.md           # Foundational PYQ Archive
-│   │   ├── networks_notes.md             # Computer Networks Core Concepts
-│   │   ├── networks_pyqs_1990_2026.md    # Networks PYQs (TCP Congestion, CSMA/CD, CIDR)
-│   │   ├── os_notes.md                   # Operating Systems Core Concepts
-│   │   ├── os_pyqs_1990_2026.md          # OS PYQs (EMAT, SRTF, Banker's, Belady's Anomaly)
-│   │   ├── toc_compiler_notes.md         # TOC & Compilers Core Concepts
-│   │   └── toc_compiler_pyqs_1990_2026.md# TOC & Compilers PYQs (Decidability, LR Parsers)
+│   ├── raw/                              # GATE CS 1990-2026 archives across 10 subjects
 │   ├── processed/                        # Persistent indices (ChromaDB + BM25 pickle)
-│   │   ├── bm25_index.pkl
-│   │   └── chroma_db/
-│   ├── train_gate_cs_dataset.jsonl       # Extracted ChatML instruction dataset for fine-tuning
-│   └── eval/                             # Benchmark dataset, results, and audit logs
-│       ├── eval_dataset.json             # 20 handcrafted GATE CS QA benchmarks
-│       ├── eval_summary.md               # Evaluation markdown report
-│       ├── results.json                  # Detailed evaluation scores
-│       └── crag_reformulation_log.jsonl  # CRAG audit trace logs
+│   ├── train_gate_cs_dataset.jsonl       # Extracted ChatML instruction dataset
+│   └── eval/                             # Benchmark evaluations and telemetry
+│       ├── eval_dataset.json             # 50 verified GATE CS benchmark questions
+│       ├── eval_summary_50q.md           # 50-question evaluation summary report
+│       ├── results_50q.json              # Raw per-question evaluation scores
+│       ├── ablation_results.md           # 4-configuration ablation study report
+│       ├── ablation_results.json         # Raw ablation metrics
+│       ├── latency_report.md             # Stage-level latency & resource profiling report
+│       └── crag_reformulation_log.jsonl  # CRAG self-correction audit logs
 ├── docs/
-│   └── assets/                           # UI Screenshots & Diagrams
-│       ├── hero_query_view.svg
-│       ├── answer_trace_view.svg
-│       └── evaluation_dashboard.svg
-├── frontend/                             # Custom React + TypeScript + Vite + Tailwind UI
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Hero.tsx                  # Display typography header, underlined input, chips
-│   │   │   ├── Marquee.tsx               # Infinite loop topic ticker with retrieval acceleration
-│   │   │   ├── AnswerSection.tsx         # KaTeX solution rendering, hover-reveal evidence cards
-│   │   │   ├── EvaluationView.tsx        # "The Numbers." large typographic comparison blocks
-│   │   │   └── Footer.tsx                # Studio footer with GitHub & evaluation route toggles
-│   │   ├── services/
-│   │   │   └── api.ts                    # Backend API client
-│   │   ├── types/
-│   │   │   └── index.ts                  # TypeScript interfaces
-│   │   ├── App.tsx                       # Main React App component
-│   │   └── index.css                     # Obsidian theme & custom animations
-│   ├── index.html
-│   ├── vite.config.ts
-│   └── package.json
+│   ├── experiments.md                    # Comprehensive experimental technical report
+│   └── assets/                           # Real 2x retina UI screenshots & diagrams
+├── frontend/                             # React + Vite + Tailwind frontend application
 ├── notebooks/
-│   └── train_calypso_qlora.ipynb         # 1-Click Google Colab 4-bit QLoRA fine-tuning notebook
-├── src/
-│   ├── api/                              # FastAPI REST API & Static UI Mount
-│   │   └── server.py
-│   ├── ingestion/                        # Phase 1: Topic-aware chunking & dual indexing
-│   │   ├── chunker.py
-│   │   └── indexer.py
-│   ├── retrieval/                        # Phases 2 & 3: Hybrid RRF, Cross-Encoder & CRAG
-│   │   ├── hybrid_retriever.py
-│   │   ├── reranker.py
-│   │   └── relevance_gate.py
-│   ├── generation/                       # Phase 4: Calypso Client & Sentence Citation Mapper
-│   │   ├── calypso_client.py
-│   │   └── citation_mapper.py
-│   ├── agent/                            # Phase 5: LangGraph Cyclic State Graph Orchestrator
-│   │   └── orchestrator.py
-│   └── evaluation/                       # Phase 6: RAGAS Metrics Calculation Engine
-│       └── evaluator.py
+│   └── train_calypso_qlora.ipynb         # 1-Click Google Colab T4 GPU fine-tuning notebook
 ├── scripts/
-│   ├── build_index.py                    # Ingestion & index builder CLI
-│   ├── prepare_training_data.py          # Dataset extractor from markdown to ChatML JSONL
-│   ├── train_qlora.py                    # 4-Bit QLoRA production fine-tuning script
-│   ├── test_retrieval.py                 # Phase 2 hybrid retrieval test script
-│   ├── test_relevance_gate.py            # Phase 3 CRAG demonstration script
-│   ├── test_generation.py                # Phase 4 generation & citation script
-│   ├── test_agent.py                     # Phase 5 LangGraph agent demonstration
-│   ├── run_evaluation.py                 # Phase 6 full evaluation harness runner
-│   └── demo.py                           # Phase 7 rich terminal interactive demo
-├── tests/                                # Full Pytest Test Suite (22 Unit & Integration Tests)
-│   ├── test_phase1.py
-│   ├── test_phase2.py
-│   ├── test_phase3.py
-│   ├── test_phase4.py
-│   ├── test_phase5.py
-│   └── test_phase6.py
-├── requirements.txt
+│   ├── build_index.py                    # Index builder (BM25 + ChromaDB)
+│   ├── capture_real_screenshots.py       # Playwright screenshot capture script
+│   ├── demo.py                           # Terminal demo runner
+│   ├── prepare_training_data.py          # Dataset extraction script
+│   ├── profile_latency.py                # Latency & resource profiler
+│   ├── run_evaluation.py                 # RAGAS evaluation harness with --ablation
+│   └── train_qlora.py                    # Standalone QLoRA trainer
+├── src/
+│   ├── agent/orchestrator.py             # LangGraph state machine with CRAG & telemetry
+│   ├── api/server.py                     # FastAPI backend REST API
+│   ├── evaluation/evaluator.py           # RAGAS evaluation engine
+│   ├── generation/calypso_client.py      # LLM reasoning client
+│   ├── ingestion/indexer.py              # DualIndexManager (BM25 + ChromaDB)
+│   └── retrieval/hybrid_retriever.py     # Hybrid RRF retriever with dense-only toggle
+├── tests/                                # Pytest test suite (22 unit & integration tests)
+├── requirements.txt                      # Python dependencies
 └── README.md
-```
-
----
-
-## 📐 Mathematical Formulation & Problem Taxonomy
-
-CALYPSO-RAG is formulated to solve multi-step analytical and quantitative problems across the entire GATE CS spectrum:
-
-| Problem Domain | Mathematical Formalism | Solution Guarantee |
-| :--- | :--- | :--- |
-| **Storage Hierarchy & Disks** | $T_{\text{total}} = \sum \Delta_{\text{track}} \cdot t_{\text{seek}} + N_{\text{tracks}} \cdot \left[ \frac{T_{\text{rev}}}{2} + \frac{T_{\text{rev}}}{S_{\text{track}}} \right]$ | Exact ms access time across rotational & seek trajectories |
-| **Paging & Virtual Memory** | $\text{EMAT} = h(t_{\text{tlb}} + t_{\text{m}}) + (1-h)(t_{\text{tlb}} + (k+1)t_{\text{m}})$ | Multi-level lookup penalties with TLB hit ratios |
-| **Asymptotic Recurrences** | $T(n) = a T(n/b) + \Theta(n^{\log_b a} \log^k n) \implies \Theta(n^{\log_b a} \log^{k+1} n)$ | Extended Master Theorem with poly-logarithmic factors |
-| **TCP Flow & Congestion** | $\text{cwnd}_{t+1} = 2 \cdot \text{cwnd}_t \text{ (Slow Start)}, \quad \text{cwnd}_{t+1} = \text{cwnd}_t + 1\text{ MSS (Avoidance)}$ | Step-by-step RTT window size tracking |
-| **Relational Normalization** | $X \rightarrow Y \implies X \text{ is superkey (BCNF) or } Y \text{ is prime (3NF)}$ | Attribute closure verification & canonical covers |
-| **Syntax Analysis** | $\text{LALR}(1) = \text{Merge } \text{LR}(1) \text{ cores} \implies \text{No S/R conflicts, potential R/R}$ | Deterministic parse table conflict analysis |
-
----
-
-## 📜 License & Citation
-
-Distributed under the **MIT License**. Created and engineered by **Piyush Pankaj** ([@piyush23-eng](https://github.com/piyush23-eng)).
-
-```bibtex
-@software{calypso_rag_2026,
-  author = {Piyush Pankaj},
-  title = {CALYPSO-RAG: Agentic Retrieval-Augmented Generation for GATE Computer Science},
-  year = {2026},
-  publisher = {GitHub},
-  url = {https://github.com/piyush23-eng/CALYPSO-RAG}
-}
 ```
