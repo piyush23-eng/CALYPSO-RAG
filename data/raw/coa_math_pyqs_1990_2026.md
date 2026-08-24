@@ -99,3 +99,46 @@ A diagnostic test for a disease has a 99% true positive rate (sensitivity) and a
 - Due to the low base rate (0.5%), a positive test result yields ~9.05% actual probability of disease.
 
 **Correct Answer**: (C) 9.04% (approx 9.05%)
+
+---
+
+## Question GATE-2022-COA-05: COA - Hard Disk Rotational Speed, Seek Time & Total Transfer Time
+**Topic**: Computer Organization and Architecture / Storage Hierarchy & Hard Disk Access Time
+**Question**:
+Consider a hard disk with a rotational speed of 15000 rpm. The time to move the read/write head from a track to its adjacent track is 1 millisecond. Initially, the head is on track 0. The number of sectors per track is 400. The sector size is 1024 bytes. It is necessary to transfer data from 10 randomly located sectors in each of the following tracks in the order: 5, 12 and 7. The total time for the data transfer (in milliseconds) from the hard disk is _______. (rounded off to one decimal place)
+
+**Key Technical Concepts**: Hard Disk Architecture, Rotational Speed (RPM to ms/rev), Average Rotational Latency ($T_{\text{rev}}/2$), Track-to-Track Seek Time, Sector Transfer Time ($T_{\text{rev}}/\text{sectors\_per\_track}$), Random Sector Access Time on a Track.
+
+**Step-by-Step Solution & Derivation**:
+1. **Rotational Calculations**:
+   - Rotational Speed $N = 15000\text{ rpm} = \frac{15000}{60}\text{ rev/sec} = 250\text{ rev/sec}$.
+   - Time for one full revolution:
+     $$T_{\text{rev}} = \frac{1}{250}\text{ sec} = \frac{1000}{250}\text{ ms} = 4\text{ ms}$$
+   - Average Rotational Latency (time to reach start of a random sector):
+     $$T_{\text{rot\_avg}} = \frac{T_{\text{rev}}}{2} = \frac{4\text{ ms}}{2} = 2\text{ ms}$$
+   - Sector Transfer Time (time for disk head to pass over 1 sector):
+     $$T_{\text{transfer\_sector}} = \frac{T_{\text{rev}}}{\text{Sectors per track}} = \frac{4\text{ ms}}{400} = 0.01\text{ ms}$$
+
+2. **Time to Read 10 Randomly Located Sectors on ONE Track**:
+   - For each randomly located sector on the track, the disk must rotate on average by half a revolution ($2\text{ ms}$) and then read the sector ($0.01\text{ ms}$):
+     $$T_{\text{sector\_access}} = T_{\text{rot\_avg}} + T_{\text{transfer\_sector}} = 2\text{ ms} + 0.01\text{ ms} = 2.01\text{ ms}$$
+   - For 10 randomly located sectors on that track:
+     $$T_{\text{track\_read}} = 10 \times 2.01\text{ ms} = 20.1\text{ ms}$$
+
+3. **Seek Time Calculations**:
+   - Time to move between adjacent tracks = $1\text{ ms/track}$.
+   - Head movement trajectory: $\text{Track 0} \rightarrow \text{Track 5} \rightarrow \text{Track 12} \rightarrow \text{Track 7}$.
+     - From Track 0 to Track 5: $|5 - 0| \times 1\text{ ms} = 5\text{ ms}$.
+     - From Track 5 to Track 12: $|12 - 5| \times 1\text{ ms} = 7\text{ ms}$.
+     - From Track 12 to Track 7: $|7 - 12| \times 1\text{ ms} = 5\text{ ms}$.
+   - Total Seek Time:
+     $$\text{Total Seek Time} = 5\text{ ms} + 7\text{ ms} + 5\text{ ms} = 17\text{ ms}$$
+
+4. **Total Data Transfer Time**:
+   - Data is read from 3 tracks (5, 12, and 7):
+     $$\text{Total Data Read Time} = 3 \times T_{\text{track\_read}} = 3 \times 20.1\text{ ms} = 60.3\text{ ms}$$
+   - Total System Time:
+     $$\text{Total Time} = \text{Total Seek Time} + \text{Total Data Read Time} = 17\text{ ms} + 60.3\text{ ms} = \mathbf{77.3\text{ ms}}$$
+
+**Correct Answer**: 77.3 ms (Range: 77.0 to 77.5 ms)
+

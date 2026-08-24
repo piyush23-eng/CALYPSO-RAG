@@ -77,20 +77,30 @@ class CalypsoAgentOrchestrator:
     # ── Node 1: Classify Query ───────────────────────────────────────────────
     def _classify_query_node(self, state: AgentState) -> Dict[str, Any]:
         q = state["query"].lower()
-        subject = "General CS"
+        subject = "Computer Organization and Architecture" if any(w in q for w in [
+            "disk", "hard disk", "rpm", "rotational", "seek", "track", "sector", "cylinder",
+            "cache", "pipeline", "pipelining", "tag", "set associative", "coa", "architecture",
+            "ieee 754", "booth", "addressing mode", "dma", "interrupt"
+        ]) else "General CS"
         
-        if any(w in q for w in ["page", "paging", "tlb", "process", "scheduling", "deadlock", "banker", "os", "semaphore"]):
+        if any(w in q for w in ["page", "paging", "tlb", "process", "scheduling", "deadlock", "banker", "os", "semaphore", "virtual memory", "belady", "emat"]):
             subject = "Operating Systems"
-        elif any(w in q for w in ["normal", "3nf", "bcnf", "acid", "serializ", "2pl", "sql", "dbms", "database", "transaction"]):
+        elif any(w in q for w in ["normal", "3nf", "bcnf", "acid", "serializ", "2pl", "sql", "dbms", "database", "transaction", "precedence graph", "fanout", "b+ tree"]):
             subject = "Database Management Systems"
-        elif any(w in q for w in ["heap", "sort", "graph", "tree", "recurrence", "complexity", "asymptotic", "algorithm"]):
+        elif any(w in q for w in ["heap", "sort", "graph", "tree", "recurrence", "complexity", "asymptotic", "algorithm", "knapsack", "dijkstra", "bellman", "floyd"]):
             subject = "Algorithms"
-        elif any(w in q for w in ["tcp", "ip", "packet", "congestion", "sliding window", "gbn", "sr", "subnet", "network"]):
+        elif any(w in q for w in ["tcp", "ip", "packet", "congestion", "sliding window", "gbn", "selective repeat", "subnet", "network", "csma", "cidr", "routing"]):
             subject = "Computer Networks"
-        elif any(w in q for w in ["grammar", "automata", "dfa", "nfa", "pda", "turing", "chomsky", "regular"]):
+        elif any(w in q for w in ["grammar", "automata", "dfa", "nfa", "pda", "turing", "chomsky", "regular", "pumping lemma", "decidab"]):
             subject = "Theory of Computation"
-        elif any(w in q for w in ["parse", "parser", "lr", "lalr", "syntax", "lexical", "compiler"]):
+        elif any(w in q for w in ["parse", "parser", "lr", "lalr", "slr", "syntax", "lexical", "compiler", "sdd", "s-attribute", "l-attribute"]):
             subject = "Compiler Design"
+        elif any(w in q for w in ["disk", "hard disk", "rpm", "rotational", "seek", "track", "sector", "cylinder", "cache", "pipeline", "pipelining", "tag", "set associative", "coa", "architecture", "ieee 754", "booth", "addressing mode", "dma", "interrupt"]):
+            subject = "Computer Organization and Architecture"
+        elif any(w in q for w in ["bayes", "probability", "poisson", "binomial", "calculus", "eigenvalue", "matrix rank", "determinant", "permutation", "eulerian", "hamiltonian", "pigeonhole", "lattice", "discrete math"]):
+            subject = "Engineering Mathematics"
+        elif any(w in q for w in ["multiplexer", "mux", "decoder", "k-map", "karnaugh", "flip-flop", "boolean algebra", "digital logic"]):
+            subject = "Digital Logic"
 
         return {
             "subject_hint": subject,
