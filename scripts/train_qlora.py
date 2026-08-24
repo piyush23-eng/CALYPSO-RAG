@@ -11,15 +11,31 @@ Usage:
 import os
 import argparse
 import torch
+
+# Ensure accelerate and torch backend are initialized before transformers imports
+try:
+    import accelerate
+except ImportError:
+    pass
+
 from datasets import load_dataset
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
-    TrainingArguments
 )
+
+try:
+    from trl import SFTConfig, SFTTrainer
+    TrainingConfigClass = SFTConfig
+except (ImportError, Exception):
+    try:
+        from transformers import TrainingArguments as TrainingConfigClass
+    except ImportError:
+        from transformers.training_args import TrainingArguments as TrainingConfigClass
+    from trl import SFTTrainer
+
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from trl import SFTTrainer
 
 
 def train_gate_model(
@@ -103,7 +119,7 @@ def train_gate_model(
 
     # 6. Training Arguments
     os.makedirs(output_dir, exist_ok=True)
-    training_args = TrainingArguments(
+    training_args = TrainingConfigClass(
         output_dir=output_dir,
         per_device_train_batch_size=batch_size,
         gradient_accumulation_steps=gradient_accumulation_steps,
