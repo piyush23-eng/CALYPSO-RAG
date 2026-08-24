@@ -128,7 +128,18 @@ Evaluates the full pipeline against all 20 benchmark questions and outputs resul
 python scripts/run_evaluation.py
 ```
 
-### 5. Launch the Custom Editorial React + Tailwind Frontend & FastAPI Server
+### 5. Fine-Tune the Reasoning LLM on Real GATE CS Data (QLoRA)
+CALYPSO includes an end-to-end dataset extraction and 4-bit QLoRA fine-tuning pipeline:
+```bash
+# 1. Extract ChatML instruction dataset from real 1990-2026 GATE CS archives
+python scripts/prepare_training_data.py
+
+# 2. Run 4-Bit QLoRA Fine-Tuning (Requires CUDA GPU or run via Google Colab)
+python scripts/train_qlora.py --epochs 4 --batch_size 2 --lr 2e-4
+```
+*You can also open [`notebooks/train_calypso_qlora.ipynb`](notebooks/train_calypso_qlora.ipynb) in [Google Colab](https://colab.research.google.com/) for 1-click free T4 GPU training!*
+
+### 6. Launch the Custom Editorial React + Tailwind Frontend & FastAPI Server
 ```bash
 # 1. Build the React production bundle (inside frontend/)
 cd frontend && npm install && npm run build && cd ..
