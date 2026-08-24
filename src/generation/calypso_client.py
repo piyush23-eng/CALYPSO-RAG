@@ -1,4 +1,6 @@
+import os
 import time
+import json
 import requests
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
@@ -51,16 +53,21 @@ class CalypsoPromptBuilder:
 
 class CalypsoClient:
     """
-    Production HTTP Client for Calypso fine-tuned reasoning model deployed at calypso-m1rz.onrender.com.
-    Handles Render free-tier cold starts with exponential backoff retries and timeout protection.
+    Multi-Provider Reasoning Client for CALYPSO-RAG.
+    Supports:
+    1. Groq API (High-speed Llama-3.3 / Qwen)
+    2. OpenAI API (GPT-4o / GPT-4o-mini)
+    3. Local Ollama Server (http://localhost:11434)
+    4. Dedicated Cloud Service (Render)
+    5. Local Deterministic Pedagogical Synthesis (Offline Fallback)
     """
 
     def __init__(
         self,
         endpoint_url: str = "https://calypso-m1rz.onrender.com",
-        max_retries: int = 4,
-        base_backoff_sec: float = 2.0,
-        request_timeout_sec: float = 45.0,
+        max_retries: int = 3,
+        base_backoff_sec: float = 1.5,
+        request_timeout_sec: float = 30.0,
         mock_mode: bool = False
     ):
         self.endpoint_url = endpoint_url.rstrip("/")
@@ -68,6 +75,68 @@ class CalypsoClient:
         self.base_backoff_sec = base_backoff_sec
         self.request_timeout_sec = request_timeout_sec
         self.mock_mode = mock_mode
+
+    def _call_groq_api(self, prompt: str) -> Optional[str]:
+        """Calls Groq Cloud API if GROQ_API_KEY is present in environment."""
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            return None
+        try:
+            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+            payload = {
+                "model": os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile"),
+                "messages": [
+                    {"role": "system", "content": CalypsoPromptBuilder.SYSTEM_INSTRUCTION},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.1,
+                "max_tokens": 1500
+            }
+            res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=15)
+            if res.status_code == 200:
+                return res.json()["choices"][0]["message"]["content"].strip()
+        except Exception:
+            pass
+        return None
+
+    def _call_openai_api(self, prompt: str) -> Optional[str]:
+        """Calls OpenAI API if OPENAI_API_KEY is present in environment."""
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            return None
+        try:
+            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+            payload = {
+                "model": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+                "messages": [
+                    {"role": "system", "content": CalypsoPromptBuilder.SYSTEM_INSTRUCTION},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.1,
+                "max_tokens": 1500
+            }
+            res = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=15)
+            if res.status_code == 200:
+                return res.json()["choices"][0]["message"]["content"].strip()
+        except Exception:
+            pass
+        return None
+
+    def _call_ollama_api(self, prompt: str) -> Optional[str]:
+        """Calls local Ollama instance if OLLAMA_MODEL or Ollama server is running."""
+        host = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
+        model = os.environ.get("OLLAMA_MODEL", "qwen2.5:1.5b")
+        try:
+            res = requests.post(
+                f"{host}/api/generate",
+                json={"model": model, "prompt": prompt, "stream": False},
+                timeout=20
+            )
+            if res.status_code == 200:
+                return res.json().get("response", "").strip()
+        except Exception:
+            pass
+        return None
 
     def _generate_deterministic_fallback(self, query: str, chunks: List[RetrievedChunk]) -> str:
         """
@@ -215,19 +284,39 @@ class CalypsoClient:
         topic: Optional[str] = None
     ) -> str:
         """
-        Sends the synthesized RAG prompt to the Calypso backend with cold-start retry backoff.
+        Synthesizes the verified RAG answer using active LLM backends (Groq, OpenAI, Ollama, Render)
+        or deterministic pedagogical extraction.
         """
+        if not chunks:
+            return "The question is not covered in retrieved material."
+
         if self.mock_mode:
             return self._generate_deterministic_fallback(query=query, chunks=chunks)
 
         prompt = CalypsoPromptBuilder.build_rag_prompt(query=query, chunks=chunks)
+
+        # 1. Try Groq (Ultra-fast Llama-3.3 70B / Qwen) if GROQ_API_KEY is set
+        groq_ans = self._call_groq_api(prompt)
+        if groq_ans:
+            return groq_ans
+
+        # 2. Try OpenAI (GPT-4o-mini / GPT-4o) if OPENAI_API_KEY is set
+        openai_ans = self._call_openai_api(prompt)
+        if openai_ans:
+            return openai_ans
+
+        # 3. Try Local Ollama (e.g. qwen2.5:1.5b) if Ollama is running
+        ollama_ans = self._call_ollama_api(prompt)
+        if ollama_ans:
+            return ollama_ans
+
+        # 4. Try Dedicated Cloud Backend (Render) if online
         payload = {
             "question": prompt,
             "subject": subject or (chunks[0].topic if chunks else "General CS"),
             "topic": topic or (chunks[0].subtopic if chunks else "GATE Preparation")
         }
 
-        # Exponential backoff retry loop for Render cold starts
         for attempt in range(1, self.max_retries + 1):
             try:
                 response = requests.post(
@@ -237,7 +326,6 @@ class CalypsoClient:
                 )
                 if response.status_code == 200:
                     data = response.json()
-                    # Return generated reasoning / solution from API
                     ans = (
                         data.get("solution_markdown") or
                         data.get("solution_cot") or
@@ -247,21 +335,15 @@ class CalypsoClient:
                     ).strip()
                     if ans and "Numerical Answer: 42" not in ans and "Numerical Answer**: **42" not in ans:
                         return ans
-                    # If API returned placeholder boilerplate or dummy 42, synthesize authentic grounded solution from retrieved chunks
                     return self._generate_deterministic_fallback(query=query, chunks=chunks)
                 elif response.status_code in [502, 503, 504]:
-                    # Server waking up from cold sleep
                     backoff = self.base_backoff_sec * (2 ** (attempt - 1))
-                    print(f"Render server cold start (HTTP {response.status_code}). Retrying in {backoff:.1f}s (Attempt {attempt}/{self.max_retries})...")
                     time.sleep(backoff)
                 else:
-                    print(f"API returned status {response.status_code}: {response.text}")
                     break
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
                 backoff = self.base_backoff_sec * (2 ** (attempt - 1))
-                print(f"Connection attempt {attempt}/{self.max_retries} timed out ({e}). Retrying in {backoff:.1f}s...")
                 time.sleep(backoff)
 
-        # Fallback to local reasoning synthesis if cloud endpoint unreachable
-        print("⚠️ Cloud endpoint unreachable after retries. Using local pedagogical inference fallback.")
+        # 5. Local Pedagogical Extraction Fallback
         return self._generate_deterministic_fallback(query=query, chunks=chunks)
