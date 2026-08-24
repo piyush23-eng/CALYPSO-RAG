@@ -25,15 +25,15 @@ When solving graduate-level engineering exams like **GATE Computer Science & Inf
 
 ### 1. Minimal Editorial Hero & Dynamic Marquee Ticker
 *Clean typography-first interface with active topic retrieval acceleration and one-click benchmark presets:*
-![CALYPSO-RAG Hero Interface](docs/assets/hero_query_view.svg)
+![CALYPSO-RAG Hero Interface](docs/assets/hero_query_view.png)
 
 ### 2. Step-by-Step Verified Solution & Hover-Reveal Evidence Cards
 *Mathematical KaTeX derivations backed by sentence-level semantic attribution tags and transparent retrieval trace logs:*
-![CALYPSO-RAG Answer & Retrieval Trace](docs/assets/answer_trace_view.svg)
+![CALYPSO-RAG Answer & Retrieval Trace](docs/assets/answer_trace_view.png)
 
 ### 3. "The Numbers." (/evaluation) Empirical Benchmark Dashboard
 *Head-to-head comparison across Base Qwen vs Fine-Tuned QLoRA vs CALYPSO-RAG with 20-question benchmark audit:*
-![CALYPSO-RAG Benchmark Dashboard](docs/assets/evaluation_dashboard.svg)
+![CALYPSO-RAG Benchmark Dashboard](docs/assets/evaluation_dashboard.png)
 
 ---
 
