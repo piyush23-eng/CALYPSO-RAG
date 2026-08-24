@@ -128,12 +128,26 @@ Evaluates the full pipeline against all 20 benchmark questions and outputs resul
 python scripts/run_evaluation.py
 ```
 
-### 5. Launch the Web UI (Streamlit)
+### 5. Launch the Custom Editorial React + Tailwind Frontend & FastAPI Server
 ```bash
-streamlit run app/app.py
+# 1. Build the React production bundle (inside frontend/)
+cd frontend && npm install && npm run build && cd ..
+
+# 2. Start the unified FastAPI backend server (serves API + static React frontend)
+uvicorn src.api.server:app --host 0.0.0.0 --port 8000
+```
+*Open [http://localhost:8000](http://localhost:8000) in your browser!*
+
+### 6. Launch Vite Development Server (Hot Reloading)
+```bash
+# Terminal 1: Backend API
+uvicorn src.api.server:app --host 0.0.0.0 --port 8000
+
+# Terminal 2: Frontend Dev Server
+cd frontend && npm run dev
 ```
 
-### 6. Launch the Terminal Showcase / Interactive Demo
+### 7. Launch the Terminal Showcase / Interactive Demo
 ```bash
 # Multi-scenario showcase mode:
 python scripts/demo.py
@@ -144,18 +158,12 @@ python scripts/demo.py --interactive
 
 ---
 
-## 🌐 1-Click Cloud Deployment
+## 🌐 Production Deployment Guide
 
-### Deploy to Streamlit Community Cloud (100% Free):
-1. Fork or push this repository to your GitHub.
-2. Go to [share.streamlit.io](https://share.streamlit.io/) and click **New app**.
-3. Select your repository `piyush23-eng/CALYPSO-RAG`, branch `main`, and main file path `app/app.py`.
-4. Click **Deploy!** 🚀
-
-### Deploy to Hugging Face Spaces (Streamlit SDK):
-1. Create a new Space on [Hugging Face Spaces](https://huggingface.co/spaces) with **Streamlit** SDK.
-2. Push this repo to your Space repository.
-3. Your live agentic RAG app will deploy automatically!
+### Deploy to Render / Railway / Fly.io (FastAPI + React):
+1. The FastAPI backend automatically serves the pre-compiled `frontend/dist` static assets at `/`.
+2. Set build command: `pip install -r requirements.txt && cd frontend && npm install && npm run build && cd .. && python scripts/build_index.py`
+3. Set start command: `uvicorn src.api.server:app --host 0.0.0.0 --port $PORT`
 
 ---
 
