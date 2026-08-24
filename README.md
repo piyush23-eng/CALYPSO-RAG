@@ -9,7 +9,31 @@
 [![Tests](https://img.shields.io/badge/pytest-22%2F22%20passing-brightgreen.svg)]()
 [![RAGAS Score](https://img.shields.io/badge/RAGAS%20Composite-79.9%25-success.svg)]()
 
-> An **Agentic Retrieval-Augmented Generation (RAG)** system engineered specifically for the **GATE Computer Science & Information Technology (CS/IT)** examination covering the complete syllabus from **1990 to 2026**. It combines domain-specialized fine-tuned LLM reasoning (`Qwen2.5-1.5B-Instruct` 4-bit QLoRA) with custom hybrid lexical/dense retrieval, Reciprocal Rank Fusion ($k=60$), Cross-Encoder reranking, Corrective Self-Correction (CRAG), sentence-level semantic attribution, and a custom motion-design editorial React frontend served via FastAPI.
+---
+
+## 💡 Why I Built CALYPSO-RAG
+
+When solving graduate-level engineering exams like **GATE Computer Science & Information Technology (CS/IT)**, general-purpose LLMs fail in two catastrophic ways:
+1. **Arithmetic & Boundary Hallucinations**: Models confidently guess numbers (e.g., hard disk seek trajectories, 2-level paging EMAT, or series sums $\sum \frac{h}{2^h}$) without calculating step-by-step invariants.
+2. **Semantic Drift in Technical Search**: Pure vector embeddings confuse similar-sounding terms (e.g., `Strict 2PL` vs `Rigorous 2PL` or `LR(0)` vs `SLR(1)` parsing conflicts) because acronyms collapse into similar vector spaces.
+
+**CALYPSO-RAG** was engineered from the ground up to solve this. It combines a **4-bit QLoRA fine-tuned reasoning model (`Qwen2.5-1.5B-Instruct`)** with a custom **Hybrid BM25 + Dense ChromaDB retrieval engine**, **Reciprocal Rank Fusion (RRF $k=60$)**, a **Cross-Encoder reranker (`ms-marco-MiniLM-L-6-v2`)**, and an autonomous **LangGraph Corrective-RAG (CRAG)** state machine that audits retrieval confidence before generating step-by-step mathematical proofs with sentence-level citations.
+
+---
+
+## 📸 Interface & System Preview
+
+### 1. Minimal Editorial Hero & Dynamic Marquee Ticker
+*Clean typography-first interface with active topic retrieval acceleration and one-click benchmark presets:*
+![CALYPSO-RAG Hero Interface](docs/assets/hero_query_view.svg)
+
+### 2. Step-by-Step Verified Solution & Hover-Reveal Evidence Cards
+*Mathematical KaTeX derivations backed by sentence-level semantic attribution tags and transparent retrieval trace logs:*
+![CALYPSO-RAG Answer & Retrieval Trace](docs/assets/answer_trace_view.svg)
+
+### 3. "The Numbers." (/evaluation) Empirical Benchmark Dashboard
+*Head-to-head comparison across Base Qwen vs Fine-Tuned QLoRA vs CALYPSO-RAG with 20-question benchmark audit:*
+![CALYPSO-RAG Benchmark Dashboard](docs/assets/evaluation_dashboard.svg)
 
 ---
 
@@ -35,32 +59,27 @@ flowchart TD
 
 ---
 
-## 🔬 Core Engineering Innovations
+## 🔬 Core Engineering Highlights
 
-### 1. Why Hybrid Retrieval Beats Dense-Only in Technical Exams
-Technical examination queries (like GATE CS) contain precision-critical acronyms, formulas, and domain notation (`EMAT`, `ssthresh`, `3NF`, `SRTF`, $O(n)$ heap sums, $15000\text{ rpm}$ disk seek) that frequently suffer from **semantic drift** in pure dense vector search.
-
-CALYPSO-RAG implements **Parallel Hybrid Retrieval** with **Reciprocal Rank Fusion (RRF $k=60$) from scratch**:
+### 1. Parallel Hybrid Retrieval & Scratch-Built RRF ($k=60$)
 - **Lexical BM25 (`rank_bm25`)**: Captures exact formula variables, acronyms, and algorithmic notation.
 - **Dense Vector Search (`BAAI/bge-small-en-v1.5` in persistent ChromaDB)**: Captures conceptual semantics and thematic intent.
-- **RRF Equation**:
+- **Reciprocal Rank Fusion Equation**:
   $$\text{RRF}(d) = \sum_{m \in \{\text{BM25}, \text{Dense}\}} \frac{1}{k + r_m(d)} \quad (k = 60)$$
-- **Cross-Encoder Attention (`cross-encoder/ms-marco-MiniLM-L-6-v2`)**: Scores top candidate chunk-query pairs with full cross-attention and sigmoid normalization:
+- **Cross-Encoder Full Attention (`cross-encoder/ms-marco-MiniLM-L-6-v2`)**: Evaluates token interaction pairs $q \times d$ simultaneously with sigmoid score normalization:
   $$\text{Score}_{\text{norm}}(q, d) = \sigma(\text{logit}(q, d)) = \frac{1}{1 + e^{-\text{logit}(q, d)}}$$
 
-#### Real-World Fusion Provenance Example:
+#### Real-World Fusion Provenance:
 For query *"Consider a hard disk with a rotational speed of 15000 rpm... transfer data from 10 randomly located sectors in tracks 5, 12 and 7"*:
 - **BM25 Rank**: #1 (`BM25 Score: 229.71`)
 - **Dense Rank**: #1 (`Cosine Distance: 0.0861`)
 - **Fused RRF Score**: `0.0328`
-- **Cross-Encoder Score**: **`0.9944`** (Rank #1)
+- **Cross-Encoder Score**: **`0.9944`** (Rank #1, Passed Gate on first attempt)
 
 ---
 
-### 2. Corrective-RAG (CRAG) for Exam Preparation
-Students often formulate queries colloquially or vaguely (e.g., *"slow speed when network packet drops"* or *"time speed heap"*). CALYPSO-RAG employs a **Corrective Relevance Gate** with domain-specific query expansion ontology.
-
-When the cross-encoder relevance score drops below threshold $\tau = 0.50$, the system automatically intercepts the flow, applies domain expansion, and re-executes hybrid retrieval.
+### 2. Corrective-RAG (CRAG) with Domain Expansion
+When students submit colloquial or underspecified queries (e.g. *"slow speed when network packet drops"*), the cross-encoder score drops below threshold $\tau = 0.50$. The system intercepts the workflow, expands the query using domain-specific ontology rules, and re-executes retrieval:
 
 ```
 [Original Query] "slow speed when network packet drops"
@@ -71,15 +90,12 @@ When the cross-encoder relevance score drops below threshold $\tau = 0.50$, the 
   └── Post-Reformulation Relevance: 0.9963  (PASSED ✅, Delta: +0.9826)
 ```
 
-Every reformulation attempt is persisted to `data/eval/crag_reformulation_log.jsonl` for auditability and fine-tuning data collection.
-
 ---
 
 ### 3. Sentence-Level Semantic Citation Mapping
-Instead of coarse document-level citations, CALYPSO-RAG parses the generated response into individual claims and computes cosine similarity against retrieved chunk embeddings:
-- **Embedding Model**: `BAAI/bge-small-en-v1.5`
-- **Attribution Threshold**: $\ge 0.60$ cosine similarity.
-- **Negative Grounding Guarantee**: If the retrieved context is insufficient, the prompt's strict negative constraint forces the model to state *"The question is not covered in retrieved material"*, preventing hallucinations.
+Instead of coarse document-level links, CALYPSO-RAG parses the generated response into individual claims and computes cosine similarity against retrieved chunk embeddings:
+- **Attribution Threshold**: $\ge 0.60$ cosine similarity with `bge-small-en-v1.5`.
+- **Negative Grounding Guarantee**: If retrieved evidence is insufficient, the system explicitly outputs *"The question is not covered in retrieved material"*, eliminating hallucinations.
 
 ---
 
@@ -96,6 +112,24 @@ CALYPSO-RAG was evaluated across **20 handcrafted benchmark questions** covering
 | **Composite Overall** | $\ge 0.75$ | **0.7990** (79.9%) | **✅ Passed** | Unweighted mean across all 4 evaluation dimensions. |
 
 *Full per-question breakdown and metrics report available in [`data/eval/eval_summary.md`](data/eval/eval_summary.md) and [`data/eval/results.json`](data/eval/results.json).*
+
+---
+
+## ⚠️ Known Limitations & Engineering Roadmap
+
+Being transparent about technical trade-offs is core to solid engineering:
+
+1. **CPU Inference Latency vs GPU Tensor Parallelism**:
+   - *Current State*: Running 4-bit QLoRA on CPU takes ~1.0–1.5s per generation cycle.
+   - *Roadmap*: Deploying the fine-tuned adapter on an NVIDIA GPU using **vLLM** with PagedAttention or TensorRT-LLM to achieve sub-150ms token generation latency.
+
+2. **Multi-Modal Visual Question Answering (VQA)**:
+   - *Current State*: GATE CS problems containing digital logic circuits (K-Maps, Flip-Flops), pipeline space-time charts, or DFA state diagrams are currently transcribed into ASCII/LaTeX notation.
+   - *Roadmap*: Fine-tuning a multi-modal vision-language backbone (e.g. `Qwen2-VL-2B`) to ingest and parse architectural diagrams directly from scanned exam papers.
+
+3. **Automated Layout-Aware Document Ingestion**:
+   - *Current State*: The corpus uses structured Markdown files with clear topic and question boundaries (`## Question`).
+   - *Roadmap*: Integrating **Docling** or **Nougat** OCR pipelines to automatically extract tables, formulas, and questions from raw past-year PDF exam papers without manual curation.
 
 ---
 
@@ -211,6 +245,11 @@ calypso-rag/
 │       ├── eval_summary.md               # Evaluation markdown report
 │       ├── results.json                  # Detailed evaluation scores
 │       └── crag_reformulation_log.jsonl  # CRAG audit trace logs
+├── docs/
+│   └── assets/                           # UI Screenshots & Diagrams
+│       ├── hero_query_view.svg
+│       ├── answer_trace_view.svg
+│       └── evaluation_dashboard.svg
 ├── frontend/                             # Custom React + TypeScript + Vite + Tailwind UI
 │   ├── src/
 │   │   ├── components/
@@ -298,4 +337,3 @@ Distributed under the **MIT License**. Created and engineered by **Piyush Pankaj
   url = {https://github.com/piyush23-eng/CALYPSO-RAG}
 }
 ```
-

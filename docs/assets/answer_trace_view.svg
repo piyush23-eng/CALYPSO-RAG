@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#141416"/>
+      <stop offset="100%" stop-color="#0e0e10"/>
+    </linearGradient>
+    <linearGradient id="badgeBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3d5afe"/>
+      <stop offset="100%" stop-color="#2a3eb1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="760" fill="#0a0a0a"/>
+  <rect x="0" y="0" width="1200" height="760" fill="none" stroke="#222" stroke-width="1"/>
+
+  <!-- Section Title -->
+  <text x="60" y="45" fill="#888" font-family="monospace" font-size="12" font-weight="600" letter-spacing="0.15em">LANGGRAPH AGENT OUTPUT · VERIFIED DERIVATION</text>
+  <text x="60" y="85" fill="#f5f5f0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800">Hard Disk Data Transfer Time Solution</text>
+
+  <!-- Telemetry Bar -->
+  <g transform="translate(60, 105)">
+    <rect x="0" y="0" width="1080" height="36" rx="6" fill="#141418" stroke="#222" stroke-width="1"/>
+    <text x="20" y="23" fill="#888" font-family="monospace" font-size="12">Domain: <tspan fill="#3d5afe" font-weight="bold">Computer Organization &amp; Architecture</tspan></text>
+    <text x="450" y="23" fill="#888" font-family="monospace" font-size="12">Rerank Score: <tspan fill="#00e676" font-weight="bold">0.9944 (Gate Passed)</tspan></text>
+    <text x="750" y="23" fill="#888" font-family="monospace" font-size="12">Attribution: <tspan fill="#f5f5f0" font-weight="bold">2 Verified Citations</tspan></text>
+    <text x="960" y="23" fill="#888" font-family="monospace" font-size="12">Latency: <tspan fill="#f5f5f0">34ms</tspan></text>
+  </g>
+
+  <!-- Main Derivation Card -->
+  <g transform="translate(60, 160)">
+    <rect x="0" y="0" width="680" height="420" rx="10" fill="url(#cardBg)" stroke="#26262a" stroke-width="1"/>
+    
+    <text x="25" y="35" fill="#3d5afe" font-family="monospace" font-size="13" font-weight="bold">1. ROTATIONAL &amp; SECTOR TRANSFER CALCULATIONS</text>
+    <text x="25" y="65" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Rotational Speed N = 15000 rpm = 250 rev/sec</text>
+    <text x="25" y="90" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• One Full Revolution Time: T_rev = 1000 / 250 = 4.0 ms</text>
+    <text x="25" y="115" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Average Rotational Latency: T_rot = 4.0 / 2 = 2.0 ms</text>
+    <text x="25" y="140" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Sector Transfer Time: T_transfer = 4.0 ms / 400 sectors = 0.01 ms</text>
+    <text x="25" y="165" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Time to read 10 random sectors on 1 track = 10 × (2.0 + 0.01) = 20.1 ms</text>
+
+    <line x1="25" y1="190" x2="655" y2="190" stroke="#222" stroke-width="1"/>
+
+    <text x="25" y="220" fill="#3d5afe" font-family="monospace" font-size="13" font-weight="bold">2. SEEK TIME TRAJECTORY (Track 0 → 5 → 12 → 7)</text>
+    <text x="25" y="245" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Track 0 → 5: |5 - 0| × 1 ms = 5 ms</text>
+    <text x="25" y="270" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Track 5 → 12: |12 - 5| × 1 ms = 7 ms</text>
+    <text x="25" y="295" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Track 12 → 7: |7 - 12| × 1 ms = 5 ms</text>
+    <text x="25" y="320" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Total Seek Time = 5 + 7 + 5 = 17.0 ms</text>
+
+    <line x1="25" y1="345" x2="655" y2="345" stroke="#222" stroke-width="1"/>
+
+    <text x="25" y="375" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="14" font-weight="bold">TOTAL TRANSFER TIME: 17.0 ms + (3 × 20.1 ms) = </text>
+    <rect x="420" y="355" width="110" height="32" rx="4" fill="#3d5afe"/>
+    <text x="475" y="376" fill="#ffffff" font-family="monospace" font-size="16" font-weight="900" text-anchor="middle">77.3 ms</text>
+  </g>
+
+  <!-- Hover-Reveal Source Receipt Cards (Right Side) -->
+  <g transform="translate(760, 160)">
+    <text x="0" y="0" fill="#888" font-family="monospace" font-size="12" font-weight="600">VERIFIED SOURCE RECEIPTS [2 CITATIONS]</text>
+
+    <!-- Source Card 1 -->
+    <rect x="0" y="15" width="380" height="195" rx="8" fill="#141417" stroke="#3d5afe" stroke-width="1.5"/>
+    <rect x="15" y="30" width="60" height="20" rx="3" fill="#1e2238"/>
+    <text x="45" y="44" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">[1] CITATION</text>
+    <text x="90" y="44" fill="#888" font-family="monospace" font-size="11">coa_math_pyqs_1990_2026.md</text>
+    
+    <text x="15" y="75" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="13" font-weight="bold">Question GATE-2022-COA-05: Hard Disk</text>
+    <text x="15" y="100" fill="#aaa" font-family="-apple-system, sans-serif" font-size="12">"Rotational Speed 15000 rpm -> T_rev = 4ms.</text>
+    <text x="15" y="120" fill="#aaa" font-family="-apple-system, sans-serif" font-size="12">Seek time 1ms/track. Track 0 -> 5 -> 12 -> 7."</text>
+    
+    <line x1="15" y1="145" x2="365" y2="145" stroke="#222" stroke-width="1"/>
+    <text x="15" y="168" fill="#3d5afe" font-family="monospace" font-size="11">Cosine Similarity: 0.9139 · BM25 Score: 229.71</text>
+    <text x="15" y="188" fill="#00e676" font-family="monospace" font-size="11">Cross-Encoder Sigmoid Confidence: 99.44%</text>
+
+    <!-- Source Card 2 -->
+    <rect x="0" y="225" width="380" height="175" rx="8" fill="#141417" stroke="#26262a" stroke-width="1"/>
+    <rect x="15" y="240" width="60" height="20" rx="3" fill="#1f1f24"/>
+    <text x="45" y="254" fill="#888" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">[2] CITATION</text>
+    <text x="90" y="254" fill="#888" font-family="monospace" font-size="11">gate_cs_syllabus.md</text>
+    
+    <text x="15" y="285" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="13" font-weight="bold">COA · Storage Hierarchy &amp; I/O Organization</text>
+    <text x="15" y="310" fill="#aaa" font-family="-apple-system, sans-serif" font-size="12">"Secondary storage organization, rotational latency,</text>
+    <text x="15" y="330" fill="#aaa" font-family="-apple-system, sans-serif" font-size="12">cylinder seek scheduling algorithms and bus transfers."</text>
+    
+    <line x1="15" y1="355" x2="365" y2="355" stroke="#222" stroke-width="1"/>
+    <text x="15" y="378" fill="#888" font-family="monospace" font-size="11">Cosine Similarity: 0.7640 · BM25 Score: 42.92</text>
+  </g>
+
+  <!-- Transparent Retrieval Trace Accordion (Bottom) -->
+  <g transform="translate(60, 600)">
+    <rect x="0" y="0" width="1080" height="120" rx="8" fill="#111114" stroke="#222" stroke-width="1"/>
+    <text x="25" y="30" fill="#f5f5f0" font-family="monospace" font-size="13" font-weight="bold">▼ RETRIEVAL TRACE &amp; RECIPROCAL RANK FUSION PROVENANCE</text>
+    <text x="25" y="58" fill="#aaa" font-family="monospace" font-size="12">• Top Lexical Match: <tspan fill="#fff">pyq_fb39395c82d6</tspan> (BM25: 229.7127, Rank #1 in coa_math_pyqs_1990_2026.md)</text>
+    <text x="25" y="80" fill="#aaa" font-family="monospace" font-size="12">• Top Dense Vector: <tspan fill="#fff">bge-small-en-v1.5</tspan> (Cosine Distance: 0.0861, Sim: 0.9139, Rank #1)</text>
+    <text x="25" y="102" fill="#aaa" font-family="monospace" font-size="12">• RRF Fusion (k=60): <tspan fill="#3d5afe">Score: 0.032787</tspan> ➔ Cross-Encoder Re-rank: <tspan fill="#00e676">0.9944</tspan> ➔ Gate Status: <tspan fill="#00e676">PASSED (0 reformulations)</tspan></text>
+  </g>
+</svg>
