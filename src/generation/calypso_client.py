@@ -88,6 +88,7 @@ class CalypsoClient:
             )
 
         # Synthesis based on top retrieved evidence
+        c_text = top_chunk.content.lower()
         if "disk" in c_text or "rotational" in c_text or "rpm" in c_text or "sector" in c_text:
             return (
                 "### 1. Rotational & Sector Transfer Calculations\n"

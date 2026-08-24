@@ -1,3 +1,4 @@
+import time
 from typing import TypedDict, List, Dict, Any, Optional, Literal
 from typing_extensions import Annotated
 from langgraph.graph import StateGraph, END
@@ -27,20 +28,21 @@ class AgentState(TypedDict):
     citations: List[Dict[str, Any]]
     final_answer: str
     telemetry: Dict[str, Any]
+    _start_perf_counter: float
 
 
 class CalypsoAgentOrchestrator:
     """
     Agentic Orchestrator built using LangGraph state graph.
     
-    Coordinates the 5-stage reasoning lifecycle:
+    Coordinates the 5-stage reasoning lifecycle with support for ablation experiments:
     1. classify_query -> identifies GATE CS domain & subject bounds.
-    2. retrieve -> executes hybrid lexical (BM25) & dense (BGE-Small) retrieval with RRF.
-    3. rerank -> applies cross-encoder full attention scoring (ms-marco-MiniLM).
+    2. retrieve -> executes hybrid lexical (BM25) & dense (BGE-Small) retrieval with RRF (or dense-only if ablated).
+    3. rerank -> applies cross-encoder full attention scoring (or bypassed if ablated).
     4. check_relevance -> evaluates top candidate relevance against gate threshold (0.50).
        └── [Conditional Edge]:
-           ├── If Score < 0.50 and count < 2 -> reformulate_and_retry (Loops back to retrieve)
-           └── If Score >= 0.50 or count >= 2 -> generate (Proceeds to generation)
+           ├── If Score < 0.50 and count < 2 and CRAG enabled -> reformulate_and_retry
+           └── Otherwise -> generate
     5. generate -> invokes fine-tuned Calypso client with strict negative grounding constraints.
     6. attach_citations -> maps sentence-level semantic attribution with cosine similarity.
     """
@@ -54,7 +56,10 @@ class CalypsoAgentOrchestrator:
         calypso_client: Optional[CalypsoClient] = None,
         citation_mapper: Optional[CitationMapper] = None,
         relevance_threshold: float = 0.50,
-        max_reformulations: int = 2
+        max_reformulations: int = 2,
+        enable_hybrid: bool = True,
+        enable_reranking: bool = True,
+        enable_crag: bool = True
     ):
         self.index_manager = index_manager or DualIndexManager()
         self.retriever = retriever or HybridRetriever(index_manager=self.index_manager, rrf_k=60)
@@ -68,7 +73,10 @@ class CalypsoAgentOrchestrator:
         self.calypso_client = calypso_client or CalypsoClient()
         self.citation_mapper = citation_mapper or CitationMapper(embedder=self.index_manager.embedder)
         self.relevance_threshold = relevance_threshold
-        self.max_reformulations = max_reformulations
+        self.max_reformulations = max_reformulations if enable_crag else 0
+        self.enable_hybrid = enable_hybrid
+        self.enable_reranking = enable_reranking
+        self.enable_crag = enable_crag
 
         # Compile the LangGraph agent state machine
         self.graph = self._build_graph()
@@ -76,6 +84,7 @@ class CalypsoAgentOrchestrator:
 
     # ── Node 1: Classify Query ───────────────────────────────────────────────
     def _classify_query_node(self, state: AgentState) -> Dict[str, Any]:
+        t_start = time.perf_counter()
         q = state["query"].lower()
         subject = "Computer Organization and Architecture" if any(w in q for w in [
             "disk", "hard disk", "rpm", "rotational", "seek", "track", "sector", "cylinder",
@@ -102,36 +111,85 @@ class CalypsoAgentOrchestrator:
         elif any(w in q for w in ["multiplexer", "mux", "decoder", "k-map", "karnaugh", "flip-flop", "boolean algebra", "digital logic"]):
             subject = "Digital Logic"
 
+        timing = dict(state.get("telemetry", {}).get("timing", {}))
+        timing["classification_ms"] = round((time.perf_counter() - t_start) * 1000.0, 2)
+
         return {
             "subject_hint": subject,
             "reformulated_query": state.get("reformulated_query") or state["query"],
             "reformulation_count": state.get("reformulation_count", 0),
-            "telemetry": {"classified_subject": subject}
+            "telemetry": {
+                **state.get("telemetry", {}),
+                "classified_subject": subject,
+                "timing": timing
+            }
         }
 
     # ── Node 2: Retrieve ─────────────────────────────────────────────────────
     def _retrieve_node(self, state: AgentState) -> Dict[str, Any]:
+        t_start = time.perf_counter()
         active_query = state["reformulated_query"]
-        fused = self.retriever.retrieve(
-            query=active_query,
-            top_candidates_per_source=20,
-            fused_top_k=10
-        )
-        return {"retrieval_results": fused}
+        
+        if self.enable_hybrid:
+            fused = self.retriever.retrieve(
+                query=active_query,
+                top_candidates_per_source=20,
+                fused_top_k=10
+            )
+        else:
+            fused = self.retriever.retrieve_dense_only(
+                query=active_query,
+                top_k=10
+            )
+            
+        elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
+        timing = dict(state.get("telemetry", {}).get("timing", {}))
+        timing["retrieval_ms"] = timing.get("retrieval_ms", 0.0) + elapsed_ms
+
+        return {
+            "retrieval_results": fused,
+            "telemetry": {
+                **state.get("telemetry", {}),
+                "timing": timing
+            }
+        }
 
     # ── Node 3: Rerank ───────────────────────────────────────────────────────
     def _rerank_node(self, state: AgentState) -> Dict[str, Any]:
+        t_start = time.perf_counter()
         active_query = state["reformulated_query"]
         candidates = state["retrieval_results"]
-        reranked = self.reranker.rerank(query=active_query, chunks=candidates, top_k=3)
-        return {"rerank_results": reranked}
+        
+        if self.enable_reranking:
+            reranked = self.reranker.rerank(query=active_query, chunks=candidates, top_k=3)
+        else:
+            reranked = list(candidates[:3])
+            for c in reranked:
+                if c.rerank_score is None:
+                    c.rerank_score = c.dense_score if c.dense_score is not None else 0.50
+
+        elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
+        timing = dict(state.get("telemetry", {}).get("timing", {}))
+        timing["rerank_ms"] = timing.get("rerank_ms", 0.0) + elapsed_ms
+
+        return {
+            "rerank_results": reranked,
+            "telemetry": {
+                **state.get("telemetry", {}),
+                "timing": timing
+            }
+        }
 
     # ── Node 4: Check Relevance ──────────────────────────────────────────────
     def _check_relevance_node(self, state: AgentState) -> Dict[str, Any]:
         reranked = state["rerank_results"]
         max_score = reranked[0].rerank_score if (reranked and reranked[0].rerank_score is not None) else 0.0
-        passed = max_score >= self.relevance_threshold
         
+        if self.enable_crag:
+            passed = max_score >= self.relevance_threshold
+        else:
+            passed = True  # CRAG disabled: bypass gate directly
+
         return {
             "relevance_score": max_score,
             "passed_gate": passed,
@@ -140,9 +198,14 @@ class CalypsoAgentOrchestrator:
 
     # ── Node 5: Reformulate & Retry ──────────────────────────────────────────
     def _reformulate_node(self, state: AgentState) -> Dict[str, Any]:
+        t_start = time.perf_counter()
         count = state["reformulation_count"] + 1
         rewritten, method = self.relevance_gate.reformulate_query(query=state["query"], attempt=count)
-        
+        elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
+
+        timing = dict(state.get("telemetry", {}).get("timing", {}))
+        timing["crag_ms"] = timing.get("crag_ms", 0.0) + elapsed_ms
+
         return {
             "reformulated_query": rewritten,
             "reformulation_count": count,
@@ -151,12 +214,14 @@ class CalypsoAgentOrchestrator:
                 f"reformulation_attempt_{count}": {
                     "rewritten_query": rewritten,
                     "method": method
-                }
+                },
+                "timing": timing
             }
         }
 
     # ── Node 6: Generate ─────────────────────────────────────────────────────
     def _generate_node(self, state: AgentState) -> Dict[str, Any]:
+        t_start = time.perf_counter()
         reranked = state["rerank_results"]
         subject = state["subject_hint"]
         
@@ -165,10 +230,22 @@ class CalypsoAgentOrchestrator:
             chunks=reranked,
             subject=subject
         )
-        return {"generation": answer_text}
+        elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
+
+        timing = dict(state.get("telemetry", {}).get("timing", {}))
+        timing["generation_ms"] = elapsed_ms
+
+        return {
+            "generation": answer_text,
+            "telemetry": {
+                **state.get("telemetry", {}),
+                "timing": timing
+            }
+        }
 
     # ── Node 7: Attach Citations ─────────────────────────────────────────────
     def _attach_citations_node(self, state: AgentState) -> Dict[str, Any]:
+        t_start = time.perf_counter()
         reranked = state["rerank_results"]
         ans = state["generation"]
         
@@ -187,7 +264,13 @@ class CalypsoAgentOrchestrator:
             answer_text=ans,
             gated_result=mock_gated
         )
-        
+        elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
+        total_e2e_ms = round((time.perf_counter() - state.get("_start_perf_counter", t_start)) * 1000.0, 2)
+
+        timing = dict(state.get("telemetry", {}).get("timing", {}))
+        timing["citations_ms"] = elapsed_ms
+        timing["total_e2e_ms"] = total_e2e_ms
+
         return {
             "citations": [c.model_dump() for c in output.citations],
             "final_answer": output.answer_text,
@@ -195,7 +278,8 @@ class CalypsoAgentOrchestrator:
             "telemetry": {
                 **state.get("telemetry", {}),
                 "confidence": output.confidence,
-                "citation_coverage": output.retrieval_metadata.get("citation_coverage", 0.0)
+                "citation_coverage": output.retrieval_metadata.get("citation_coverage", 0.0),
+                "timing": timing
             }
         }
 
@@ -203,10 +287,10 @@ class CalypsoAgentOrchestrator:
     def _route_after_relevance_check(self, state: AgentState) -> Literal["generate", "reformulate_and_retry"]:
         """
         Agentic Conditional Edge:
-        If relevance score >= threshold OR max reformulation attempts reached -> Generate.
+        If relevance score >= threshold OR max reformulation attempts reached OR CRAG disabled -> Generate.
         Otherwise -> Reformulate and loop back to Retrieve.
         """
-        if state["passed_gate"] or state["reformulation_count"] >= self.max_reformulations:
+        if not self.enable_crag or state["passed_gate"] or state["reformulation_count"] >= self.max_reformulations:
             return "generate"
         return "reformulate_and_retry"
 
@@ -254,6 +338,7 @@ class CalypsoAgentOrchestrator:
         """
         Runs the LangGraph agent state graph to completion for a user query.
         """
+        t0 = time.perf_counter()
         initial_state: AgentState = {
             "query": query,
             "reformulated_query": query,
@@ -267,7 +352,8 @@ class CalypsoAgentOrchestrator:
             "generation": "",
             "citations": [],
             "final_answer": "",
-            "telemetry": {}
+            "telemetry": {"timing": {}},
+            "_start_perf_counter": t0
         }
         return self.app.invoke(initial_state)
 

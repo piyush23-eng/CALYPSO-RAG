@@ -114,6 +114,39 @@ class HybridRetriever:
 
         return fused_chunks
 
+    def retrieve_dense_only(
+        self,
+        query: str,
+        top_k: int = 10,
+        topic_filter: Optional[str] = None
+    ) -> List[RetrievedChunk]:
+        """
+        Executes Dense-only vector search without lexical BM25 or RRF fusion.
+        """
+        dense_results = self.index_manager.search_dense(query=query, top_k=top_k, topic_filter=topic_filter)
+        chunks: List[RetrievedChunk] = []
+        for rank_idx, item in enumerate(dense_results):
+            score = float(item["score"])
+            chunks.append(RetrievedChunk(
+                chunk_id=item["chunk_id"],
+                content=item["content"],
+                topic=item["topic"],
+                subtopic=item["subtopic"],
+                source_type=item["source_type"],
+                source_file=item["source_file"],
+                bm25_score=None,
+                bm25_rank=None,
+                dense_score=score,
+                dense_rank=rank_idx + 1,
+                rrf_score=None,
+                metadata={
+                    "retrieval_method": "dense_only",
+                    "found_in_bm25": False,
+                    "found_in_dense": True
+                }
+            ))
+        return chunks
+
     def retrieve(
         self,
         query: str,

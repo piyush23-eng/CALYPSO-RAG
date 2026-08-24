@@ -1,0 +1,34 @@
+{
+  "full_system": {
+    "name": "a) Full System (Hybrid + Rerank + CRAG)",
+    "mean_context_precision": 0.95,
+    "mean_context_recall": 0.85,
+    "mean_faithfulness": 0.9029,
+    "mean_answer_relevance": 0.9561,
+    "mean_overall_score": 0.9147
+  },
+  "dense_only": {
+    "name": "b) Dense-Only Retrieval (No BM25/RRF)",
+    "mean_context_precision": 0.95,
+    "mean_context_recall": 0.85,
+    "mean_faithfulness": 0.9033,
+    "mean_answer_relevance": 0.9589,
+    "mean_overall_score": 0.9155
+  },
+  "no_rerank": {
+    "name": "c) Hybrid Retrieval w/o Cross-Encoder Reranking",
+    "mean_context_precision": 1.0,
+    "mean_context_recall": 0.86,
+    "mean_faithfulness": 0.8955,
+    "mean_answer_relevance": 0.9774,
+    "mean_overall_score": 0.9332
+  },
+  "no_crag": {
+    "name": "d) Hybrid + Rerank w/o CRAG Correction Loop",
+    "mean_context_precision": 0.95,
+    "mean_context_recall": 0.85,
+    "mean_faithfulness": 0.9029,
+    "mean_answer_relevance": 0.9561,
+    "mean_overall_score": 0.9147
+  }
+}
