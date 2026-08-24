@@ -114,7 +114,7 @@ def train_gate_model(
     # 5. Load and Format Dataset (ChatML format)
     dataset = load_dataset("json", data_files=data_path)
 
-    def format_chatml_prompts(batch):
+    def tokenize_chatml(batch):
         formatted_texts = []
         for inst, inp, out in zip(batch["instruction"], batch["input"], batch["output"]):
             chatml_text = (
@@ -123,38 +123,46 @@ def train_gate_model(
                 f"<|im_start|>assistant\n{out}<|im_end|>"
             )
             formatted_texts.append(chatml_text)
-        return {"text": formatted_texts}
+        
+        tokenized = tokenizer(
+            formatted_texts,
+            truncation=True,
+            max_length=1024,
+            padding=False
+        )
+        tokenized["labels"] = [ids.copy() for ids in tokenized["input_ids"]]
+        return tokenized
 
-    formatted_dataset = dataset.map(format_chatml_prompts, batched=True)
+    tokenized_dataset = dataset.map(tokenize_chatml, batched=True, remove_columns=dataset["train"].column_names)
 
-    # 6. Training Arguments
+    # 6. Training Arguments & Standard HuggingFace Trainer
     os.makedirs(output_dir, exist_ok=True)
-    training_kwargs = {
-        "output_dir": output_dir,
-        "per_device_train_batch_size": batch_size,
-        "gradient_accumulation_steps": gradient_accumulation_steps,
-        "learning_rate": learning_rate,
-        "num_train_epochs": num_epochs,
-        "logging_steps": 1,
-        "fp16": use_cuda and not torch.cuda.is_bf16_supported(),
-        "bf16": use_cuda and torch.cuda.is_bf16_supported(),
-        "save_strategy": "epoch",
-        "report_to": "none"
-    }
+    from transformers import TrainingArguments, Trainer, DataCollatorForSeq2Seq
 
-    try:
-        training_args = TrainingConfigClass(**training_kwargs)
-    except Exception:
-        from transformers import TrainingArguments
-        training_args = TrainingArguments(**training_kwargs)
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        per_device_train_batch_size=batch_size,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        learning_rate=learning_rate,
+        num_train_epochs=num_epochs,
+        logging_steps=1,
+        fp16=use_cuda and not torch.cuda.is_bf16_supported(),
+        bf16=use_cuda and torch.cuda.is_bf16_supported(),
+        save_strategy="epoch",
+        report_to="none"
+    )
 
-    # 7. Supervised Fine-Tuning (SFTTrainer)
-    trainer = SFTTrainer(
-        model=model,
-        train_dataset=formatted_dataset["train"],
-        dataset_text_field="text",
-        peft_config=peft_config,
+    data_collator = DataCollatorForSeq2Seq(
         tokenizer=tokenizer,
+        model=model,
+        pad_to_multiple_of=8
+    )
+
+    # 7. Supervised Fine-Tuning
+    trainer = Trainer(
+        model=model,
+        train_dataset=tokenized_dataset["train"],
+        data_collator=data_collator,
         args=training_args
     )
 
