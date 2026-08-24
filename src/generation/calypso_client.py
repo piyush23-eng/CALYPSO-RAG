@@ -319,6 +319,61 @@ class CalypsoClient:
             f"**Correct Answer**: {L_min_bits:.0f} bits ({L_min_bytes:.1f} bytes)"
         )
 
+    def _solve_poset_total_orders_dynamic(self, query: str, top_chunk: RetrievedChunk) -> Optional[str]:
+        """Dynamically computes linear extensions / total orders containing a given poset relation."""
+        import itertools
+        q_lower = query.lower()
+        if not any(w in q_lower for w in ["total order", "total orders", "linear extension", "partial order", "poset"]):
+            return None
+
+        # Extract base set elements, e.g. {1, 2, 3, 4} or {1,2,3,4}
+        set_match = re.search(r'set\s*\{([^}]+)\}', query, re.IGNORECASE) or re.search(r'\{([0-9a-zA-Z,\s]+)\}', query)
+        if not set_match:
+            return None
+        raw_elems = [e.strip() for e in set_match.group(1).split(",") if e.strip()]
+        if not raw_elems or len(raw_elems) > 8:
+            return None
+
+        # Extract relation pairs, e.g. (1,2), (3,2), (3,4)
+        pairs = re.findall(r'\(\s*([0-9a-zA-Z]+)\s*,\s*([0-9a-zA-Z]+)\s*\)', query)
+        strict_pairs = [(u, v) for u, v in pairs if u != v and u in raw_elems and v in raw_elems]
+        if not strict_pairs:
+            return None
+
+        # Find all valid linear extensions (permutations)
+        valid_orders = []
+        for perm in itertools.permutations(raw_elems):
+            pos_map = {elem: idx for idx, elem in enumerate(perm)}
+            is_valid = True
+            for u, v in strict_pairs:
+                if pos_map[u] >= pos_map[v]:
+                    is_valid = False
+                    break
+            if is_valid:
+                valid_orders.append(perm)
+
+        total_count = len(valid_orders)
+        pairs_str = ", ".join([f"${u} < {v}$" for u, v in strict_pairs])
+        orders_str = "\n".join([f"     - $({', '.join(map(str, o))})$" for o in valid_orders])
+
+        return (
+            f"### 1. Conceptual Framework & Theoretical Formulation\n"
+            f"- **Domain**: Discrete Mathematics / Set Theory & Partial Orders (Posets)\n"
+            f"- **Definition**: A **Total Order** (or **Linear Extension**) on a poset $(S, P)$ is a permutation of elements of $S$ that preserves all partial ordering constraints: whenever $(u, v) \\in P$, $u$ must strictly precede $v$ in the sequence.\n"
+            f"- **Given Set**: $S = \\{{{', '.join(raw_elems)}\\}}$\n"
+            f"- **Strict Ordering Constraints**: {pairs_str}\n\n"
+            f"### 2. Step-by-Step Derivation & Invariant Analysis\n"
+            f"1. **Constraint Analysis**:\n"
+            f"   - Any valid linear extension $(a_1, a_2, \\dots, a_n)$ must satisfy:\n"
+            f"     " + "\n     ".join([f"- ${u}$ must appear before ${v}$." for u, v in strict_pairs]) + "\n\n"
+            f"2. **Combinatorial Enumeration of Valid Total Orders (Topological Sorts)**:\n"
+            f"{orders_str}\n\n"
+            f"3. **Count Evaluation**:\n"
+            f"   - Total number of linear extensions containing $P$ = $\\mathbf{{{total_count}}}$.\n\n"
+            f"### 3. Final Verified Conclusion\n"
+            f"**Correct Answer**: {total_count}"
+        )
+
     def _generate_deterministic_fallback(self, query: str, chunks: List[RetrievedChunk]) -> str:
         """
         Local deterministic reasoning synthesis used when offline or in local inference mode.
@@ -331,6 +386,10 @@ class CalypsoClient:
         content = top_chunk.content.strip()
 
         # 0. Dynamic Parameter Mathematical Solvers (Executes exact formulas for custom numbers)
+        poset_ans = self._solve_poset_total_orders_dynamic(query, top_chunk)
+        if poset_ans:
+            return poset_ans
+
         sliding_ans = self._solve_sliding_window_dynamic(query, top_chunk)
         if sliding_ans:
             return sliding_ans
