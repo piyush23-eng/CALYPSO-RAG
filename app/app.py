@@ -138,26 +138,19 @@ if submit_btn and user_query.strip():
     reform_count = state.get("reformulation_count", 0)
     is_low_conf = state.get("is_low_confidence", False)
 
-    badge_class = {
-        "Operating Systems": "badge-os",
-        "Database Management Systems": "badge-dbms",
-        "Algorithms": "badge-algo",
-        "Computer Networks": "badge-cn",
-        "Theory of Computation": "badge-toc",
-        "Compiler Design": "badge-comp"
-    }.get(subject, "badge-os")
-
-    st.markdown(f"""
-    <div style="margin-bottom: 1rem;">
-        <span class="metric-badge {badge_class}">Subject: {subject}</span>
-        <span class="metric-badge" style="background-color: {'#E8F5E9' if passed_gate else '#FFEBEE'}; color: {'#2E7D32' if passed_gate else '#C62828'};">
-            Relevance: {relevance_score:.4f} ({'PASSED' if passed_gate else 'LOW CONFIDENCE'})
-        </span>
-        <span class="metric-badge" style="background-color: {'#E0F7FA' if reform_count > 0 else '#F5F5F5'}; color: {'#006064' if reform_count > 0 else '#616161'};">
-            CRAG Self-Correction Loops: {reform_count}
-        </span>
-    </div>
-    """, unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.info(f"📚 **Subject**: {subject}")
+    with col2:
+        if passed_gate:
+            st.success(f"🎯 **Relevance**: `{relevance_score:.4f}` (Gate Passed)")
+        else:
+            st.warning(f"⚠️ **Relevance**: `{relevance_score:.4f}` (Low Confidence)")
+    with col3:
+        if reform_count > 0:
+            st.warning(f"🔄 **CRAG Loops**: {reform_count} Reformulations")
+        else:
+            st.success("✅ **CRAG**: Passed on 1st Attempt")
 
     # Step 2: CRAG Self-Correction Trace (if triggered)
     if reform_count > 0:
@@ -167,27 +160,32 @@ if submit_btn and user_query.strip():
 
     # Step 3: Calypso Verified Solution
     st.subheader("📝 Verified Step-by-Step Solution")
-    st.markdown(state.get("final_answer", ""))
+    with st.container(border=True):
+        st.markdown(state.get("final_answer", ""))
 
     # Step 4: Sentence-Level Citations & Attribution
     citations = state.get("citations", [])
     if citations:
         st.subheader(f"🔗 Sentence-Level Attribution ({len(citations)} Verified Citations)")
         for idx, cit in enumerate(citations, 1):
-            st.markdown(f"""
-            <div class="citation-card">
-                <b>[{idx}] Answer Sentence Claim:</b> <i>"{cit['sentence']}"</i><br>
-                <small><b>Cited:</b> <code>[{cit['chunk_id']}]</code> in <b>{cit['source_file']}</b> (Topic: {cit['topic']}) | <b>Cosine Similarity:</b> {cit['similarity_score']:.4f}</small>
-            </div>
-            """, unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown(f"**[{idx}] Answer Sentence Claim:**")
+                st.markdown(f"> *\"{cit['sentence']}\"*")
+                col_a, col_b, col_c = st.columns([2, 2, 1])
+                with col_a:
+                    st.caption(f"📁 **Source**: `{cit['source_file']}`")
+                with col_b:
+                    st.caption(f"🏷️ **Chunk ID**: `{cit['chunk_id']}` ({cit['topic']})")
+                with col_c:
+                    st.caption(f"📐 **Similarity**: `{cit['similarity_score']:.4f}`")
     else:
-        st.caption("No individual sentences matched citation threshold (≥ 0.60).")
+        st.info("ℹ️ No individual sentences matched citation threshold (≥ 0.60).")
 
     # Step 5: Retrieved Context Evidence Cards
     with st.expander("📚 View Top Retrieved Context Evidence Chunks", expanded=False):
         chunks = state.get("rerank_results", [])
         for c_idx, c in enumerate(chunks, 1):
-            st.markdown(f"**Chunk [{c_idx}] — `{c.chunk_id}`** ({c.source_file} • {c.topic} / {c.subtopic})")
-            st.caption(f"Cross-Encoder Relevance Score: {c.rerank_score:.4f} | RRF Score: {c.rrf_score:.4f}")
-            st.code(c.content, language="markdown")
-            st.divider()
+            with st.container(border=True):
+                st.markdown(f"**Chunk [{c_idx}] — `{c.chunk_id}`** ({c.source_file} • {c.topic} / {c.subtopic})")
+                st.caption(f"Cross-Encoder Relevance Score: `{c.rerank_score:.4f}` | RRF Score: `{c.rrf_score:.4f}`")
+                st.code(c.content, language="markdown")
