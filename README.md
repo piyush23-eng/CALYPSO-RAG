@@ -173,12 +173,13 @@ python scripts/demo.py --interactive
 
 ---
 
-## 🌐 Production Deployment Guide
+## ⚡ Production Build & Serving Architecture
 
-### Deploy to Render / Railway / Fly.io (FastAPI + React):
-1. The FastAPI backend automatically serves the pre-compiled `frontend/dist` static assets at `/`.
-2. Set build command: `pip install -r requirements.txt && cd frontend && npm install && npm run build && cd .. && python scripts/build_index.py`
-3. Set start command: `uvicorn src.api.server:app --host 0.0.0.0 --port $PORT`
+CALYPSO-RAG uses a unified deployment design where the FastAPI backend serves both the REST API endpoints (`/api/query`, `/api/evaluation`, `/api/topics`) and mounts the compiled React + Vite frontend bundle directly at the root (`/`):
+
+1. **Frontend Compilation**: `cd frontend && npm install && npm run build` bundles TypeScript, Tailwind CSS, and KaTeX into optimized static assets in `frontend/dist/`.
+2. **Knowledge Ingestion**: `python scripts/build_index.py` constructs the persistent BM25 and ChromaDB dual indexes.
+3. **Unified Server**: `uvicorn src.api.server:app --host 0.0.0.0 --port 8000` serves the entire application as a single cohesive service.
 
 ---
 
