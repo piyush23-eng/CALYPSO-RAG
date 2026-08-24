@@ -37,6 +37,15 @@
   },
   {
     "question_id": "GATE_EVAL_05",
+    "subject": "Operating Systems",
+    "topic": "Process Synchronization",
+    "question": "How do counting semaphores coordinate concurrent access to shared resources and prevent race conditions?",
+    "ground_truth_answer": "Semaphores provide atomic wait (P) and signal (V) primitives. A counting semaphore initialized to N allows at most N processes into a critical section, decrementing on wait and incrementing on signal.",
+    "ground_truth_context_keywords": ["counting semaphore", "wait", "signal", "critical section", "process synchronization"],
+    "expected_source_file": "os_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_06",
     "subject": "Database Management Systems",
     "topic": "Transactions & Concurrency Control",
     "question": "Why does Strict 2-Phase Locking (Strict 2PL) eliminate cascading aborts and guarantee conflict serializability?",
@@ -45,7 +54,7 @@
     "expected_source_file": "dbms_notes.md"
   },
   {
-    "question_id": "GATE_EVAL_06",
+    "question_id": "GATE_EVAL_07",
     "subject": "Database Management Systems",
     "topic": "Normalization",
     "question": "What is the highest normal form for a relation where every attribute is a prime attribute?",
@@ -54,129 +63,390 @@
     "expected_source_file": "dbms_notes.md"
   },
   {
-    "question_id": "GATE_EVAL_07",
+    "question_id": "GATE_EVAL_08",
     "subject": "Database Management Systems",
     "topic": "Indexing & B+ Trees",
     "question": "What are the structural properties and fanout constraints of a B+ Tree index in databases?",
-    "ground_truth_answer": "In a B+ Tree of order p, all leaf nodes appear at the same depth and store actual data pointers linked as a doubly linked list. Non-leaf nodes store search keys and child tree pointers with node occupancy between ceil(p/2) and p pointers.",
-    "ground_truth_context_keywords": ["b+ tree", "order p", "leaf nodes", "search keys", "fanout"],
-    "expected_source_file": "dbms_notes.md"
-  },
-  {
-    "question_id": "GATE_EVAL_08",
-    "subject": "Database Management Systems",
-    "topic": "Serializability",
-    "question": "How is a precedence graph (serialization graph) used to test conflict serializability of a schedule?",
-    "ground_truth_answer": "A precedence graph has transactions as vertices and directed edges (Ti -> Tj) for conflicting operations where Ti executes before Tj. A schedule is conflict serializable if and only if its precedence graph contains no directed cycles.",
-    "ground_truth_context_keywords": ["precedence graph", "conflict serializability", "directed cycle", "conflicting operations", "topological sort"],
+    "ground_truth_answer": "In a B+ Tree of order p, leaf nodes store all data pointers and are linked sequentially. Internal nodes store search keys and child pointers, with each internal node holding at least ceil(p/2) child pointers.",
+    "ground_truth_context_keywords": ["b+ tree", "fanout", "leaf nodes", "order", "search key"],
     "expected_source_file": "dbms_notes.md"
   },
   {
     "question_id": "GATE_EVAL_09",
-    "subject": "Algorithms",
-    "topic": "Heap Construction",
-    "question": "What is the worst-case time complexity of constructing a binary max-heap from an unsorted array of n elements?",
-    "ground_truth_answer": "Building a binary max-heap from an unsorted array of n elements takes O(n) worst-case time using Floyd's bottom-up build-heap algorithm, derived from the sum sum_{h=0}^{floor(log n)} (n / 2^{h+1}) * O(h) = O(n).",
-    "ground_truth_context_keywords": ["binary max-heap", "build-heap", "time complexity", "o(n)", "floyd"],
-    "expected_source_file": "algorithms_notes.md"
+    "subject": "Database Management Systems",
+    "topic": "Serializability & Precedence Graphs",
+    "question": "How is conflict serializability of a concurrent schedule tested using a precedence graph?",
+    "ground_truth_answer": "A precedence (serialization) graph draws a directed edge Ti -> Tj if an operation of Ti conflicts with and occurs before an operation of Tj. The schedule is conflict serializable if and only if the graph is acyclic.",
+    "ground_truth_context_keywords": ["precedence graph", "conflict serializable", "acyclic", "topological sort", "conflicting operations"],
+    "expected_source_file": "dbms_pyqs_1990_2026.md"
   },
   {
     "question_id": "GATE_EVAL_10",
-    "subject": "Algorithms",
-    "topic": "Asymptotic Analysis & Recurrences",
-    "question": "How is the Master Theorem applied to solve divide-and-conquer recurrence relations of the form T(n) = a T(n/b) + f(n)?",
-    "ground_truth_answer": "The Master Theorem compares f(n) with n^{log_b a}. If f(n) = O(n^{log_b a - epsilon}), T(n) = Theta(n^{log_b a}). If f(n) = Theta(n^{log_b a} * log^k n), T(n) = Theta(n^{log_b a} * log^{k+1} n). If f(n) = Omega(n^{log_b a + epsilon}), T(n) = Theta(f(n)).",
-    "ground_truth_context_keywords": ["master theorem", "recurrence", "divide and conquer", "log_b a", "asymptotic"],
-    "expected_source_file": "algorithms_notes.md"
+    "subject": "Database Management Systems",
+    "topic": "Relational Algebra",
+    "question": "What is the relational division operator and what type of universal queries does it solve in SQL?",
+    "ground_truth_answer": "Relational division (R / S) finds tuples in R that are associated with ALL tuples in S. It expresses universal quantification (e.g. find students enrolled in all courses).",
+    "ground_truth_context_keywords": ["relational division", "universal quantification", "relational algebra", "for all"],
+    "expected_source_file": "dbms_notes.md"
   },
   {
     "question_id": "GATE_EVAL_11",
     "subject": "Algorithms",
-    "topic": "Graph Algorithms",
-    "question": "What are the time complexities of Dijkstra's algorithm and Bellman-Ford algorithm for shortest paths?",
-    "ground_truth_answer": "Dijkstra's algorithm with a Fibonacci/min-binary heap runs in O((V + E) log V) and cannot handle negative edge weights. Bellman-Ford runs in O(V * E) and detects negative weight cycles.",
-    "ground_truth_context_keywords": ["dijkstra", "bellman-ford", "shortest path", "negative weight cycle", "min-heap"],
-    "expected_source_file": "algorithms_notes.md"
+    "topic": "Heap Data Structure & Analysis",
+    "question": "What is the worst-case time complexity of constructing a binary max heap from an unsorted array using Floyd's algorithm?",
+    "ground_truth_answer": "Floyd's bottom-up BUILD-MAX-HEAP runs in O(n) linear time. This is derived from the summation of node heights sum(h / 2^h) = 2, making the total work proportional to 2n = O(n).",
+    "ground_truth_context_keywords": ["floyd's algorithm", "build-max-heap", "linear time", "o(n)", "heapify"],
+    "expected_source_file": "algo_pyqs_1990_2026.md"
   },
   {
     "question_id": "GATE_EVAL_12",
     "subject": "Algorithms",
-    "topic": "Dynamic Programming",
-    "question": "What is the recurrence relation and space-time complexity of the 0/1 Knapsack problem?",
-    "ground_truth_answer": "The 0/1 Knapsack DP relation is DP[i][w] = max(DP[i-1][w], DP[i-1][w - wt[i]] + val[i]) for w >= wt[i]. The time complexity is O(n * W) (pseudo-polynomial) with O(W) space optimization.",
-    "ground_truth_context_keywords": ["0/1 knapsack", "dynamic programming", "recurrence", "pseudo-polynomial", "o(n*w)"],
-    "expected_source_file": "algorithms_notes.md"
+    "topic": "Asymptotic Analysis & Recurrences",
+    "question": "How does the Master Theorem solve the recurrence T(n) = 4T(n/2) + n^2 log n?",
+    "ground_truth_answer": "With a=4, b=2, critical polynomial is n^(log_2 4) = n^2. Since f(n) = n^2 log n = Theta(n^(log_b a) * log^1 n), Extended Case 2 applies giving T(n) = Theta(n^2 log^2 n).",
+    "ground_truth_context_keywords": ["master theorem", "extended case 2", "recurrence", "critical exponent", "log^2 n"],
+    "expected_source_file": "algo_pyqs_1990_2026.md"
   },
   {
     "question_id": "GATE_EVAL_13",
-    "subject": "Computer Networks",
-    "topic": "Transport Layer & TCP",
-    "question": "What are the three distinct phases of TCP Congestion Control and how does the congestion window grow in each?",
-    "ground_truth_answer": "TCP congestion control operates in Slow Start (exponential growth: cwnd doubles every RTT), Congestion Avoidance (additive increase: cwnd increases by 1 MSS per RTT), and Fast Recovery (multiplicative decrease after 3 duplicate ACKs without resetting to 1 MSS).",
-    "ground_truth_context_keywords": ["tcp congestion control", "slow start", "congestion avoidance", "fast recovery", "cwnd"],
-    "expected_source_file": "networks_notes.md"
+    "subject": "Algorithms",
+    "topic": "Graph Algorithms",
+    "question": "Why does Dijkstra's algorithm fail on graphs with negative edge weights while Bellman-Ford succeeds?",
+    "ground_truth_answer": "Dijkstra relies on the greedy assumption that extracting the minimum tentative distance settles the vertex permanently. Negative edges violate this monotonic property. Bellman-Ford relaxes all edges |V|-1 times and can detect negative cycles in O(V*E) time.",
+    "ground_truth_context_keywords": ["dijkstra", "bellman-ford", "negative edge weights", "negative cycle detection", "relaxation"],
+    "expected_source_file": "algo_pyqs_1990_2026.md"
   },
   {
     "question_id": "GATE_EVAL_14",
-    "subject": "Computer Networks",
-    "topic": "Flow Control Protocols",
-    "question": "How is link utilization efficiency calculated in Stop-and-Wait and Sliding Window (Go-Back-N, Selective Repeat) protocols?",
-    "ground_truth_answer": "Efficiency for Stop-and-Wait is eta = 1 / (1 + 2a), where a = T_prop / T_trans. For Sliding Window with window size W, efficiency is eta = min(1, W / (1 + 2a)).",
-    "ground_truth_context_keywords": ["link utilization", "stop-and-wait", "go-back-n", "selective repeat", "propagation delay"],
-    "expected_source_file": "networks_notes.md"
+    "subject": "Algorithms",
+    "topic": "Dynamic Programming",
+    "question": "What is the time and space complexity of the standard dynamic programming solution for the 0/1 Knapsack problem?",
+    "ground_truth_answer": "The standard DP solution runs in O(n*W) pseudo-polynomial time and O(n*W) space, which can be optimized to O(W) space using a 1D array.",
+    "ground_truth_context_keywords": ["0/1 knapsack", "pseudo-polynomial", "dynamic programming", "space optimization", "time complexity"],
+    "expected_source_file": "algo_pyqs_1990_2026.md"
   },
   {
     "question_id": "GATE_EVAL_15",
-    "subject": "Computer Networks",
-    "topic": "IP Addressing & Subnetting",
-    "question": "How are subnet masks and CIDR prefixes used to calculate total usable host addresses and broadcast addresses?",
-    "ground_truth_answer": "In IPv4 /n CIDR notation, the host portion has (32 - n) bits. Total host configurations = 2^{32-n}. Usable host addresses = 2^{32-n} - 2 (subtracting network address and direct broadcast address).",
-    "ground_truth_context_keywords": ["cidr", "subnet mask", "usable host addresses", "broadcast address", "ipv4"],
-    "expected_source_file": "networks_notes.md"
+    "subject": "Algorithms",
+    "topic": "Greedy Algorithms & MST",
+    "question": "What is the cut property and how do Kruskal's and Prim's algorithms utilize it to construct a Minimum Spanning Tree?",
+    "ground_truth_answer": "The cut property states that for any cut in a connected weighted graph, the minimum weight crossing edge belongs to the MST. Kruskal uses a disjoint-set (union-find) in O(E log E), while Prim grows a single tree using a priority queue in O(E log V).",
+    "ground_truth_context_keywords": ["cut property", "kruskal", "prim", "minimum spanning tree", "mst"],
+    "expected_source_file": "algorithms_notes.md"
   },
   {
     "question_id": "GATE_EVAL_16",
-    "subject": "Theory of Computation",
-    "topic": "Chomsky Hierarchy & Grammars",
-    "question": "What are the four levels of Chomsky Hierarchy and their corresponding recognizing automata?",
-    "ground_truth_answer": "Type 3 (Regular) -> Finite Automata (DFA/NFA); Type 2 (Context-Free) -> Pushdown Automata (PDA); Type 1 (Context-Sensitive) -> Linear Bounded Automata (LBA); Type 0 (Unrestricted / Recursively Enumerable) -> Turing Machine.",
-    "ground_truth_context_keywords": ["chomsky hierarchy", "regular", "context-free", "pushdown automata", "turing machine"],
-    "expected_source_file": "toc_compiler_notes.md"
+    "subject": "Computer Networks",
+    "topic": "Transport Layer & TCP",
+    "question": "How does TCP Congestion Control transition between Slow Start, Congestion Avoidance, and Fast Recovery upon 3 duplicate ACKs?",
+    "ground_truth_answer": "In Slow Start, cwnd doubles every RTT until ssthresh. In Congestion Avoidance, cwnd increases linearly (+1 MSS per RTT). On 3 duplicate ACKs, ssthresh is set to cwnd/2, cwnd is set to ssthresh + 3 MSS, and Fast Recovery is entered.",
+    "ground_truth_context_keywords": ["slow start", "congestion avoidance", "fast recovery", "cwnd", "ssthresh", "duplicate acks"],
+    "expected_source_file": "networks_notes.md"
   },
   {
     "question_id": "GATE_EVAL_17",
-    "subject": "Theory of Computation",
-    "topic": "Pumping Lemma & Regular Languages",
-    "question": "How is Pumping Lemma for Regular Languages used to prove that a language is not regular?",
-    "ground_truth_answer": "If L is regular, there exists pumping length p such that any string s in L with |s| >= p can be split into s = xyz satisfying |y| > 0, |xy| <= p, and xy^i z in L for all i >= 0. Finding a contradiction proves L is not regular.",
-    "ground_truth_context_keywords": ["pumping lemma", "regular language", "pumping length", "contradiction", "automata"],
-    "expected_source_file": "toc_compiler_notes.md"
+    "subject": "Computer Networks",
+    "topic": "Data Link Layer & Sliding Window",
+    "question": "What is the maximum window size in Go-Back-N (GBN) and Selective Repeat (SR) protocols for an n-bit sequence number field?",
+    "ground_truth_answer": "For an n-bit sequence number field (2^n sequence numbers): GBN maximum sender window is 2^n - 1 (receiver window = 1). In Selective Repeat, maximum sender and receiver window size is 2^(n-1).",
+    "ground_truth_context_keywords": ["go-back-n", "selective repeat", "sliding window", "sequence numbers", "window size"],
+    "expected_source_file": "networks_notes.md"
   },
   {
     "question_id": "GATE_EVAL_18",
-    "subject": "Compiler Design",
-    "topic": "Parsing & LR Parsers",
-    "question": "What causes shift-reduce and reduce-reduce conflicts in LR(0), SLR(1), and LALR(1) parsing tables?",
-    "ground_truth_answer": "A shift-reduce conflict occurs when a parser state simultaneously allows shifting a terminal and reducing via a production. A reduce-reduce conflict occurs when multiple reduce actions are valid for the same lookahead symbol.",
-    "ground_truth_context_keywords": ["shift-reduce", "reduce-reduce", "lr parser", "lalr(1)", "lookahead"],
-    "expected_source_file": "toc_compiler_notes.md"
+    "subject": "Computer Networks",
+    "topic": "Medium Access Control",
+    "question": "What is the minimum frame size formula in CSMA/CD to ensure reliable collision detection on a broadcast channel?",
+    "ground_truth_answer": "To detect collisions before transmission completes, Transmission Time (L/B) >= 2 * Propagation Time (Tp). Thus Minimum Frame Size L_min = 2 * Tp * Bandwidth.",
+    "ground_truth_context_keywords": ["csma/cd", "minimum frame size", "propagation delay", "collision detection", "transmission time"],
+    "expected_source_file": "networks_pyqs_1990_2026.md"
   },
   {
     "question_id": "GATE_EVAL_19",
-    "subject": "Compiler Design",
-    "topic": "Syntax Directed Translation & Code Optimization",
-    "question": "What is the difference between S-attributed and L-attributed Syntax Directed Definitions (SDDs)?",
-    "ground_truth_answer": "S-attributed definitions use only synthesized attributes (evaluated bottom-up during LR parsing). L-attributed definitions allow both synthesized attributes and inherited attributes restricted to evaluate from left-to-right siblings or parent nodes.",
-    "ground_truth_context_keywords": ["s-attributed", "l-attributed", "synthesized attributes", "inherited attributes", "sdd"],
-    "expected_source_file": "toc_compiler_notes.md"
+    "subject": "Computer Networks",
+    "topic": "IP Addressing & CIDR",
+    "question": "How does CIDR subnetting and longest prefix match routing determine the next hop for an IP packet?",
+    "ground_truth_answer": "CIDR replaces classful addressing with variable-length network prefixes (/n). A router computes bitwise AND of destination IP with each subnet mask and selects the route with the longest matching prefix length.",
+    "ground_truth_context_keywords": ["cidr", "longest prefix match", "subnet mask", "routing table", "ip addressing"],
+    "expected_source_file": "networks_pyqs_1990_2026.md"
   },
   {
     "question_id": "GATE_EVAL_20",
-    "subject": "General / Syllabus",
-    "topic": "GATE CS Syllabus & Scoring",
-    "question": "What is the weightage distribution and core subject list in the official GATE Computer Science syllabus?",
-    "ground_truth_answer": "General Aptitude carries 15 marks, Engineering Mathematics + Discrete Math carries ~13 marks, and Core CS subjects (OS, DBMS, Algorithms, TOC, Compilers, CN, COA, Digital Logic, Programming) carry ~72 marks out of 100.",
-    "ground_truth_context_keywords": ["gate computer science syllabus", "general aptitude", "engineering mathematics", "core cs", "weightage"],
+    "subject": "Computer Networks",
+    "topic": "Network Security & Cryptography",
+    "question": "How does RSA public key cryptography generate keys and perform modular exponentiation encryption?",
+    "ground_truth_answer": "RSA chooses primes p, q, computes n = p*q and Euler totient phi(n) = (p-1)*(q-1). Public exponent e is coprime to phi(n). Private key d is the modular inverse d = e^(-1) mod phi(n). Ciphertext C = M^e mod n.",
+    "ground_truth_context_keywords": ["rsa", "public key", "modular inverse", "euler totient", "encryption"],
+    "expected_source_file": "networks_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_21",
+    "subject": "Theory of Computation",
+    "topic": "Finite Automata & Regular Languages",
+    "question": "What is the Pumping Lemma for Regular Languages and how is it applied to prove non-regularity?",
+    "ground_truth_answer": "The Pumping Lemma states that for any regular language L, there exists a pumping length p such that any string w in L with |w| >= p can be split as w = xyz with |y| > 0, |xy| <= p, such that xy^i z is in L for all i >= 0. Pumping y^i outside L proves non-regularity.",
+    "ground_truth_context_keywords": ["pumping lemma", "regular language", "non-regular", "pumping length", "adversarial proof"],
+    "expected_source_file": "toc_compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_22",
+    "subject": "Theory of Computation",
+    "topic": "Chomsky Hierarchy & Grammars",
+    "question": "What are the structural constraints defining Type 3, Type 2, Type 1, and Type 0 grammars in the Chomsky Hierarchy?",
+    "ground_truth_answer": "Type 3 (Regular): A -> aB or A -> a. Type 2 (Context-Free): A -> alpha. Type 1 (Context-Sensitive): alpha -> beta with |alpha| <= |beta|. Type 0 (Unrestricted): alpha -> beta recognized by Turing Machines.",
+    "ground_truth_context_keywords": ["chomsky hierarchy", "regular grammar", "context-free", "context-sensitive", "unrestricted"],
+    "expected_source_file": "toc_compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_23",
+    "subject": "Theory of Computation",
+    "topic": "Decidability & Turing Machines",
+    "question": "Which language decision problems are undecidable for Context-Free Languages and Turing Machines?",
+    "ground_truth_answer": "For CFLs, Ambiguity, Equivalence (L1 = L2), Universality (L = Sigma*), and Intersection Emptiness (L1 intersection L2 = empty) are undecidable. For Turing Machines, the Halting Problem and all non-trivial semantic properties (Rice's Theorem) are undecidable.",
+    "ground_truth_context_keywords": ["undecidable", "cfl equivalence", "halting problem", "rice's theorem", "turing machines"],
+    "expected_source_file": "toc_compiler_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_24",
+    "subject": "Theory of Computation",
+    "topic": "Pushdown Automata",
+    "question": "What is the difference between Deterministic Pushdown Automata (DPDA) and Non-deterministic Pushdown Automata (NPDA) in terms of expressive power?",
+    "ground_truth_answer": "DPDA recognizes Deterministic Context-Free Languages (DCFLs), which is a strict subset of Context-Free Languages recognized by NPDAs. Unlike finite automata, non-determinism strictly increases the expressive power of pushdown automata.",
+    "ground_truth_context_keywords": ["dpda", "npda", "dcfl", "context-free languages", "non-determinism"],
+    "expected_source_file": "toc_compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_25",
+    "subject": "Theory of Computation",
+    "topic": "Closure Properties",
+    "question": "What are the closure properties of Regular, DCFL, CFL, Recursive, and Recursively Enumerable languages under complementation and intersection?",
+    "ground_truth_answer": "Regular and Recursive languages are closed under union, intersection, and complementation. DCFL is closed under complementation but NOT union or intersection. CFL is closed under union but NOT intersection or complementation. RE is closed under union and intersection but NOT complementation.",
+    "ground_truth_context_keywords": ["closure properties", "complementation", "intersection", "cfl closure", "recursively enumerable"],
+    "expected_source_file": "toc_compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_26",
+    "subject": "Compiler Design",
+    "topic": "Bottom-Up Syntax Analysis",
+    "question": "What is the relationship between LR(0), SLR(1), LALR(1), and CLR(1) parsers in terms of parsing power and state count?",
+    "ground_truth_answer": "In parsing power: LR(0) < SLR(1) < LALR(1) < CLR(1). LR(0), SLR(1), and LALR(1) have the identical number of states. LALR(1) is obtained by merging CLR(1) states with identical LR(0) cores, which never introduces Shift/Reduce conflicts but may introduce Reduce/Reduce conflicts.",
+    "ground_truth_context_keywords": ["lr(0)", "slr(1)", "lalr(1)", "clr(1)", "shift-reduce conflict", "reduce-reduce conflict"],
+    "expected_source_file": "toc_compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_27",
+    "subject": "Compiler Design",
+    "topic": "Syntax-Directed Translation",
+    "question": "What is the difference between S-attributed and L-attributed Syntax Directed Definitions (SDDs)?",
+    "ground_truth_answer": "S-attributed SDDs use only synthesized attributes evaluated bottom-up during LR parsing. L-attributed SDDs permit synthesized and restricted inherited attributes where attribute values depend only on parent and left siblings, evaluated in depth-first left-to-right traversal.",
+    "ground_truth_context_keywords": ["s-attributed", "l-attributed", "synthesized attribute", "inherited attribute", "sdd"],
+    "expected_source_file": "toc_compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_28",
+    "subject": "Compiler Design",
+    "topic": "Intermediate Code Generation",
+    "question": "What is Static Single Assignment (SSA) form in compiler optimization and why is it useful?",
+    "ground_truth_answer": "In SSA form, each variable is assigned a value exactly once, and phi-functions are placed at control flow join points. SSA simplifies and improves data-flow optimizations like constant propagation, dead code elimination, and value numbering.",
+    "ground_truth_context_keywords": ["static single assignment", "ssa", "phi-function", "data-flow optimization", "dead code elimination"],
+    "expected_source_file": "toc_compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_29",
+    "subject": "Compiler Design",
+    "topic": "Code Optimization",
+    "question": "What are basic blocks and how is a Directed Acyclic Graph (DAG) used for local basic block optimization?",
+    "ground_truth_answer": "A basic block is a maximal sequence of consecutive instructions with single entry and single exit. A DAG representation of a basic block identifies common subexpressions, eliminates dead code, and enables optimal register allocation.",
+    "ground_truth_context_keywords": ["basic block", "dag optimization", "common subexpression elimination", "leader statement"],
+    "expected_source_file": "toc_compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_EVAL_30",
+    "subject": "Compiler Design",
+    "topic": "Top-Down LL(1) Parsing",
+    "question": "What are the mathematical conditions for a Context-Free Grammar to be LL(1)?",
+    "ground_truth_answer": "A grammar is LL(1) iff for every production A -> alpha | beta: (1) FIRST(alpha) and FIRST(beta) are disjoint, (2) at most one of alpha, beta can derive epsilon, and (3) if beta =>* epsilon, then FIRST(alpha) and FOLLOW(A) are disjoint. Left-recursive or ambiguous grammars can never be LL(1).",
+    "ground_truth_context_keywords": ["ll(1)", "first and follow", "left recursion", "parsing table conflict", "disjoint first sets"],
+    "expected_source_file": "toc_compiler_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_31",
+    "subject": "Computer Organization and Architecture",
+    "topic": "Storage Hierarchy & Hard Disk Access Time",
+    "question": "Consider a hard disk with a rotational speed of 15000 rpm. The time to move the read/write head from a track to its adjacent track is 1 ms. Initially head is on track 0. Sectors per track = 400. Transfer data from 10 randomly located sectors in tracks 5, 12, 7. What is total data transfer time in milliseconds?",
+    "ground_truth_answer": "Rotational latency = 4ms / 2 = 2ms. Sector transfer = 4ms / 400 = 0.01ms. Time per track = 10 * (2.0 + 0.01) = 20.1ms. Seek time = (5 + 7 + 5) * 1ms = 17ms. Total time = 17 + (3 * 20.1) = 77.3 ms.",
+    "ground_truth_context_keywords": ["hard disk", "15000 rpm", "seek time", "rotational latency", "sector transfer time", "77.3 ms"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_32",
+    "subject": "Computer Organization and Architecture",
+    "topic": "Memory Hierarchy & Cache Mapping",
+    "question": "In a 4-way set associative cache of 32 KB with 64-byte block size and 32-bit physical address, what are the Tag, Set Index, and Block Offset bit widths?",
+    "ground_truth_answer": "Block Offset = log2(64) = 6 bits. Total lines = 32 KB / 64 B = 512 lines. Sets = 512 / 4 = 128 = 2^7 sets -> Set Index = 7 bits. Tag = 32 - (7 + 6) = 19 bits.",
+    "ground_truth_context_keywords": ["cache memory", "set associative", "tag bits", "set index", "block offset", "19 bits"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_33",
+    "subject": "Computer Organization and Architecture",
+    "topic": "Instruction Pipelining & Performance",
+    "question": "How is the speedup of an instruction pipeline calculated given stage delays and pipeline register latch delay?",
+    "ground_truth_answer": "Clock cycle time tau = max(stage delays) + register overhead. Speedup S = non-pipelined execution time / pipelined clock cycle time = sum(stage delays) / tau.",
+    "ground_truth_context_keywords": ["pipelining", "speedup", "clock cycle time", "stage delay", "bottleneck stage"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_34",
+    "subject": "Computer Organization and Architecture",
+    "topic": "Computer Arithmetic",
+    "question": "How does Booth's multiplication algorithm reduce the number of additions for consecutive sequences of 1s in binary numbers?",
+    "ground_truth_answer": "Booth's algorithm inspects bit pairs (Q_i, Q_{i-1}). For 10 it subtracts the multiplicand, for 01 it adds, and for 00 or 11 it only performs arithmetic right shifts, replacing a string of k ones with one subtraction and one addition.",
+    "ground_truth_context_keywords": ["booth's algorithm", "two's complement", "arithmetic right shift", "multiplication"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_35",
+    "subject": "Computer Organization and Architecture",
+    "topic": "Input/Output & DMA",
+    "question": "What is the difference between Burst Mode and Cycle Stealing mode in Direct Memory Access (DMA) data transfer?",
+    "ground_truth_answer": "In Burst Mode, the DMA controller transfers an entire block of data continuously while holding the system bus. In Cycle Stealing mode, the DMA controller steals single bus cycles from the CPU between machine cycles, minimizing CPU freeze.",
+    "ground_truth_context_keywords": ["dma", "burst mode", "cycle stealing", "bus master", "direct memory access"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_36",
+    "subject": "Discrete Mathematics",
+    "topic": "Graph Theory & Connectivity",
+    "question": "What is the necessary and sufficient condition for a connected graph to possess an Eulerian Circuit and an Eulerian Path?",
+    "ground_truth_answer": "An undirected connected graph contains an Eulerian Circuit iff every vertex has an even degree. It contains an Eulerian Path (open trail) iff exactly 0 or 2 vertices have an odd degree.",
+    "ground_truth_context_keywords": ["eulerian circuit", "eulerian path", "even degree", "connected graph", "handshaking lemma"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_37",
+    "subject": "Discrete Mathematics",
+    "topic": "Propositional & First-Order Logic",
+    "question": "What is the relationship between validity, satisfiability, and unsatisfiability in first-order predicate logic?",
+    "ground_truth_answer": "A formula is valid (tautology) iff it is true under all interpretations. A formula F is valid iff its negation not(F) is unsatisfiable. Satisfiable means true under at least one interpretation.",
+    "ground_truth_context_keywords": ["validity", "satisfiability", "tautology", "predicate logic", "first-order logic"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_38",
+    "subject": "Discrete Mathematics",
+    "topic": "Set Theory & Relations",
+    "question": "What properties define an Equivalence Relation and a Partial Order Relation (Poset)?",
+    "ground_truth_answer": "An equivalence relation is reflexive, symmetric, and transitive, partitioning the set into disjoint equivalence classes. A partial order relation (poset) is reflexive, antisymmetric, and transitive.",
+    "ground_truth_context_keywords": ["equivalence relation", "partial order", "poset", "reflexive", "antisymmetric", "transitive"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_39",
+    "subject": "Discrete Mathematics",
+    "topic": "Combinatorics & Generating Functions",
+    "question": "How is the Pigeonhole Principle applied to guarantee duplicate selections in finite subsets?",
+    "ground_truth_answer": "The generalized Pigeonhole Principle states that if n items are put into k pigeonholes, then at least one pigeonhole must contain at least ceil(n/k) items.",
+    "ground_truth_context_keywords": ["pigeonhole principle", "combinatorics", "ceil(n/k)", "worst case guarantee"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_40",
+    "subject": "Discrete Mathematics",
+    "topic": "Group Theory & Lattices",
+    "question": "What mathematical conditions define a Lattice in algebraic structures?",
+    "ground_truth_answer": "A lattice is a partially ordered set (poset) in which every pair of elements has a unique greatest lower bound (meet, a wedge b) and a unique least upper bound (join, a vee b).",
+    "ground_truth_context_keywords": ["lattice", "meet and join", "poset", "least upper bound", "greatest lower bound"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_41",
+    "subject": "Engineering Mathematics",
+    "topic": "Probability & Bayes' Theorem",
+    "question": "How is Bayes' Theorem formulated to calculate posterior probability given conditional evidence?",
+    "ground_truth_answer": "Bayes' Theorem states P(A|B) = [P(B|A) * P(A)] / P(B), where P(B) is the total probability sum(P(B|A_i) * P(A_i)). It updates prior probability P(A) to posterior P(A|B) given observation B.",
+    "ground_truth_context_keywords": ["bayes' theorem", "conditional probability", "posterior probability", "total probability", "prior"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_42",
+    "subject": "Engineering Mathematics",
+    "topic": "Linear Algebra & Eigenvalues",
+    "question": "What is the relationship between the trace, determinant, and eigenvalues of an n x n matrix?",
+    "ground_truth_answer": "The sum of the eigenvalues equals the trace of the matrix (sum of diagonal elements). The product of the eigenvalues equals the determinant of the matrix. An invertible matrix has non-zero determinant and non-zero eigenvalues.",
+    "ground_truth_context_keywords": ["eigenvalues", "trace", "determinant", "characteristic equation", "linear algebra"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_43",
+    "subject": "Engineering Mathematics",
+    "topic": "Discrete Probability Distributions",
+    "question": "What are the expectation and variance of Binomial and Poisson probability distributions?",
+    "ground_truth_answer": "For Binomial(n, p): Mean E[X] = n*p, Variance Var(X) = n*p*(1-p). For Poisson(lambda): Mean E[X] = lambda, Variance Var(X) = lambda.",
+    "ground_truth_context_keywords": ["poisson distribution", "binomial distribution", "mean", "variance", "lambda"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_44",
+    "subject": "Engineering Mathematics",
+    "topic": "Calculus & Optimization",
+    "question": "How is Lagrange's Mean Value Theorem (LMVT) stated for continuous differentiable functions?",
+    "ground_truth_answer": "If f(x) is continuous on [a, b] and differentiable on (a, b), there exists at least one point c in (a, b) such that f'(c) = [f(b) - f(a)] / (b - a).",
+    "ground_truth_context_keywords": ["lagrange mean value theorem", "lmvt", "differentiable", "derivative", "slope of secant"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_45",
+    "subject": "Engineering Mathematics",
+    "topic": "Matrix Rank & Systems of Equations",
+    "question": "When does a linear system AX = B have a unique solution, infinitely many solutions, or no solution (inconsistent)?",
+    "ground_truth_answer": "Let augmented matrix be [A|B]. System is consistent iff rank(A) = rank([A|B]). If rank(A) = rank([A|B]) = n (number of variables), unique solution. If rank < n, infinitely many solutions. If rank(A) < rank([A|B]), no solution.",
+    "ground_truth_context_keywords": ["matrix rank", "augmented matrix", "consistent system", "unique solution", "infinite solutions"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_46",
+    "subject": "Digital Logic",
+    "topic": "Combinational Circuits & Minimization",
+    "question": "How do Karnaugh Maps (K-Maps) eliminate static hazards and produce minimal Sum of Products (SOP) boolean expressions?",
+    "ground_truth_answer": "K-Maps group adjacent minterms in powers of 2 (1, 2, 4, 8, 16) using Gray code ordering. Prime implicants that cover essential minterms form the minimal SOP. Overlapping adjacent group consensus terms eliminates static-1 hazards.",
+    "ground_truth_context_keywords": ["k-map", "karnaugh map", "sum of products", "sop", "essential prime implicant", "hazard"],
+    "expected_source_file": "gate_cs_syllabus.md"
+  },
+  {
+    "question_id": "GATE_EVAL_47",
+    "subject": "Digital Logic",
+    "topic": "Sequential Circuits & Flip-Flops",
+    "question": "What is the race around condition in a JK Flip-Flop and how does Master-Slave configuration eliminate it?",
+    "ground_truth_answer": "Race around occurs when J=1, K=1, level clock is high (tp > tff), causing output to toggle uncontrollably. Master-Slave JK flip-flop eliminates this by using two latches driven by complementary clock pulses, isolating input and output transitions.",
+    "ground_truth_context_keywords": ["jk flip-flop", "race around condition", "master-slave", "toggle", "edge triggering"],
+    "expected_source_file": "gate_cs_syllabus.md"
+  },
+  {
+    "question_id": "GATE_EVAL_48",
+    "subject": "Digital Logic",
+    "topic": "Multiplexers & Decoders",
+    "question": "How can a 4-to-1 multiplexer implement any arbitrary 3-variable Boolean function f(A, B, C)?",
+    "ground_truth_answer": "Connect two variables (A, B) to the select lines S1, S0. The 4 input lines (I0, I1, I2, I3) are driven by the remaining variable literals: 0, 1, C, or C_bar depending on the function truth table.",
+    "ground_truth_context_keywords": ["multiplexer", "4-to-1 mux", "boolean function implementation", "select lines"],
+    "expected_source_file": "gate_cs_syllabus.md"
+  },
+  {
+    "question_id": "GATE_EVAL_49",
+    "subject": "Digital Logic",
+    "topic": "Number Representation",
+    "question": "What are the range, representation, and overflow detection conditions for n-bit Two's Complement signed integers?",
+    "ground_truth_answer": "The range of n-bit two's complement integer is -2^(n-1) to +(2^(n-1) - 1). Overflow during addition occurs iff the sign of both operands is the same and the result has the opposite sign, detected by XORing carry-in and carry-out of the MSB: C_in XOR C_out.",
+    "ground_truth_context_keywords": ["two's complement", "signed integer range", "overflow detection", "msb carry"],
+    "expected_source_file": "coa_math_pyqs_1990_2026.md"
+  },
+  {
+    "question_id": "GATE_EVAL_50",
+    "subject": "Digital Logic",
+    "topic": "Counters & State Machines",
+    "question": "How is the modulus of a synchronous counter determined and what is the difference between Johnson and Ring counters?",
+    "ground_truth_answer": "Modulus is the total number of distinct states in the counting cycle. For n flip-flops, a Ring Counter has mod-n states, a Johnson (twisted ring) counter has mod-2n states, and a binary counter has mod-2^n states.",
+    "ground_truth_context_keywords": ["synchronous counter", "modulus", "johnson counter", "ring counter", "state machine"],
     "expected_source_file": "gate_cs_syllabus.md"
   }
 ]
