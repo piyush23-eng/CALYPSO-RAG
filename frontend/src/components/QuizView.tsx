@@ -443,25 +443,25 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
 
           {/* Right Question Palette (Sticky & Scrollable Box) */}
           <div className="space-y-6 md:sticky md:top-24 self-start">
-            <div className="p-5 sm:p-6 rounded-2xl border border-white/[0.08] border-t-white/[0.16] bg-[#111116] shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <h4 className="text-xs font-mono uppercase tracking-widest text-muted-gray">
+            <div className="p-5 sm:p-6 rounded-2xl border border-white/[0.08] bg-[#111116] shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
+              <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-white/[0.06]">
+                <h4 className="text-xs font-mono uppercase tracking-widest text-muted-gray font-semibold">
                   Question Palette
                 </h4>
-                <span className="text-[11px] font-mono text-accent font-bold">
-                  {questions.length} Questions
+                <span className="text-[11px] font-mono text-accent font-bold px-2 py-0.5 rounded bg-accent/10 border border-accent/20">
+                  {questions.length} Qs
                 </span>
               </div>
 
               {/* Scrollable Question Grid Container */}
-              <div className="max-h-64 sm:max-h-80 overflow-y-auto pr-1 mb-4 scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-accent/40">
+              <div className="max-h-64 sm:max-h-80 overflow-y-auto p-1 pr-2 mb-4 scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-accent/40">
                 <div className="grid grid-cols-5 gap-2">
                   {questions.map((q, idx) => {
                     const isAns = !!userAnswers[q.id];
                     const isMarked = !!markedForReview[q.id];
                     const isCurrent = currentIdx === idx;
 
-                    let badgeColor = "border-white/[0.08] text-muted-gray bg-[#14141c]";
+                    let badgeColor = "border-white/[0.08] text-muted-gray bg-[#14141c] hover:border-white/20";
                     if (isMarked) {
                       badgeColor = "border-amber-500/80 bg-amber-500/20 text-amber-300 font-bold shadow-[0_0_8px_rgba(245,158,11,0.3)]";
                     } else if (isAns) {
@@ -471,9 +471,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                     return (
                       <button
                         key={q.id}
+                        type="button"
                         onClick={() => setCurrentIdx(idx)}
                         className={`h-8 rounded-lg border text-xs font-mono flex items-center justify-center transition-all cursor-pointer ${badgeColor} ${
-                          isCurrent ? 'ring-2 ring-white text-off-white scale-105 font-bold z-10' : ''
+                          isCurrent ? 'ring-2 ring-accent border-accent text-white font-bold scale-[1.03] z-10 shadow-[0_0_12px_rgba(61,90,254,0.4)]' : ''
                         }`}
                       >
                         {idx + 1}
@@ -482,6 +483,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                   })}
                 </div>
               </div>
+
 
               {/* Legend */}
               <div className="space-y-1.5 text-[11px] font-mono text-muted-gray border-t border-white/[0.06] pt-3">
