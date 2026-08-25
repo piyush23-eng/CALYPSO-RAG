@@ -5,6 +5,7 @@
 [![ChromaDB](https://img.shields.io/badge/vector_db-ChromaDB%20%2B%20BM25-purple.svg)](https://www.trychroma.com/)
 [![React + Tailwind](https://img.shields.io/badge/frontend-React%20%2B%20Tailwind%20Vite-06B6D4.svg)](https://vitejs.dev/)
 [![FastAPI](https://img.shields.io/badge/backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
+[![PRM Engine](https://img.shields.io/badge/reasoning-Step--Level%20PRM%20%28DeepSeek--R1%29-indigo.svg)]()
 [![QLoRA 4-bit](https://img.shields.io/badge/fine--tuning-Qwen2.5--1.5B%20QLoRA-FFD21E.svg)](https://github.com/huggingface/peft)
 [![Docker](https://img.shields.io/badge/container-Docker%20Compose-2496ED.svg)](https://www.docker.com/)
 [![Tests](https://img.shields.io/badge/pytest-22%2F22%20passing-brightgreen.svg)]()
@@ -19,7 +20,7 @@ Solving technical exam problems in **GATE Computer Science & Information Technol
 2. **Semantic Dispersion on Technical Acronyms**: Dense embeddings alone disperse queries containing concise acronyms and formulas (e.g., `Strict 2PL`, `LR(0)` vs `SLR(1)`, `ssthresh`, `3NF`).
 3. **Multi-Hop Relational Invariants**: Complex questions often span multiple conceptual rules (e.g., *Which concurrency protocol prevents cascading aborts and guarantees conflict serializability?*).
 
-**CALYPSO-RAG** is an end-to-end, multi-stage **Agentic Retrieval-Augmented Generation & Simulation System** engineered specifically for the GATE CS/IT syllabus. It integrates hybrid lexical-dense search, cross-encoder reranking, Corrective-RAG (CRAG) self-healing loops, in-memory AST Python execution, a dedicated GATE Knowledge Graph, multimodal Vision-RAG diagram parsing, and an authentic IIT Professor Neural Voice engine.
+**CALYPSO-RAG** is an end-to-end, multi-stage **Agentic Retrieval-Augmented Generation & Simulation System** engineered specifically for the GATE CS/IT syllabus. It integrates hybrid lexical-dense search, cross-encoder reranking, Corrective-RAG (CRAG) self-healing loops, in-memory AST Python execution, a dedicated GATE Knowledge Graph (GraphRAG), a **DeepSeek-R1 style Step-Level Process Reward Model (PRM)**, multimodal Vision-RAG diagram parsing, and an authentic IIT Professor Neural Voice engine.
 
 ---
 
@@ -80,9 +81,10 @@ flowchart TD
     SandboxCheck -- Yes --> PythonSandbox[AST-Secured Python Sandbox Execution < 0.25ms]
     SandboxCheck -- No --> QLoRAGeneration[Fine-Tuned Qwen2.5-1.5B QLoRA Generation]
     
-    PythonSandbox --> Synthesis[Synthesize Verified Proof & KaTeX Math]
-    QLoRAGeneration --> Synthesis
+    PythonSandbox --> PRMVerifier[Process Reward Model: Step-by-Step Symbolic Proof Verifier]
+    QLoRAGeneration --> PRMVerifier
     
+    PRMVerifier --> Synthesis[Synthesize Verified Proof & KaTeX Math + think Trace]
     Synthesis --> CitationMapper[Sentence-Level Cosine Attribution Mapper]
     CitationMapper --> END([Verified Solution + Voice Walkthrough + Dynamic Sliders])
 ```
@@ -173,7 +175,21 @@ A comprehensive report covering all ablation studies, latency profiling, and tra
 
 ---
 
-### 2. 10-Subject Stratified Performance Table
+### 2. Multi-Hop GraphRAG Ablation (With KG vs Without KG)
+
+Evaluated on 10 multi-relational questions across 7 GATE CS domains requiring combining 2+ relational invariants (e.g., Strict 2PL $\implies$ Cascading Aborts + Conflict Serializability):
+
+| Configuration | Context Precision | Context Recall | Faithfulness | Answer Relevance | Composite Score | $\Delta$ vs With KG |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **a) Full Pipeline WITH Knowledge Graph (GraphRAG)** | **0.9333** | **0.7200** | **0.8912** | **0.8931** | **0.8594** | **Baseline** |
+| **b) Full Pipeline WITHOUT Knowledge Graph (Hybrid Only)** | **1.0000** | **0.6119** | **0.8395** | **0.8922** | **0.8359** | `-0.0235` |
+
+> **Key Takeaway**: GraphRAG provides a **+10.81 percentage point boost in Context Recall** ($0.6119 \to 0.7200$) and **+5.17 percentage points in Faithfulness** by directly supplying connective relational facts that are split across distant textbook sections.
+
+---
+
+### 3. 10-Subject Stratified Performance Table
+
 
 | GATE CS Subject | Context Precision | Context Recall | Faithfulness | Relevance | Domain Score |
 | :--- | :---: | :---: | :---: | :---: | :---: |
