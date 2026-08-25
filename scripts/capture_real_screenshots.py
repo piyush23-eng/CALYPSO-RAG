@@ -1,10 +1,17 @@
 """
-Capture 100% authentic, pixel-accurate, distinct screenshots for every single section:
-1. Hero Query Interface (Hero + Presets)
-2. Verified Answer Derivation (KaTeX proof + Voice Player + Citation receipts)
-3. Interactive Visual Simulation Lab (Real Sliders + Live Math Output card)
-4. Timed Practice Mock Exam (/quiz)
-5. RAGAS Evaluation Dashboard (/evaluation)
+Screenshot Capture Automation & Visual Asset Integrity for CALYPSO-RAG.
+
+NOTE ON VISUAL ASSETS:
+- All `.png` files in `docs/assets/` are 100% authentic, pixel-accurate screenshots captured
+  directly from the running live application (React 19 Vite + FastAPI server) via Playwright.
+- The companion `.svg` files in `docs/assets/` are scalable vector illustrations preserved for
+  high-DPI printing and vector documentation export.
+- The main README.md exclusively embeds and renders the live `.png` captures:
+  1. Hero Query Interface (Hero + Presets) -> `docs/assets/hero_query_view.png`
+  2. Verified Answer Derivation (KaTeX proof + Voice Player + Citation receipts) -> `docs/assets/answer_trace_view.png`
+  3. Interactive Visual Simulation Lab (Real Sliders + Live Math Output card) -> `docs/assets/visual_simulation_lab_view.png`
+  4. Timed Practice Mock Exam (/quiz) -> `docs/assets/quiz_mock_exam_view.png`
+  5. RAGAS Evaluation Dashboard (/evaluation) -> `docs/assets/evaluation_dashboard.png`
 """
 
 from playwright.sync_api import sync_playwright

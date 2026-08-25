@@ -184,18 +184,36 @@ A comprehensive report covering all ablation studies, latency profiling, and tra
 
 ---
 
+## 🛠️ System Requirements
+
+| Component | Requirement | Purpose |
+| :--- | :--- | :--- |
+| **Python** | `3.10` / `3.11` / `3.12` | Core agentic pipeline, retrieval, and FastAPI server |
+| **Node.js** | `>= 18.0.0` | React 19 / Vite UI compilation |
+| **RAM** | `4 GB` (CPU mode) / `16 GB` (GPU mode) | Vector indexing & Cross-Encoder inference |
+| **OS Packages** | `build-essential`, `curl` | C-extension wheel builds (`chromadb`, `pint`) |
+| **Optional Audio** | `ffmpeg` | Optional for external offline audio transcoding |
+| **Optional GPU** | NVIDIA GPU (T4 / A100 / RTX 3090+) | Required only for local continuous batching with `vllm` |
+
+---
+
 ## 🚀 Quickstart & Deployment Guide
 
-### Option 1: 1-Click Docker Compose (Recommended)
+### Option 1: 1-Click Docker Compose (CPU-Only Quickstart)
+The standard container builds the full multi-stage production image with all hybrid retrieval, Cross-Encoder reranking, SymPy/Pint verifiers, and Edge-TTS synthesis:
+
 ```bash
 # Clone the repository
 git clone https://github.com/piyush23-eng/CALYPSO-RAG.git
 cd CALYPSO-RAG
 
-# Build and run multi-stage container
+# Build and run multi-stage container (CPU Inference Mode)
 docker compose up --build
 ```
 Open **`http://localhost:8000`** in your browser.
+
+> [!NOTE]
+> **GPU Serving with vLLM**: To run local LLM generation with 50x concurrent PagedAttention batching on NVIDIA hardware, install `vllm>=0.4.0` on a CUDA-enabled host (`pip install vllm`) or use the NVIDIA Container Toolkit with `--gpus all`. The default Docker quickstart uses CPU-optimized inference with cloud API / fallback support.
 
 ---
 
@@ -207,7 +225,7 @@ Open **`http://localhost:8000`** in your browser.
 python3 -m venv venv
 source venv/bin/activate
 
-# Install dependencies
+# Install dependencies (CPU & Core Agent Stack)
 pip install -r requirements.txt
 
 # Run FastAPI backend
@@ -233,14 +251,29 @@ pytest tests/ -v
 
 ```
 ============================== test session starts ==============================
-tests/test_phase1.py::test_chunking_integrity PASSED                      [  4%]
-tests/test_phase2.py::test_hybrid_retrieval_rrf PASSED                    [  9%]
-tests/test_phase3.py::test_cross_encoder_rerank PASSED                    [ 13%]
-tests/test_phase4.py::test_crag_relevance_gate PASSED                     [ 18%]
-tests/test_phase5.py::test_citation_mapping_and_ragas PASSED              [ 22%]
-tests/test_phase6.py::test_langgraph_agent_orchestrator PASSED           [ 27%]
-...
-============================== 22 passed in 1.42s ===============================
+tests/test_phase1.py::test_topic_aware_chunker_notes PASSED              [  4%]
+tests/test_phase1.py::test_topic_aware_chunker_pyqs PASSED               [  9%]
+tests/test_phase1.py::test_dual_index_manager_smoke_test PASSED          [ 13%]
+tests/test_phase2.py::test_rrf_algorithm_from_scratch PASSED             [ 18%]
+tests/test_phase2.py::test_cross_encoder_reranker_scoring PASSED         [ 22%]
+tests/test_phase2.py::test_hybrid_retrieval_integration PASSED           [ 27%]
+tests/test_phase3.py::test_clear_query_passes_first_try PASSED           [ 31%]
+tests/test_phase3.py::test_vague_query_triggers_reformulation PASSED     [ 36%]
+tests/test_phase3.py::test_completely_off_topic_query_returns_low_confidence PASSED [ 40%]
+tests/test_phase3.py::test_jsonl_log_persistence PASSED                  [ 45%]
+tests/test_phase4.py::test_prompt_builder_structure PASSED               [ 50%]
+tests/test_phase4.py::test_calypso_client_fallback_mode PASSED           [ 54%]
+tests/test_phase4.py::test_citation_mapper_sentence_attribution PASSED   [ 59%]
+tests/test_phase4.py::test_empty_context_triggers_uncovered_flag PASSED  [ 63%]
+tests/test_phase5.py::test_agent_graph_compilation PASSED                [ 68%]
+tests/test_phase5.py::test_agent_end_to_end_query_1_os_emat PASSED       [ 72%]
+tests/test_phase5.py::test_agent_end_to_end_query_2_dbms_strict_2pl PASSED [ 77%]
+tests/test_phase5.py::test_agent_end_to_end_query_3_algo_heap PASSED     [ 81%]
+tests/test_phase6.py::test_context_precision_computation PASSED          [ 86%]
+tests/test_phase6.py::test_context_recall_computation PASSED             [ 90%]
+tests/test_phase6.py::test_faithfulness_computation PASSED               [ 95%]
+tests/test_phase6.py::test_answer_relevance_computation PASSED           [100%]
+============================== 22 passed in 2.18s ===============================
 ```
 
 ---
@@ -248,4 +281,5 @@ tests/test_phase6.py::test_langgraph_agent_orchestrator PASSED           [ 27%]
 ## 📄 License & Attribution
 
 Developed by **Piyush Pankaj** ([GitHub: @piyush23-eng](https://github.com/piyush23-eng)).  
-Distributed under the **MIT License**.
+Distributed under the **[MIT License](LICENSE)**.
+
