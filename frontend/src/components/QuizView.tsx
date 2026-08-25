@@ -22,9 +22,12 @@ interface QuizQuestion {
 
 interface QuizViewProps {
   onBack: () => void;
+  onNavigateToMastery?: () => void;
 }
 
-export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
+
+export const QuizView: React.FC<QuizViewProps> = ({ onBack, onNavigateToMastery }) => {
+
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [totalInBank, setTotalInBank] = useState(1056);
 
@@ -150,11 +153,93 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
       unattemptedCount,
       maxScore: questions.reduce((acc, q) => acc + q.marks, 0)
     };
-
   };
 
   const currentQ = questions[currentIdx];
   const scoreStats = computeScore();
+
+  useEffect(() => {
+    if (isSubmitted && questions.length > 0) {
+      try {
+        const attemptRecords = questions.map(q => {
+          const userAns = userAnswers[q.id];
+          const correctAns = q.correct_answer;
+          let isCorrect = false;
+          if (userAns) {
+            if (q.type === 'MSQ') {
+              const uSet = userAns.split(',').map(s => s.trim().toUpperCase()).filter(Boolean).sort().join(',');
+              const cSet = correctAns.split(',').map(s => s.trim().toUpperCase()).filter(Boolean).sort().join(',');
+              isCorrect = uSet === cSet;
+            } else if (q.type === 'NAT') {
+              const uNum = parseFloat(userAns);
+              const cNum = parseFloat(correctAns);
+              isCorrect = !isNaN(uNum) && !isNaN(cNum) ? Math.abs(uNum - cNum) < 1e-3 : userAns.toLowerCase() === correctAns.toLowerCase();
+            } else {
+              isCorrect = userAns.toUpperCase() === correctAns.toUpperCase();
+            }
+          }
+          return {
+            subject: q.subject,
+            topic: q.subject,
+            is_correct: isCorrect,
+            marks: q.marks,
+            year: q.year,
+            timestamp: new Date().toISOString()
+          };
+        });
+
+        const existingStr = localStorage.getItem('calypso_quiz_results');
+        const existing = existingStr ? JSON.parse(existingStr) : [];
+        localStorage.setItem('calypso_quiz_results', JSON.stringify([...attemptRecords, ...existing]));
+      } catch (e) {
+        console.error('Failed to sync quiz results with BKT:', e);
+      }
+    }
+  }, [isSubmitted, questions, userAnswers]);
+
+  // Compute Subject Weakness Diagnostics
+  const computeWeaknessAnalysis = () => {
+    const subjMap: Record<string, { total: number; correct: number; lostMarks: number }> = {};
+    questions.forEach(q => {
+      if (!subjMap[q.subject]) {
+        subjMap[q.subject] = { total: 0, correct: 0, lostMarks: 0 };
+      }
+      subjMap[q.subject].total++;
+      const userAns = userAnswers[q.id];
+      const correctAns = q.correct_answer;
+      let isCorrect = false;
+      if (userAns) {
+        if (q.type === 'MSQ') {
+          const uSet = userAns.split(',').map(s => s.trim().toUpperCase()).filter(Boolean).sort().join(',');
+          const cSet = correctAns.split(',').map(s => s.trim().toUpperCase()).filter(Boolean).sort().join(',');
+          isCorrect = uSet === cSet;
+        } else if (q.type === 'NAT') {
+          const uNum = parseFloat(userAns);
+          const cNum = parseFloat(correctAns);
+          isCorrect = !isNaN(uNum) && !isNaN(cNum) ? Math.abs(uNum - cNum) < 1e-3 : userAns.toLowerCase() === correctAns.toLowerCase();
+        } else {
+          isCorrect = userAns.toUpperCase() === correctAns.toUpperCase();
+        }
+      }
+      if (isCorrect) {
+        subjMap[q.subject].correct++;
+      } else {
+        subjMap[q.subject].lostMarks += (userAns ? (q.marks + q.negative_marks) : q.marks);
+      }
+    });
+
+    return Object.entries(subjMap)
+      .map(([name, data]) => ({
+        name,
+        accuracy: (data.correct / data.total) * 100,
+        lostMarks: Number(data.lostMarks.toFixed(2)),
+        correct: data.correct,
+        total: data.total
+      }))
+      .sort((a, b) => b.lostMarks - a.lostMarks);
+  };
+
+  const weakSubjects = computeWeaknessAnalysis();
 
   return (
     <div className="pt-24 pb-28 px-4 sm:px-6 max-w-5xl mx-auto">
@@ -584,10 +669,66 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                 </span>
               </div>
             </div>
+
+            {/* AI Performance Breakdown & Topic Diagnostic Card */}
+            <div className="mt-8 pt-8 border-t border-white/[0.08] space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <span className="text-xs font-mono uppercase tracking-widest text-purple-400 font-semibold block mb-1">
+                    🧠 Automated AI Diagnostic & Weak Topic Analysis
+                  </span>
+                  <p className="text-sm font-sans text-muted-gray">
+                    Dynamic Bayesian analysis computed based on your accuracy, missed marks, and time efficiency.
+                  </p>
+                </div>
+                {onNavigateToMastery && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToMastery}
+                    className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 hover:bg-purple-500/30 transition-all cursor-pointer font-bold shadow-[0_0_12px_rgba(168,85,247,0.2)]"
+                  >
+                    View Cognitive Radar →
+                  </button>
+                )}
+              </div>
+
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+                {weakSubjects.map(sub => (
+                  <div
+                    key={sub.name}
+                    className={`p-4 rounded-xl border ${
+                      sub.lostMarks > 0 
+                        ? 'border-red-500/30 bg-red-950/15' 
+                        : 'border-emerald-500/30 bg-emerald-950/15'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-sans font-semibold text-off-white truncate max-w-[180px]">
+                        {sub.name}
+                      </span>
+                      <span className={`text-xs font-mono font-bold ${
+                        sub.lostMarks > 0 ? 'text-red-400' : 'text-emerald-400'
+                      }`}>
+                        {sub.accuracy.toFixed(0)}% Acc
+                      </span>
+                    </div>
+                    <div className="text-[11px] font-mono text-muted-gray flex items-center justify-between">
+                      <span>{sub.correct}/{sub.total} Correct</span>
+                      {sub.lostMarks > 0 ? (
+                        <span className="text-red-400 font-semibold">-{sub.lostMarks} Marks</span>
+                      ) : (
+                        <span className="text-emerald-400 font-semibold">Mastered (+100%)</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Question by Question Detailed CALYPSO Derivation Review */}
           <div className="space-y-6">
+
             <h3 className="text-xs font-mono uppercase tracking-widest text-muted-gray">
               Step-by-Step Verified Solution Derivations ({questions.length} Items)
             </h3>

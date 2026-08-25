@@ -311,8 +311,12 @@ export function App() {
       {/* Main View Area */}
       <main className="flex-grow">
         {currentView === 'quiz' ? (
-          <QuizView onBack={() => setCurrentView('solver')} />
+          <QuizView 
+            onBack={() => setCurrentView('solver')} 
+            onNavigateToMastery={() => setCurrentView('mastery')}
+          />
         ) : currentView === 'mastery' ? (
+
           <StudentMasteryView onBack={() => setCurrentView('solver')} />
         ) : currentView === 'evaluation' ? (
           <EvaluationView onBack={() => setCurrentView('solver')} />
