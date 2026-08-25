@@ -94,18 +94,21 @@ def structure_gate_content(raw_text: str, subject_hint: Optional[str] = None, so
 
 def process_single_pdf(pdf_path: Path, output_dir: Path, subject_hint: Optional[str] = None):
     """Processes a single PDF file and saves formatted markdown."""
-    raw_text = extract_text_from_pdf(pdf_path)
-    if not raw_text.strip():
-        print(f"⚠️ Warning: No text could be extracted from {pdf_path.name}")
-        return
+    try:
+        raw_text = extract_text_from_pdf(pdf_path)
+        if not raw_text.strip():
+            print(f"⚠️ Warning: No readable text extracted from {pdf_path.name} (may be scanned images)")
+            return
 
-    print(f"✅ Extracted {len(raw_text)} characters from {pdf_path.name}")
-    markdown_content = structure_gate_content(raw_text, subject_hint=subject_hint, source_filename=pdf_path.name)
+        print(f"✅ Extracted {len(raw_text)} characters from {pdf_path.name}")
+        markdown_content = structure_gate_content(raw_text, subject_hint=subject_hint, source_filename=pdf_path.name)
 
-    out_filename = pdf_path.stem.lower().replace(" ", "_").replace("-", "_") + "_pyqs.md"
-    out_path = output_dir / out_filename
-    out_path.write_text(markdown_content, encoding="utf-8")
-    print(f"   📁 Saved -> {out_path}")
+        out_filename = pdf_path.stem.lower().replace(" ", "_").replace("-", "_") + "_pyqs.md"
+        out_path = output_dir / out_filename
+        out_path.write_text(markdown_content, encoding="utf-8")
+        print(f"   📁 Saved -> {out_path}")
+    except Exception as e:
+        print(f"⚠️ Skipped {pdf_path.name} due to PDF parsing error: {e}")
 
 
 def main():

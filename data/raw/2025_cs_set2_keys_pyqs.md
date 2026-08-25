@@ -1,0 +1,210 @@
+# GATE CS Past Year Questions Archive - Computer Science
+
+### Computer Science
+
+Answer Key for Computer Science and Information Technology 2 (CS2)
+Q. No.
+Session
+Q. Type
+Section
+Key/Range
+Marks
+MCQ
+GA
+C
+MCQ
+GA
+C
+MCQ
+GA
+A
+MCQ
+GA
+A
+MCQ
+GA
+B
+MCQ
+GA
+B
+MCQ
+GA
+B
+MCQ
+GA
+A
+MCQ
+GA
+D
+MCQ
+GA
+C
+MCQ
+CS-2
+C
+MCQ
+CS-2
+A
+MCQ
+CS-2
+B
+MCQ
+CS-2
+A
+MCQ
+CS-2
+A
+MCQ
+CS-2
+B
+MCQ
+CS-2
+A
+MCQ
+CS-2
+D
+MCQ
+CS-2
+D
+MCQ
+CS-2
+A
+MCQ
+CS-2
+C
+MCQ
+CS-2
+C
+MCQ
+CS-2
+D
+MCQ
+CS-2
+A
+MCQ
+CS-2
+D
+MCQ
+CS-2
+D
+MSQ
+CS-2
+B;C
+MSQ
+CS-2
+D
+MSQ
+CS-2
+B;C;D
+MSQ
+CS-2
+B;C
+Page 1 of 2
+
+
+MSQ
+CS-2
+A;B;C
+NAT
+CS-2
+13 to 13
+NAT
+CS-2
+21 to 21
+NAT
+CS-2
+250 to 250
+NAT
+CS-2
+4 to 4
+MCQ
+CS-2
+A
+MCQ
+CS-2
+C
+MCQ
+CS-2
+A
+MCQ
+CS-2
+A
+MCQ
+CS-2
+C
+MCQ
+CS-2
+D
+MSQ
+CS-2
+B;C
+MSQ
+CS-2
+A;D
+MSQ
+CS-2
+A;B;C
+MSQ
+CS-2
+A
+MSQ
+CS-2
+C;D
+MSQ
+CS-2
+D
+MSQ
+CS-2
+C;D
+MSQ
+CS-2
+A;B;C
+MSQ
+CS-2
+B;C;D
+MSQ
+CS-2
+C;D
+MSQ
+CS-2
+A;C
+MSQ
+CS-2
+B
+MSQ
+CS-2
+A;C;D
+NAT
+CS-2
+4.0 to 4.0
+NAT
+CS-2
+260.20 to 261.20
+NAT
+CS-2
+33 to 33
+NAT
+CS-2
+11 to 11
+NAT
+CS-2
+6 to 6
+NAT
+CS-2
+6 to 6
+NAT
+CS-2
+3.0 to 3.0
+NAT
+CS-2
+111 to 111
+NAT
+CS-2
+46 to 46
+NAT
+CS-2
+0.5 to 0.5
+NAT
+CS-2
+0.70 to 0.80
+Page 2 of 2

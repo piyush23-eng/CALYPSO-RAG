@@ -3,6 +3,7 @@ import { Hero } from './components/Hero';
 import { Marquee } from './components/Marquee';
 import { AnswerSection } from './components/AnswerSection';
 import { EvaluationView } from './components/EvaluationView';
+import { QuizView } from './components/QuizView';
 import { SubjectFilter, type SubjectPreset } from './components/SubjectFilter';
 import { HistoryDrawer, type HistoryItem } from './components/HistoryDrawer';
 import { Footer } from './components/Footer';
@@ -11,7 +12,7 @@ import type { QueryResponse } from './types';
 import { AlertCircle, History } from 'lucide-react';
 
 export function App() {
-  const [isEvalView, setIsEvalView] = useState(false);
+  const [currentView, setCurrentView] = useState<'solver' | 'evaluation' | 'quiz'>('solver');
   const [topics, setTopics] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<QueryResponse | null>(null);
@@ -110,7 +111,7 @@ export function App() {
       <header className="fixed top-0 left-0 right-0 z-40 bg-[#000000]/85 backdrop-blur-md border-b border-white/[0.08] py-4 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button
-            onClick={() => setIsEvalView(false)}
+            onClick={() => setCurrentView('solver')}
             className="flex items-center gap-2 group cursor-pointer"
           >
             <span className="w-2.5 h-2.5 rounded-full bg-accent group-hover:scale-125 transition-transform shadow-[0_0_10px_rgba(61,90,254,0.6)]" />
@@ -120,19 +121,27 @@ export function App() {
           </button>
 
           <div className="flex items-center gap-3 sm:gap-6">
-            <nav className="flex items-center gap-4 sm:gap-6 text-xs font-mono">
+            <nav className="flex items-center gap-3 sm:gap-6 text-xs font-mono">
               <button
-                onClick={() => setIsEvalView(false)}
+                onClick={() => setCurrentView('solver')}
                 className={`transition-colors cursor-pointer ${
-                  !isEvalView ? 'text-accent font-semibold' : 'text-muted-gray hover:text-off-white'
+                  currentView === 'solver' ? 'text-accent font-semibold' : 'text-muted-gray hover:text-off-white'
                 }`}
               >
                 Solver
               </button>
               <button
-                onClick={() => setIsEvalView(true)}
+                onClick={() => setCurrentView('quiz')}
                 className={`transition-colors cursor-pointer ${
-                  isEvalView ? 'text-accent font-semibold' : 'text-muted-gray hover:text-off-white'
+                  currentView === 'quiz' ? 'text-accent font-semibold' : 'text-muted-gray hover:text-off-white'
+                }`}
+              >
+                Mock Exam (/quiz)
+              </button>
+              <button
+                onClick={() => setCurrentView('evaluation')}
+                className={`transition-colors cursor-pointer ${
+                  currentView === 'evaluation' ? 'text-accent font-semibold' : 'text-muted-gray hover:text-off-white'
                 }`}
               >
                 The Numbers (/evaluation)
@@ -142,7 +151,7 @@ export function App() {
             {/* History & Bookmarks Drawer Trigger */}
             <button
               onClick={() => setIsHistoryOpen(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-lg border border-white/[0.08] border-t-white/[0.16] bg-[#11111a] hover:border-accent/60 text-muted-gray hover:text-off-white transition-all shadow-[0_2px_8px_rgba(0,0,0,0.4)] cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-lg border border-white/[0.08] border-t-white/[0.16] bg-[#111116] hover:border-accent/60 text-muted-gray hover:text-off-white transition-all shadow-[0_2px_8px_rgba(0,0,0,0.4)] cursor-pointer"
               title="View study history & revision list"
             >
               <History className="w-3.5 h-3.5 text-accent" />
@@ -163,7 +172,7 @@ export function App() {
         bookmarks={bookmarks}
         onSelectQuery={(qData) => {
           setResult(qData);
-          setIsEvalView(false);
+          setCurrentView('solver');
           setTimeout(() => {
             window.scrollTo({
               top: window.innerHeight * 0.75,
@@ -177,8 +186,10 @@ export function App() {
 
       {/* Main View Area */}
       <main className="flex-grow">
-        {isEvalView ? (
-          <EvaluationView onBack={() => setIsEvalView(false)} />
+        {currentView === 'quiz' ? (
+          <QuizView onBack={() => setCurrentView('solver')} />
+        ) : currentView === 'evaluation' ? (
+          <EvaluationView onBack={() => setCurrentView('solver')} />
         ) : (
           <div>
             <Hero onSearch={handleSearch} isLoading={isLoading} />
@@ -219,7 +230,7 @@ export function App() {
         )}
       </main>
 
-      <Footer onToggleEval={() => setIsEvalView(!isEvalView)} isEvalView={isEvalView} />
+      <Footer onToggleEval={() => setCurrentView(currentView === 'evaluation' ? 'solver' : 'evaluation')} isEvalView={currentView === 'evaluation'} />
     </div>
   );
 }

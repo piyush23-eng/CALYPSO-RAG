@@ -1,0 +1,210 @@
+# GATE CS Past Year Questions Archive - Computer Science
+
+### Computer Science
+
+Answer Key for Computer Science and Information Technology 1 (CS1)
+Q. No.
+Session
+Q. Type
+Section
+Key/Range
+Marks
+MCQ
+GA
+A
+MCQ
+GA
+B
+MCQ
+GA
+C
+MCQ
+GA
+A
+MCQ
+GA
+C
+MCQ
+GA
+C
+MCQ
+GA
+A
+MCQ
+GA
+A
+MCQ
+GA
+A
+MCQ
+GA
+B
+MCQ
+CS-1
+A
+MCQ
+CS-1
+C
+MCQ
+CS-1
+B
+MCQ
+CS-1
+A
+MCQ
+CS-1
+C
+MCQ
+CS-1
+B
+MCQ
+CS-1
+D
+MCQ
+CS-1
+B
+MCQ
+CS-1
+A
+MCQ
+CS-1
+A
+MSQ
+CS-1
+B;D
+MSQ
+CS-1
+B;D
+MSQ
+CS-1
+A;D
+MSQ
+CS-1
+B;D
+MSQ
+CS-1
+B;D
+MSQ
+CS-1
+A;B
+MSQ
+CS-1
+A;B;C
+MSQ
+CS-1
+D
+NAT
+CS-1
+21 to 21
+NAT
+CS-1
+195 to 195
+Page 1 of 2
+
+
+NAT
+CS-1
+-2.1 to -1.9
+NAT
+CS-1
+0.49 to 0.51
+NAT
+CS-1
+435 to 435
+NAT
+CS-1
+25 to 25
+NAT
+CS-1
+5 to 5
+MCQ
+CS-1
+A
+MCQ
+CS-1
+B
+MCQ
+CS-1
+A
+MCQ
+CS-1
+A
+MCQ
+CS-1
+A
+MCQ
+CS-1
+D
+MCQ
+CS-1
+A
+MCQ
+CS-1
+C
+MCQ
+CS-1
+C
+MCQ
+CS-1
+C
+MSQ
+CS-1
+A;D
+MSQ
+CS-1
+B;C
+MSQ
+CS-1
+B;D
+MSQ
+CS-1
+B
+MSQ
+CS-1
+C
+NAT
+CS-1
+65468 to 65468
+NAT
+CS-1
+6 to 6
+NAT
+CS-1
+11.83 to 11.87
+NAT
+CS-1
+6 to 6
+NAT
+CS-1
+26 to 26
+NAT
+CS-1
+0.949 to 0.952
+NAT
+CS-1
+7 to 7
+NAT
+CS-1
+0.300 to 0.302
+NAT
+CS-1
+5 to 5
+NAT
+CS-1
+7 to 8
+NAT
+CS-1
+5 to 5
+NAT
+CS-1
+5 to 5
+NAT
+CS-1
+46 to 46
+NAT
+CS-1
+5 to 5
+NAT
+CS-1
+10 to 11
+Page 2 of 2

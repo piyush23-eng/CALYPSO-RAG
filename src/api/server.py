@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse
 
 from src.ingestion.indexer import DualIndexManager
 from src.agent.orchestrator import CalypsoAgentOrchestrator
+from src.api.quiz_routes import quiz_router
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
@@ -27,6 +28,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(quiz_router)
 
 # Lazy-loaded singletons
 _index_manager: Optional[DualIndexManager] = None

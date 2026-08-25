@@ -11,6 +11,9 @@ from src.generation.calypso_client import CalypsoClient
 from src.generation.citation_mapper import CitationMapper, GenerationOutput, SentenceCitation
 
 
+from src.retrieval.parent_retriever import ParentDocumentRetriever
+
+
 class AgentState(TypedDict):
     """
     Complete state schema for the CALYPSO-RAG LangGraph state machine.
@@ -38,13 +41,10 @@ class CalypsoAgentOrchestrator:
     Coordinates the 5-stage reasoning lifecycle with support for ablation experiments:
     1. classify_query -> identifies GATE CS domain & subject bounds.
     2. retrieve -> executes hybrid lexical (BM25) & dense (BGE-Small) retrieval with RRF (or dense-only if ablated).
-    3. rerank -> applies cross-encoder full attention scoring (or bypassed if ablated).
-    4. check_relevance -> evaluates top candidate relevance against gate threshold (0.50).
-       └── [Conditional Edge]:
-           ├── If Score < 0.50 and count < 2 and CRAG enabled -> reformulate_and_retry
-           └── Otherwise -> generate
-    5. generate -> invokes fine-tuned Calypso client with strict negative grounding constraints.
-    6. attach_citations -> maps sentence-level semantic attribution with cosine similarity.
+    3. rerank -> applies cross-encoder full attention scoring over top candidates (or passes top candidates if ablated).
+    4. evaluate_relevance -> CRAG confidence gate: checks if top score >= tau (0.50). If below & retries remain, loops back to reformulate.
+    5. generate_answer -> synthesizes mathematical derivation grounded strictly in evidence + dynamic parameter execution.
+    6. map_citations -> pairwise sentence-to-evidence cosine attribution mapping.
     """
 
     def __init__(
@@ -63,17 +63,21 @@ class CalypsoAgentOrchestrator:
     ):
         self.index_manager = index_manager or DualIndexManager()
         self.retriever = retriever or HybridRetriever(index_manager=self.index_manager, rrf_k=60)
+        self.parent_retriever = ParentDocumentRetriever()
         self.reranker = reranker or CrossEncoderReranker()
+        self.relevance_threshold = relevance_threshold
         self.relevance_gate = relevance_gate or CorrectiveRelevanceGate(
             retriever=self.retriever,
             reranker=self.reranker,
             relevance_threshold=relevance_threshold,
             max_attempts=max_reformulations
         )
-        self.calypso_client = calypso_client or CalypsoClient()
+        self.generator = calypso_client or CalypsoClient()
+        self.calypso_client = self.generator
         self.citation_mapper = citation_mapper or CitationMapper(embedder=self.index_manager.embedder)
-        self.relevance_threshold = relevance_threshold
         self.max_reformulations = max_reformulations if enable_crag else 0
+        
+        # Ablation control flags
         self.enable_hybrid = enable_hybrid
         self.enable_reranking = enable_reranking
         self.enable_crag = enable_crag
@@ -142,12 +146,15 @@ class CalypsoAgentOrchestrator:
                 top_k=10
             )
             
+        # Expand granular chunks into enclosing parent sections for higher Context Recall
+        expanded_chunks = self.parent_retriever.expand_chunks(fused)
+
         elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
         timing = dict(state.get("telemetry", {}).get("timing", {}))
         timing["retrieval_ms"] = timing.get("retrieval_ms", 0.0) + elapsed_ms
 
         return {
-            "retrieval_results": fused,
+            "retrieval_results": expanded_chunks,
             "telemetry": {
                 **state.get("telemetry", {}),
                 "timing": timing
