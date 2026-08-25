@@ -39,8 +39,9 @@ Solving technical exam problems in **GATE Computer Science & Information Technol
 ---
 
 ### 3. Interactive GATE CS Timed Practice Exam (`/quiz`)
-*Authentic 10-minute practice exam with official negative marking (+1.0/+2.0, -0.33/-0.66), color-coded question palette, and instant step-by-step score report:*
+*Authentic practice exam supporting all official GATE question patterns (**MCQs**, **MSQs with multi-selection**, and **NAT with numerical input**), real-time negative marking (+1.0/+2.0, -0.33/-0.66), color-coded question palette, and instant step-by-step score reports:*
 ![CALYPSO-RAG GATE Mock Exam](docs/assets/quiz_mock_exam_view.png)
+
 
 ---
 

@@ -95,10 +95,33 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
     let unattemptedCount = 0;
 
     questions.forEach(q => {
-      const ans = userAnswers[q.id];
-      if (!ans) {
+      const userAns = (userAnswers[q.id] || '').trim();
+      const correctAns = (q.correct_answer || '').trim();
+
+      if (!userAns) {
         unattemptedCount++;
-      } else if (ans === q.correct_answer) {
+        return;
+      }
+
+      let isCorrect = false;
+
+      if (q.type === 'MSQ') {
+        const userSet = userAns.split(',').map(s => s.trim().toUpperCase()).filter(Boolean).sort().join(',');
+        const correctSet = correctAns.split(',').map(s => s.trim().toUpperCase()).filter(Boolean).sort().join(',');
+        isCorrect = userSet === correctSet;
+      } else if (q.type === 'NAT') {
+        const userNum = parseFloat(userAns);
+        const correctNum = parseFloat(correctAns);
+        if (!isNaN(userNum) && !isNaN(correctNum)) {
+          isCorrect = Math.abs(userNum - correctNum) < 1e-3;
+        } else {
+          isCorrect = userAns.toLowerCase() === correctAns.toLowerCase();
+        }
+      } else {
+        isCorrect = userAns.toUpperCase() === correctAns.toUpperCase();
+      }
+
+      if (isCorrect) {
         totalScore += q.marks;
         correctCount++;
       } else {
@@ -114,6 +137,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
       unattemptedCount,
       maxScore: questions.reduce((acc, q) => acc + q.marks, 0)
     };
+
   };
 
   const currentQ = questions[currentIdx];
@@ -203,11 +227,20 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
           {/* Main Question Panel */}
           <div className="md:col-span-3 space-y-6">
             <div className="p-6 sm:p-8 rounded-2xl border border-white/[0.08] border-t-white/[0.16] bg-[#111116] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
-              {/* Question Metadata Bar */}
+              {/* Question Type & Marks Indicator */}
               <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-white/[0.06]">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-mono text-accent uppercase tracking-widest px-2.5 py-1 rounded bg-accent/10 border border-accent/20 font-bold">
                     Q{currentIdx + 1} OF {questions.length}
+                  </span>
+                  <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded border font-bold ${
+                    currentQ.type === 'MSQ'
+                      ? 'border-purple-500/40 bg-purple-500/10 text-purple-400'
+                      : currentQ.type === 'NAT'
+                        ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-400'
+                        : 'border-white/[0.08] bg-white/[0.04] text-muted-gray'
+                  }`}>
+                    {currentQ.type || 'MCQ'}
                   </span>
                   <span className="text-xs font-mono text-muted-gray">
                     {currentQ.subject}
@@ -215,7 +248,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                 </div>
                 <div className="flex items-center gap-3 text-xs font-mono">
                   <span className="text-accent font-semibold">+{currentQ.marks.toFixed(1)} Marks</span>
-                  <span className="text-red-400">-{currentQ.negative_marks.toFixed(2)} Neg</span>
+                  {currentQ.negative_marks > 0 ? (
+                    <span className="text-red-400">-{currentQ.negative_marks.toFixed(2)} Neg</span>
+                  ) : (
+                    <span className="text-emerald-400">0.00 Neg (No Negative)</span>
+                  )}
                 </div>
               </div>
 
@@ -224,32 +261,89 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                 {currentQ.question}
               </p>
 
-              {/* Option Cards */}
-              <div className="space-y-3">
-                {currentQ.options?.map((opt) => {
-                  const optKey = opt.charAt(0);
-                  const isSelected = userAnswers[currentQ.id] === optKey;
+              {/* Question Inputs: NAT vs MSQ vs MCQ */}
+              {currentQ.type === 'NAT' ? (
+                <div className="p-6 rounded-xl border border-cyan-500/30 bg-cyan-950/10 space-y-3">
+                  <span className="text-xs font-mono text-cyan-300 block font-semibold">
+                    Numerical Answer Type (NAT) — Enter Exact Real / Integer Value:
+                  </span>
+                  <input
+                    type="text"
+                    value={userAnswers[currentQ.id] || ''}
+                    onChange={(e) => handleSelectOption(currentQ.id, e.target.value.trim())}
+                    placeholder="Enter numerical answer..."
+                    className="w-full max-w-sm px-4 py-3 rounded-lg border border-cyan-500/40 bg-[#121420] text-off-white font-mono text-base focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              ) : currentQ.type === 'MSQ' ? (
+                <div className="space-y-3">
+                  <span className="text-xs font-mono text-purple-300 block mb-2 font-semibold">
+                    Multiple Select Question (MSQ) — Select All Options That Apply:
+                  </span>
+                  {currentQ.options?.map((opt) => {
+                    const optKey = opt.charAt(0);
+                    const currentSelected = (userAnswers[currentQ.id] || '').split(',').filter(Boolean);
+                    const isChecked = currentSelected.includes(optKey);
 
-                  return (
-                    <button
-                      key={opt}
-                      onClick={() => handleSelectOption(currentQ.id, optKey)}
-                      className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center justify-between cursor-pointer ${
-                        isSelected
-                          ? 'border-accent bg-accent/15 text-white font-medium shadow-[0_0_16px_rgba(61,90,254,0.25)] ring-1 ring-accent/40'
-                          : 'border-white/[0.08] border-t-white/[0.12] bg-[#14141c] hover:border-accent/50 text-off-white/90'
-                      }`}
-                    >
-                      <span className="text-sm font-mono">{opt}</span>
-                      <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                        isSelected ? 'border-accent bg-accent' : 'border-white/20'
-                      }`}>
-                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+                    const handleToggleMSQ = () => {
+                      if (isSubmitted) return;
+                      const next = isChecked
+                        ? currentSelected.filter(k => k !== optKey)
+                        : [...currentSelected, optKey].sort();
+                      setUserAnswers(prev => ({ ...prev, [currentQ.id]: next.join(',') }));
+                    };
+
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={handleToggleMSQ}
+                        className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center justify-between cursor-pointer ${
+                          isChecked
+                            ? 'border-purple-500 bg-purple-500/15 text-white font-medium shadow-[0_0_16px_rgba(168,85,247,0.25)] ring-1 ring-purple-500/40'
+                            : 'border-white/[0.08] border-t-white/[0.12] bg-[#14141c] hover:border-purple-500/50 text-off-white/90'
+                        }`}
+                      >
+                        <span className="text-sm font-mono">{opt}</span>
+                        <span className={`w-4 h-4 rounded border flex items-center justify-center ${
+                          isChecked ? 'border-purple-500 bg-purple-500 text-black font-bold text-[10px]' : 'border-white/20'
+                        }`}>
+                          {isChecked && '✓'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Standard MCQ */
+                <div className="space-y-3">
+                  {currentQ.options?.map((opt) => {
+                    const optKey = opt.charAt(0);
+                    const isSelected = userAnswers[currentQ.id] === optKey;
+
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => handleSelectOption(currentQ.id, optKey)}
+                        className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center justify-between cursor-pointer ${
+                          isSelected
+                            ? 'border-accent bg-accent/15 text-white font-medium shadow-[0_0_16px_rgba(61,90,254,0.25)] ring-1 ring-accent/40'
+                            : 'border-white/[0.08] border-t-white/[0.12] bg-[#14141c] hover:border-accent/50 text-off-white/90'
+                        }`}
+                      >
+                        <span className="text-sm font-mono">{opt}</span>
+                        <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          isSelected ? 'border-accent bg-accent' : 'border-white/20'
+                        }`}>
+                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
 
               {/* Navigation & Action Buttons */}
               <div className="flex flex-wrap items-center justify-between gap-4 pt-8 mt-8 border-t border-white/[0.06]">
