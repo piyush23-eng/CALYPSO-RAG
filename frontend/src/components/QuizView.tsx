@@ -416,65 +416,83 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
             </div>
           </div>
 
-          {/* Right Question Palette */}
-          <div className="space-y-6">
-            <div className="p-6 rounded-2xl border border-white/[0.08] border-t-white/[0.16] bg-[#111116] shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
-              <h4 className="text-xs font-mono uppercase tracking-widest text-muted-gray mb-4">
-                Question Palette
-              </h4>
+          {/* Right Question Palette (Sticky & Scrollable Box) */}
+          <div className="space-y-6 md:sticky md:top-24 self-start">
+            <div className="p-5 sm:p-6 rounded-2xl border border-white/[0.08] border-t-white/[0.16] bg-[#111116] shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <h4 className="text-xs font-mono uppercase tracking-widest text-muted-gray">
+                  Question Palette
+                </h4>
+                <span className="text-[11px] font-mono text-accent font-bold">
+                  {questions.length} Questions
+                </span>
+              </div>
 
-              <div className="grid grid-cols-5 gap-2 mb-6">
-                {questions.map((q, idx) => {
-                  const isAns = !!userAnswers[q.id];
-                  const isMarked = !!markedForReview[q.id];
-                  const isCurrent = currentIdx === idx;
+              {/* Scrollable Question Grid Container */}
+              <div className="max-h-64 sm:max-h-80 overflow-y-auto pr-1 mb-4 scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-accent/40">
+                <div className="grid grid-cols-5 gap-2">
+                  {questions.map((q, idx) => {
+                    const isAns = !!userAnswers[q.id];
+                    const isMarked = !!markedForReview[q.id];
+                    const isCurrent = currentIdx === idx;
 
-                  let badgeColor = "border-white/[0.08] text-muted-gray bg-[#14141c]";
-                  if (isMarked) {
-                    badgeColor = "border-amber-500/80 bg-amber-500/20 text-amber-300 font-bold shadow-[0_0_8px_rgba(245,158,11,0.3)]";
-                  } else if (isAns) {
-                    badgeColor = "border-accent bg-accent/20 text-accent font-bold shadow-[0_0_8px_rgba(61,90,254,0.3)]";
-                  }
+                    let badgeColor = "border-white/[0.08] text-muted-gray bg-[#14141c]";
+                    if (isMarked) {
+                      badgeColor = "border-amber-500/80 bg-amber-500/20 text-amber-300 font-bold shadow-[0_0_8px_rgba(245,158,11,0.3)]";
+                    } else if (isAns) {
+                      badgeColor = "border-accent bg-accent/20 text-accent font-bold shadow-[0_0_8px_rgba(61,90,254,0.3)]";
+                    }
 
-                  return (
-                    <button
-                      key={q.id}
-                      onClick={() => setCurrentIdx(idx)}
-                      className={`h-9 rounded-lg border text-xs font-mono flex items-center justify-center transition-all cursor-pointer ${badgeColor} ${
-                        isCurrent ? 'ring-2 ring-white text-off-white scale-105' : ''
-                      }`}
-                    >
-                      {idx + 1}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={q.id}
+                        onClick={() => setCurrentIdx(idx)}
+                        className={`h-8 rounded-lg border text-xs font-mono flex items-center justify-center transition-all cursor-pointer ${badgeColor} ${
+                          isCurrent ? 'ring-2 ring-white text-off-white scale-105 font-bold z-10' : ''
+                        }`}
+                      >
+                        {idx + 1}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Legend */}
-              <div className="space-y-2 text-[11px] font-mono text-muted-gray border-t border-white/[0.06] pt-4">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded bg-accent" />
-                  <span>Answered ({Object.keys(userAnswers).length})</span>
+              <div className="space-y-1.5 text-[11px] font-mono text-muted-gray border-t border-white/[0.06] pt-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded bg-accent" />
+                    <span>Answered</span>
+                  </div>
+                  <span className="text-off-white font-bold">{Object.keys(userAnswers).length}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded bg-amber-500" />
-                  <span>Marked for Review ({Object.keys(markedForReview).filter(k => markedForReview[k]).length})</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded bg-amber-500" />
+                    <span>Marked</span>
+                  </div>
+                  <span className="text-amber-400 font-bold">{Object.keys(markedForReview).filter(k => markedForReview[k]).length}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded bg-[#1e1e24] border border-white/20" />
-                  <span>Unattempted ({questions.length - Object.keys(userAnswers).length})</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded bg-[#1e1e24] border border-white/20" />
+                    <span>Unattempted</span>
+                  </div>
+                  <span className="text-muted-gray">{questions.length - Object.keys(userAnswers).length}</span>
                 </div>
               </div>
 
               {/* Instant Submit Button */}
               <button
                 onClick={() => setIsSubmitted(true)}
-                className="w-full mt-6 py-2.5 rounded-xl border border-accent/40 bg-accent/15 text-accent text-xs font-mono font-bold hover:bg-accent hover:text-white transition-all shadow-[0_0_12px_rgba(61,90,254,0.2)]"
+                className="w-full mt-5 py-2.5 rounded-xl border border-accent/40 bg-accent/15 text-accent text-xs font-mono font-bold hover:bg-accent hover:text-white transition-all shadow-[0_0_12px_rgba(61,90,254,0.2)] cursor-pointer"
               >
                 Submit Exam
               </button>
             </div>
           </div>
+
         </div>
       ) : (
         /* Post-Exam Score Report & Detailed Review */
