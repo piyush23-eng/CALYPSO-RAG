@@ -105,9 +105,9 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-[#f5f5f0] flex flex-col justify-between selection:bg-accent selection:text-white">
+    <div className="min-h-screen bg-[#000000] text-[#f5f5f0] flex flex-col justify-between selection:bg-accent selection:text-white">
       {/* Top Studio Nav Bar */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[#0a0a0f]/85 backdrop-blur-md border-b border-white/[0.08] py-4 px-4 sm:px-6">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[#000000]/85 backdrop-blur-md border-b border-white/[0.08] py-4 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button
             onClick={() => setIsEvalView(false)}

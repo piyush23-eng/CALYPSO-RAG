@@ -33,10 +33,10 @@ export const Marquee: React.FC<MarqueeProps> = ({
   const marqueeItems = [...displayTopics, ...displayTopics, ...displayTopics];
 
   return (
-    <div className="w-full border-y border-white/[0.07] bg-[#0c0c14] py-3.5 overflow-hidden select-none marquee-container relative">
-      {/* Subtle vignette gradients on left & right matching #0a0a0f */}
-      <div className="absolute left-0 top-0 bottom-0 w-28 bg-gradient-to-r from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-28 bg-gradient-to-l from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent z-10 pointer-events-none" />
+    <div className="w-full border-y border-white/[0.07] bg-[#070707] py-3.5 overflow-hidden select-none marquee-container relative">
+      {/* Subtle vignette gradients on left & right matching #000000 */}
+      <div className="absolute left-0 top-0 bottom-0 w-28 bg-gradient-to-r from-[#000000] via-[#000000]/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-28 bg-gradient-to-l from-[#000000] via-[#000000]/80 to-transparent z-10 pointer-events-none" />
 
       <div
         className={`flex whitespace-nowrap marquee-content ${

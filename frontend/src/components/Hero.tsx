@@ -33,12 +33,6 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
 
   return (
     <section className="relative pt-24 pb-16 px-6 max-w-5xl mx-auto">
-      {/* Subtle Blue Radial Glow strictly behind the Hero */}
-      <div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-12 w-[650px] sm:w-[900px] h-[420px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(61,90,254,0.14),rgba(61,90,254,0.03)_50%,transparent_75%)] pointer-events-none -z-10 blur-2xl" 
-        aria-hidden="true"
-      />
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
