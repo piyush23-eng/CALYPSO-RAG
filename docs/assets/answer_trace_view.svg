@@ -1,96 +1,175 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="100%" height="100%">
-  <defs>
-    <linearGradient id="cardBg" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#141416"/>
-      <stop offset="100%" stop-color="#0e0e10"/>
-    </linearGradient>
-    <linearGradient id="badgeBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3d5afe"/>
-      <stop offset="100%" stop-color="#2a3eb1"/>
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 860" width="100%" height="100%">
+  <!-- Pure Black Background -->
+  <rect width="1200" height="860" fill="#000000"/>
+  <rect x="0" y="0" width="1200" height="860" fill="none" stroke="#1c1c24" stroke-width="1"/>
 
-  <!-- Background -->
-  <rect width="1200" height="760" fill="#0a0a0a"/>
-  <rect x="0" y="0" width="1200" height="760" fill="none" stroke="#222" stroke-width="1"/>
+  <!-- Top Metadata Bar -->
+  <g transform="translate(60, 45)">
+    <!-- Subject Badge -->
+    <rect x="0" y="0" width="145" height="28" rx="14" fill="#181828" stroke="#3d5afe" stroke-opacity="0.5" stroke-width="1"/>
+    <text x="72" y="18" fill="#3d5afe" font-family="monospace" font-size="11" font-weight="700" text-anchor="middle">OPERATING SYSTEMS</text>
 
-  <!-- Section Title -->
-  <text x="60" y="45" fill="#888" font-family="monospace" font-size="12" font-weight="600" letter-spacing="0.15em">LANGGRAPH AGENT OUTPUT · VERIFIED DERIVATION</text>
-  <text x="60" y="85" fill="#f5f5f0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800">Hard Disk Data Transfer Time Solution</text>
+    <!-- Relevance Score -->
+    <rect x="160" y="0" width="155" height="28" rx="14" fill="#12121a" stroke="#252535" stroke-width="1"/>
+    <text x="175" y="18" fill="#888899" font-family="monospace" font-size="11">Relevance:</text>
+    <text x="250" y="18" fill="#f5f5f0" font-family="monospace" font-size="11" font-weight="bold">0.9963</text>
 
-  <!-- Telemetry Bar -->
-  <g transform="translate(60, 105)">
-    <rect x="0" y="0" width="1080" height="36" rx="6" fill="#141418" stroke="#222" stroke-width="1"/>
-    <text x="20" y="23" fill="#888" font-family="monospace" font-size="12">Domain: <tspan fill="#3d5afe" font-weight="bold">Computer Organization &amp; Architecture</tspan></text>
-    <text x="450" y="23" fill="#888" font-family="monospace" font-size="12">Rerank Score: <tspan fill="#00e676" font-weight="bold">0.9944 (Gate Passed)</tspan></text>
-    <text x="750" y="23" fill="#888" font-family="monospace" font-size="12">Attribution: <tspan fill="#f5f5f0" font-weight="bold">2 Verified Citations</tspan></text>
-    <text x="960" y="23" fill="#888" font-family="monospace" font-size="12">Latency: <tspan fill="#f5f5f0">34ms</tspan></text>
+    <!-- Confidence Indicator -->
+    <rect x="330" y="0" width="170" height="28" rx="14" fill="#14192e" stroke="#3d5afe" stroke-opacity="0.4" stroke-width="1"/>
+    <circle cx="345" cy="14" r="3" fill="#3d5afe"/>
+    <text x="355" y="18" fill="#3d5afe" font-family="monospace" font-size="11" font-weight="600">High System Confidence</text>
+
+    <!-- Gate Passed -->
+    <text x="520" y="18" fill="#3d5afe" font-family="monospace" font-size="11" font-weight="600">✓ Gate Passed</text>
+
+    <!-- Bookmark Button -->
+    <rect x="940" y="0" width="140" height="28" rx="6" fill="#141420" stroke="#3d5afe" stroke-opacity="0.4" stroke-width="1"/>
+    <text x="1010" y="18" fill="#3d5afe" font-family="monospace" font-size="11" text-anchor="middle">★ Bookmarked</text>
   </g>
 
-  <!-- Main Derivation Card -->
-  <g transform="translate(60, 160)">
-    <rect x="0" y="0" width="680" height="420" rx="10" fill="url(#cardBg)" stroke="#26262a" stroke-width="1"/>
-    
-    <text x="25" y="35" fill="#3d5afe" font-family="monospace" font-size="13" font-weight="bold">1. ROTATIONAL &amp; SECTOR TRANSFER CALCULATIONS</text>
-    <text x="25" y="65" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Rotational Speed N = 15000 rpm = 250 rev/sec</text>
-    <text x="25" y="90" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• One Full Revolution Time: T_rev = 1000 / 250 = 4.0 ms</text>
-    <text x="25" y="115" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Average Rotational Latency: T_rot = 4.0 / 2 = 2.0 ms</text>
-    <text x="25" y="140" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Sector Transfer Time: T_transfer = 4.0 ms / 400 sectors = 0.01 ms</text>
-    <text x="25" y="165" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Time to read 10 random sectors on 1 track = 10 × (2.0 + 0.01) = 20.1 ms</text>
+  <!-- Editorial Answer Card -->
+  <g transform="translate(60, 95)">
+    <rect x="0" y="0" width="1080" height="490" rx="16" fill="#0d0d14" stroke="#252535" stroke-width="1"/>
+    <line x1="0" y1="0" x2="1080" y2="0" stroke="#3d5afe" stroke-opacity="0.6" stroke-width="2"/>
 
-    <line x1="25" y1="190" x2="655" y2="190" stroke="#222" stroke-width="1"/>
+    <!-- Answer Card Header with Voice Tutor Player -->
+    <g transform="translate(25, 25)">
+      <text x="0" y="18" fill="#888899" font-family="monospace" font-size="11" font-weight="700" letter-spacing="0.12em">VERIFIED MATHEMATICAL DERIVATION &amp; PROOF</text>
+      
+      <!-- IIT Professor Voice Player Toolbar -->
+      <g transform="translate(560, 0)">
+        <!-- Voice Persona Select -->
+        <rect x="0" y="0" width="180" height="30" rx="6" fill="#161624" stroke="#2c2c3e" stroke-width="1"/>
+        <text x="10" y="19" fill="#f5f5f0" font-family="monospace" font-size="10">Prof. Prabhat (IIT Faculty)</text>
+        <text x="165" y="19" fill="#888" font-size="9">▾</text>
 
-    <text x="25" y="220" fill="#3d5afe" font-family="monospace" font-size="13" font-weight="bold">2. SEEK TIME TRAJECTORY (Track 0 → 5 → 12 → 7)</text>
-    <text x="25" y="245" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Track 0 → 5: |5 - 0| × 1 ms = 5 ms</text>
-    <text x="25" y="270" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Track 5 → 12: |12 - 5| × 1 ms = 7 ms</text>
-    <text x="25" y="295" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Track 12 → 7: |7 - 12| × 1 ms = 5 ms</text>
-    <text x="25" y="320" fill="#ccc" font-family="-apple-system, sans-serif" font-size="13">• Total Seek Time = 5 + 7 + 5 = 17.0 ms</text>
+        <!-- Audio Play Button -->
+        <rect x="190" y="0" width="170" height="30" rx="6" fill="#1c1d32" stroke="#3d5afe" stroke-width="1"/>
+        <text x="205" y="19" fill="#3d5afe" font-size="12">🎙️</text>
+        <text x="225" y="19" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold">Listen to Walkthrough</text>
 
-    <line x1="25" y1="345" x2="655" y2="345" stroke="#222" stroke-width="1"/>
+        <!-- Speed -->
+        <rect x="370" y="0" width="45" height="30" rx="6" fill="#161624" stroke="#2c2c3e" stroke-width="1"/>
+        <text x="392" y="19" fill="#ccc" font-family="monospace" font-size="10" text-anchor="middle">1.0x</text>
+      </g>
+    </g>
 
-    <text x="25" y="375" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="14" font-weight="bold">TOTAL TRANSFER TIME: 17.0 ms + (3 × 20.1 ms) = </text>
-    <rect x="420" y="355" width="110" height="32" rx="4" fill="#3d5afe"/>
-    <text x="475" y="376" fill="#ffffff" font-family="monospace" font-size="16" font-weight="900" text-anchor="middle">77.3 ms</text>
+    <line x1="25" y1="70" x2="1055" y2="70" stroke="#1c1c28" stroke-width="1"/>
+
+    <!-- Mathematical Derivation Body -->
+    <g transform="translate(30, 95)">
+      <rect x="0" y="0" width="60" height="20" rx="4" fill="#1e1e30" stroke="#3d5afe" stroke-opacity="0.4" stroke-width="1"/>
+      <text x="30" y="14" fill="#3d5afe" font-family="monospace" font-size="9" font-weight="bold" text-anchor="middle">STAGE 1</text>
+      <text x="75" y="16" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="18" font-weight="bold">Effective Memory Access Time (EMAT) Formulation</text>
+
+      <text x="0" y="48" fill="#d0d0dc" font-family="-apple-system, sans-serif" font-size="14">
+        In a 2-level paging architecture, let <tspan font-family="monospace" fill="#3d5afe">h = 0.90</tspan> be the TLB hit ratio, <tspan font-family="monospace" fill="#3d5afe">t_TLB = 20 ns</tspan>, and <tspan font-family="monospace" fill="#3d5afe">t_m = 100 ns</tspan>.
+      </text>
+
+      <rect x="0" y="65" width="1020" height="42" rx="6" fill="#14141e" stroke="#222232" stroke-width="1"/>
+      <text x="20" y="91" fill="#f5f5f0" font-family="monospace" font-size="13">
+        EMAT = h × (t_TLB + t_m) + (1 - h) × [ t_TLB + (k + 1) × t_m ]
+      </text>
+
+      <text x="0" y="132" fill="#d0d0dc" font-family="-apple-system, sans-serif" font-size="14">
+        1. When TLB Hits (90% probability): Access = 20 ns (TLB) + 100 ns (Physical Frame) = <tspan font-weight="bold" fill="#10b981">120 ns</tspan>.
+      </text>
+      <text x="0" y="156" fill="#d0d0dc" font-family="-apple-system, sans-serif" font-size="14">
+        2. When TLB Misses (10% probability): Access = 20 ns (TLB) + 2 × 100 ns (2-level Page Tables) + 100 ns = <tspan font-weight="bold" fill="#f59e0b">320 ns</tspan>.
+      </text>
+
+      <rect x="0" y="175" width="1020" height="38" rx="6" fill="#14141e" stroke="#222232" stroke-width="1"/>
+      <text x="20" y="199" fill="#3d5afe" font-family="monospace" font-size="13" font-weight="bold">
+        EMAT = 0.90 × (120 ns) + 0.10 × (320 ns) = 108 ns + 32 ns = 140.00 ns
+      </text>
+    </g>
+
+    <!-- Embedded Targeted Simulation Lab Bar -->
+    <g transform="translate(25, 340)">
+      <line x1="0" y1="0" x2="1030" y2="0" stroke="#222232" stroke-width="1"/>
+
+      <rect x="0" y="15" width="340" height="34" rx="8" fill="#18182c" stroke="#3d5afe" stroke-width="1"/>
+      <text x="15" y="36" fill="#3d5afe" font-size="13">⚡</text>
+      <text x="35" y="36" fill="#3d5afe" font-family="monospace" font-size="11" font-weight="bold">2-Level Paging &amp; EMAT Simulator</text>
+      <circle cx="320" cy="32" r="3" fill="#10b981"/>
+
+      <!-- Live Slider Controls Preview -->
+      <g transform="translate(0, 60)">
+        <rect x="0" y="0" width="1030" height="70" rx="8" fill="#12121c" stroke="#1f1f2e" stroke-width="1"/>
+        
+        <!-- Slider 1 -->
+        <text x="20" y="25" fill="#888" font-family="monospace" font-size="10">TLB Hit Rate (h): <tspan fill="#3d5afe" font-weight="bold">90%</tspan></text>
+        <line x1="20" y1="42" x2="220" y2="42" stroke="#333" stroke-width="4"/>
+        <line x1="20" y1="42" x2="200" y2="42" stroke="#3d5afe" stroke-width="4"/>
+        <circle cx="200" cy="42" r="6" fill="#3d5afe"/>
+
+        <!-- Slider 2 -->
+        <text x="270" y="25" fill="#888" font-family="monospace" font-size="10">TLB Latency: <tspan fill="#3d5afe" font-weight="bold">20 ns</tspan></text>
+        <line x1="270" y1="42" x2="470" y2="42" stroke="#333" stroke-width="4"/>
+        <line x1="270" y1="42" x2="350" y2="42" stroke="#3d5afe" stroke-width="4"/>
+        <circle cx="350" cy="42" r="6" fill="#3d5afe"/>
+
+        <!-- Slider 3 -->
+        <text x="520" y="25" fill="#888" font-family="monospace" font-size="10">Memory Latency: <tspan fill="#3d5afe" font-weight="bold">100 ns</tspan></text>
+        <line x1="520" y1="42" x2="720" y2="42" stroke="#333" stroke-width="4"/>
+        <line x1="520" y1="42" x2="620" y2="42" stroke="#3d5afe" stroke-width="4"/>
+        <circle cx="620" cy="42" r="6" fill="#3d5afe"/>
+
+        <!-- Output Display -->
+        <rect x="760" y="10" width="250" height="50" rx="6" fill="#1a1a2a" stroke="#3d5afe" stroke-opacity="0.4" stroke-width="1"/>
+        <text x="780" y="32" fill="#888" font-family="monospace" font-size="9">CALCULATED EMAT:</text>
+        <text x="780" y="50" fill="#3d5afe" font-family="-apple-system, sans-serif" font-size="20" font-weight="900">140.00 <tspan font-size="12" fill="#888">ns</tspan></text>
+      </g>
+    </g>
   </g>
 
-  <!-- Hover-Reveal Source Receipt Cards (Right Side) -->
-  <g transform="translate(760, 160)">
-    <text x="0" y="0" fill="#888" font-family="monospace" font-size="12" font-weight="600">VERIFIED SOURCE RECEIPTS [2 CITATIONS]</text>
+  <!-- Evidence Attribution Receipts -->
+  <g transform="translate(60, 610)">
+    <text x="0" y="15" fill="#8888a0" font-family="monospace" font-size="11" font-weight="700" letter-spacing="0.14em">EVIDENCE SOURCES (3 VERIFIED RECEIPTS · ATTRIBUTION COSINE SIM ≥ 0.60)</text>
 
-    <!-- Source Card 1 -->
-    <rect x="0" y="15" width="380" height="195" rx="8" fill="#141417" stroke="#3d5afe" stroke-width="1.5"/>
-    <rect x="15" y="30" width="60" height="20" rx="3" fill="#1e2238"/>
-    <text x="45" y="44" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">[1] CITATION</text>
-    <text x="90" y="44" fill="#888" font-family="monospace" font-size="11">coa_math_pyqs_1990_2026.md</text>
-    
-    <text x="15" y="75" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="13" font-weight="bold">Question GATE-2022-COA-05: Hard Disk</text>
-    <text x="15" y="100" fill="#aaa" font-family="-apple-system, sans-serif" font-size="12">"Rotational Speed 15000 rpm -> T_rev = 4ms.</text>
-    <text x="15" y="120" fill="#aaa" font-family="-apple-system, sans-serif" font-size="12">Seek time 1ms/track. Track 0 -> 5 -> 12 -> 7."</text>
-    
-    <line x1="15" y1="145" x2="365" y2="145" stroke="#222" stroke-width="1"/>
-    <text x="15" y="168" fill="#3d5afe" font-family="monospace" font-size="11">Cosine Similarity: 0.9139 · BM25 Score: 229.71</text>
-    <text x="15" y="188" fill="#00e676" font-family="monospace" font-size="11">Cross-Encoder Sigmoid Confidence: 99.44%</text>
+    <!-- Receipt 1 -->
+    <g transform="translate(0, 30)">
+      <rect x="0" y="0" width="345" height="170" rx="10" fill="#0e0e16" stroke="#252535" stroke-width="1"/>
+      <text x="15" y="25" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold">[1] RECEIPT</text>
+      <text x="315" y="25" fill="#888" font-size="12">↗</text>
+      <text x="15" y="50" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="13" font-weight="bold">Operating Systems / Paging</text>
+      <text x="15" y="70" fill="#888899" font-family="monospace" font-size="9">2025_cs_set1_paper_pyqs.md</text>
+      
+      <rect x="15" y="85" width="315" height="45" rx="4" fill="#141420"/>
+      <text x="25" y="105" fill="#aaaab8" font-family="monospace" font-size="9">"EMAT = h*(t_tlb + t_m) +</text>
+      <text x="25" y="120" fill="#aaaab8" font-family="monospace" font-size="9">(1-h)*(t_tlb + (k+1)*t_m)"</text>
 
-    <!-- Source Card 2 -->
-    <rect x="0" y="225" width="380" height="175" rx="8" fill="#141417" stroke="#26262a" stroke-width="1"/>
-    <rect x="15" y="240" width="60" height="20" rx="3" fill="#1f1f24"/>
-    <text x="45" y="254" fill="#888" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">[2] CITATION</text>
-    <text x="90" y="254" fill="#888" font-family="monospace" font-size="11">gate_cs_syllabus.md</text>
-    
-    <text x="15" y="285" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="13" font-weight="bold">COA · Storage Hierarchy &amp; I/O Organization</text>
-    <text x="15" y="310" fill="#aaa" font-family="-apple-system, sans-serif" font-size="12">"Secondary storage organization, rotational latency,</text>
-    <text x="15" y="330" fill="#aaa" font-family="-apple-system, sans-serif" font-size="12">cylinder seek scheduling algorithms and bus transfers."</text>
-    
-    <line x1="15" y1="355" x2="365" y2="355" stroke="#222" stroke-width="1"/>
-    <text x="15" y="378" fill="#888" font-family="monospace" font-size="11">Cosine Similarity: 0.7640 · BM25 Score: 42.92</text>
-  </g>
+      <text x="15" y="155" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold">Sim: 0.9963</text>
+    </g>
 
-  <!-- Transparent Retrieval Trace Accordion (Bottom) -->
-  <g transform="translate(60, 600)">
-    <rect x="0" y="0" width="1080" height="120" rx="8" fill="#111114" stroke="#222" stroke-width="1"/>
-    <text x="25" y="30" fill="#f5f5f0" font-family="monospace" font-size="13" font-weight="bold">▼ RETRIEVAL TRACE &amp; RECIPROCAL RANK FUSION PROVENANCE</text>
-    <text x="25" y="58" fill="#aaa" font-family="monospace" font-size="12">• Top Lexical Match: <tspan fill="#fff">pyq_fb39395c82d6</tspan> (BM25: 229.7127, Rank #1 in coa_math_pyqs_1990_2026.md)</text>
-    <text x="25" y="80" fill="#aaa" font-family="monospace" font-size="12">• Top Dense Vector: <tspan fill="#fff">bge-small-en-v1.5</tspan> (Cosine Distance: 0.0861, Sim: 0.9139, Rank #1)</text>
-    <text x="25" y="102" fill="#aaa" font-family="monospace" font-size="12">• RRF Fusion (k=60): <tspan fill="#3d5afe">Score: 0.032787</tspan> ➔ Cross-Encoder Re-rank: <tspan fill="#00e676">0.9944</tspan> ➔ Gate Status: <tspan fill="#00e676">PASSED (0 reformulations)</tspan></text>
+    <!-- Receipt 2 -->
+    <g transform="translate(365, 30)">
+      <rect x="0" y="0" width="345" height="170" rx="10" fill="#0e0e16" stroke="#252535" stroke-width="1"/>
+      <text x="15" y="25" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold">[2] RECEIPT</text>
+      <text x="315" y="25" fill="#888" font-size="12">↗</text>
+      <text x="15" y="50" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="13" font-weight="bold">Virtual Memory &amp; TLB Invariants</text>
+      <text x="15" y="70" fill="#888899" font-family="monospace" font-size="9">os_virtual_memory_theory.md</text>
+      
+      <rect x="15" y="85" width="315" height="45" rx="4" fill="#141420"/>
+      <text x="25" y="105" fill="#aaaab8" font-family="monospace" font-size="9">"Multi-level page table walk</text>
+      <text x="25" y="120" fill="#aaaab8" font-family="monospace" font-size="9">requires k memory accesses"</text>
+
+      <text x="15" y="155" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold">Sim: 0.9412</text>
+    </g>
+
+    <!-- Receipt 3 -->
+    <g transform="translate(730, 30)">
+      <rect x="0" y="0" width="350" height="170" rx="10" fill="#0e0e16" stroke="#252535" stroke-width="1"/>
+      <text x="15" y="25" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold">[3] RECEIPT</text>
+      <text x="320" y="25" fill="#888" font-size="12">↗</text>
+      <text x="15" y="50" fill="#f5f5f0" font-family="-apple-system, sans-serif" font-size="13" font-weight="bold">Knowledge Graph Relational Triplet</text>
+      <text x="15" y="70" fill="#888899" font-family="monospace" font-size="9">graphrag_ontology_invariants.json</text>
+      
+      <rect x="15" y="85" width="320" height="45" rx="4" fill="#141420"/>
+      <text x="25" y="105" fill="#aaaab8" font-family="monospace" font-size="9">[Two-Level Paging] --[requires]--> </text>
+      <text x="25" y="120" fill="#aaaab8" font-family="monospace" font-size="9">[2 Memory Accesses per TLB Miss]</text>
+
+      <text x="15" y="155" fill="#3d5afe" font-family="monospace" font-size="10" font-weight="bold">Sim: 0.8920</text>
+    </g>
   </g>
 </svg>
