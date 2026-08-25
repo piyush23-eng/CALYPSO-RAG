@@ -20,8 +20,10 @@ interface QuizViewProps {
 
 export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [totalInBank, setTotalInBank] = useState(1532);
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<string>("All Subjects");
+  const [selectedType, setSelectedType] = useState<string>("All Types");
   const [currentIdx, setCurrentIdx] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [markedForReview, setMarkedForReview] = useState<Record<string, boolean>>({});
@@ -32,14 +34,17 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
   // Fetch Questions
   useEffect(() => {
     setLoading(true);
-    const url = selectedSubject === "All Subjects" 
-      ? '/api/quiz/questions' 
-      : `/api/quiz/questions?subject=${encodeURIComponent(selectedSubject)}`;
+    const params = new URLSearchParams();
+    if (selectedSubject !== "All Subjects") params.append("subject", selectedSubject);
+    if (selectedType !== "All Types") params.append("q_type", selectedType);
+
+    const url = `/api/quiz/questions?${params.toString()}`;
     
     fetch(url)
       .then(res => res.json())
       .then(data => {
         setQuestions(data.questions || []);
+        if (data.total_in_bank) setTotalInBank(data.total_in_bank);
         setCurrentIdx(0);
         setUserAnswers({});
         setMarkedForReview({});
@@ -49,7 +54,8 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [selectedSubject]);
+  }, [selectedSubject, selectedType]);
+
 
   // Countdown timer
   useEffect(() => {
@@ -180,38 +186,60 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
           Practice Mock Exam.
         </h1>
         <p className="text-sm sm:text-base text-muted-gray font-light max-w-2xl">
-          Timed simulation adhering strictly to official GATE CS marking schemes (+1.0 / +2.0 marks, -0.33 / -0.66 negative marking) with instant verified CALYPSO derivations.
+          Authentic examination simulator loaded with <strong>{totalInBank.toLocaleString()} official GATE CS questions (1991–2025)</strong> across MCQs, MSQs (multi-select), and NAT (numerical type).
         </p>
       </div>
 
-      {/* Subject Filter Selector */}
+      {/* Type & Subject Filter Bar */}
       {!isSubmitted && (
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
-          <button
-            onClick={() => setSelectedSubject("All Subjects")}
-            className={`text-xs font-mono px-3.5 py-1.5 rounded-lg border transition-all ${
-              selectedSubject === "All Subjects"
-                ? 'border-accent bg-accent/15 text-accent font-semibold shadow-[0_0_12px_rgba(61,90,254,0.25)]'
-                : 'border-white/[0.08] text-muted-gray hover:text-off-white bg-[#111116]'
-            }`}
-          >
-            All Subjects ({questions.length})
-          </button>
-          {GATE_SUBJECTS.map(s => (
+        <div className="space-y-3 mb-8">
+          {/* Question Type Filter (MCQ / MSQ / NAT) */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/[0.06]">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-muted-gray mr-2">Pattern:</span>
+            {["All Types", "MCQ", "MSQ", "NAT"].map(t => (
+              <button
+                key={t}
+                onClick={() => setSelectedType(t)}
+                className={`text-xs font-mono px-3 py-1 rounded-lg border transition-all cursor-pointer ${
+                  selectedType === t
+                    ? 'border-cyan-500/80 bg-cyan-500/15 text-cyan-300 font-bold shadow-[0_0_10px_rgba(6,182,212,0.25)]'
+                    : 'border-white/[0.08] text-muted-gray hover:text-off-white bg-[#111116]'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          {/* Subject Filter Selector */}
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
             <button
-              key={s.id}
-              onClick={() => setSelectedSubject(s.name)}
-              className={`text-xs font-mono px-3.5 py-1.5 rounded-lg border transition-all flex-shrink-0 ${
-                selectedSubject === s.name
+              onClick={() => setSelectedSubject("All Subjects")}
+              className={`text-xs font-mono px-3.5 py-1.5 rounded-lg border transition-all flex-shrink-0 cursor-pointer ${
+                selectedSubject === "All Subjects"
                   ? 'border-accent bg-accent/15 text-accent font-semibold shadow-[0_0_12px_rgba(61,90,254,0.25)]'
                   : 'border-white/[0.08] text-muted-gray hover:text-off-white bg-[#111116]'
               }`}
             >
-              {s.short}
+              All Subjects ({questions.length})
             </button>
-          ))}
+            {GATE_SUBJECTS.map(s => (
+              <button
+                key={s.id}
+                onClick={() => setSelectedSubject(s.name)}
+                className={`text-xs font-mono px-3.5 py-1.5 rounded-lg border transition-all flex-shrink-0 cursor-pointer ${
+                  selectedSubject === s.name
+                    ? 'border-accent bg-accent/15 text-accent font-semibold shadow-[0_0_12px_rgba(61,90,254,0.25)]'
+                    : 'border-white/[0.08] text-muted-gray hover:text-off-white bg-[#111116]'
+                }`}
+              >
+                {s.short}
+              </button>
+            ))}
+          </div>
         </div>
       )}
+
 
       {loading ? (
         <div className="py-20 text-center text-xs font-mono text-muted-gray animate-pulse">

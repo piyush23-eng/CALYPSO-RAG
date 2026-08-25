@@ -3,6 +3,8 @@ Authentic GATE CS Mock Quiz & Practice Test API for CALYPSO-RAG.
 Provides curated authentic examination questions across all 10 GATE subjects with official scoring rules (MCQ, MSQ, NAT).
 """
 
+import json
+from pathlib import Path
 from fastapi import APIRouter, Query
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
@@ -10,20 +12,19 @@ from src.api.quiz_bank import COMPREHENSIVE_GATE_QUIZ_BANK
 
 quiz_router = APIRouter(prefix="/api/quiz", tags=["quiz"])
 
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+FULL_BANK_PATH = PROJECT_ROOT / "data/processed/full_quiz_bank_1991_2025.json"
 
-class QuizQuestion(BaseModel):
-    id: str
-    subject: str
-    type: str  # 'MCQ', 'MSQ', or 'NAT'
-    marks: float
-    negative_marks: float
-    question: str
-    options: Optional[List[str]] = None
-    correct_answer: str
-    explanation: str
+# Load full extracted question bank or fallback to curated list
+if FULL_BANK_PATH.exists():
+    try:
+        with open(FULL_BANK_PATH, "r", encoding="utf-8") as f:
+            QUIZ_BANK = json.load(f)
+    except Exception:
+        QUIZ_BANK = COMPREHENSIVE_GATE_QUIZ_BANK
+else:
+    QUIZ_BANK = COMPREHENSIVE_GATE_QUIZ_BANK
 
-
-QUIZ_BANK = COMPREHENSIVE_GATE_QUIZ_BANK
 
 
 @quiz_router.get("/questions")
