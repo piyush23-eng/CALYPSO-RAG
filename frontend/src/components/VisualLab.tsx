@@ -11,32 +11,114 @@ export type LabType =
   | 'subnet' 
   | 'b_tree';
 
+export interface DetectedSimulation {
+  type: LabType;
+  title: string;
+  subject: string;
+  description: string;
+}
+
+/**
+ * Intelligent topic detector that maps user queries, reformulated queries, 
+ * or final answers to the exact corresponding GATE CS simulation lab.
+ */
+export function detectSimulationLab(text: string): DetectedSimulation | null {
+  if (!text) return null;
+  const q = text.toLowerCase();
+
+  if (q.includes('emat') || q.includes('paging') || q.includes('page table') || q.includes('tlb') || q.includes('hit ratio') || q.includes('effective memory')) {
+    return {
+      type: 'emat',
+      title: 'Paging & EMAT Simulator',
+      subject: 'Operating Systems',
+      description: 'Simulate dynamic TLB hit ratios, memory access latencies, and multi-level paging walks.'
+    };
+  }
+  if (q.includes('window') || q.includes('gbn') || q.includes('go-back-n') || q.includes('selective repeat') || q.includes('propagation') || q.includes('bandwidth') || q.includes('efficiency')) {
+    return {
+      type: 'sliding_window',
+      title: 'Sliding Window (GBN/SR) Simulator',
+      subject: 'Computer Networks',
+      description: 'Simulate link distance, bandwidth, optimal window sizes, and protocol channel efficiency.'
+    };
+  }
+  if (q.includes('cache') || q.includes('amat') || q.includes('hit rate') || q.includes('miss penalty') || q.includes('l1') || q.includes('l2')) {
+    return {
+      type: 'cache',
+      title: 'Cache Hierarchy (AMAT) Simulator',
+      subject: 'Computer Organization & Architecture',
+      description: 'Simulate multi-level cache hit rates, latencies, and average memory access time.'
+    };
+  }
+  if (q.includes('pipeline') || q.includes('pipelining') || q.includes('speedup') || q.includes('stall') || q.includes('hazard') || q.includes('mips')) {
+    return {
+      type: 'pipeline',
+      title: 'CPU Pipelining & Speedup Simulator',
+      subject: 'Computer Organization & Architecture',
+      description: 'Simulate pipeline stage depths, branch stall penalties, and real speedup vs ideal.'
+    };
+  }
+  if (q.includes('disk') || q.includes('rpm') || q.includes('rotational') || q.includes('seek time') || q.includes('spindle')) {
+    return {
+      type: 'disk',
+      title: 'Disk Arm & Access Latency Simulator',
+      subject: 'Operating Systems / Storage',
+      description: 'Simulate rotational latency, seek times, and transfer rates across different spindle RPMs.'
+    };
+  }
+  if (q.includes('master theorem') || q.includes('recurrence') || q.includes('t(n)') || (q.includes('t(n/2)') && q.includes('theta'))) {
+    return {
+      type: 'master_theorem',
+      title: 'Master Theorem Recurrence Solver',
+      subject: 'Algorithms',
+      description: 'Simulate divide-and-conquer subproblems, division factors, and asymptotic Big-Θ cases.'
+    };
+  }
+  if (q.includes('cidr') || q.includes('subnet') || q.includes('prefix') || q.includes('usable host') || q.includes('ip address') || q.includes('/24') || q.includes('/16')) {
+    return {
+      type: 'subnet',
+      title: 'CIDR Subnetting & IP Range Simulator',
+      subject: 'Computer Networks',
+      description: 'Simulate prefix length variations, total usable host IPs, and subnet masks.'
+    };
+  }
+  if (q.includes('b+ tree') || q.includes('b-tree') || q.includes('fanout') || q.includes('index block') || q.includes('internal node') || q.includes('leaf node')) {
+    return {
+      type: 'b_tree',
+      title: 'B+ Tree Index Fanout & Capacity Simulator',
+      subject: 'Database Management Systems',
+      description: 'Simulate block capacities, key/pointer sizing, and maximum record indexing heights.'
+    };
+  }
+
+  return null;
+}
+
 interface VisualLabProps {
   initialLab?: LabType;
   queryTopicHint?: string;
+  forceSpecificLab?: LabType;
+  hideTabBar?: boolean;
 }
 
 export const VisualLab: React.FC<VisualLabProps> = ({
   initialLab = 'emat',
-  queryTopicHint
+  queryTopicHint,
+  forceSpecificLab,
+  hideTabBar = false
 }) => {
-  // Determine starting active tab based on query topic hint
+  // Determine starting active tab based on query topic hint or forced lab
   const getStartingTab = (): LabType => {
+    if (forceSpecificLab) return forceSpecificLab;
     if (queryTopicHint) {
-      const q = queryTopicHint.toLowerCase();
-      if (q.includes('window') || q.includes('gbn') || q.includes('selective') || q.includes('packet')) return 'sliding_window';
-      if (q.includes('pipeline') || q.includes('pipelining') || q.includes('speedup') || q.includes('stall')) return 'pipeline';
-      if (q.includes('disk') || q.includes('rpm') || q.includes('rotational') || q.includes('seek')) return 'disk';
-      if (q.includes('master') || q.includes('recurrence') || q.includes('complexity') || q.includes('t(n)')) return 'master_theorem';
-      if (q.includes('cidr') || q.includes('subnet') || q.includes('ip address') || q.includes('mask')) return 'subnet';
-      if (q.includes('b+ tree') || q.includes('b-tree') || q.includes('fanout') || q.includes('index block')) return 'b_tree';
-      if (q.includes('cache') || q.includes('amat') || q.includes('hierarchy') || q.includes('miss penalty')) return 'cache';
-      if (q.includes('page') || q.includes('paging') || q.includes('emat') || q.includes('tlb')) return 'emat';
+      const detected = detectSimulationLab(queryTopicHint);
+      if (detected) return detected.type;
     }
     return initialLab;
   };
 
   const [activeLab, setActiveLab] = useState<LabType>(getStartingTab());
+  const [showAllTabs, setShowAllTabs] = useState(!hideTabBar && !forceSpecificLab);
 
   // ── Lab 1 State: 2-Level Paging & EMAT ──────────────────────────────
   const [ematHitRatio, setEmatHitRatio] = useState(0.90);
@@ -129,7 +211,6 @@ export const VisualLab: React.FC<VisualLabProps> = ({
   const totalIpAddresses = Math.pow(2, hostBits);
   const usableHostAddresses = Math.max(0, totalIpAddresses - 2);
 
-  // Compute dotted-decimal mask
   const getSubnetMask = (p: number) => {
     let mask = [];
     for (let i = 0; i < 4; i++) {
@@ -147,9 +228,7 @@ export const VisualLab: React.FC<VisualLabProps> = ({
   const [blockPtrSizeBytes, setBlockPtrSizeBytes] = useState(6);
   const [recordPtrSizeBytes, setRecordPtrSizeBytes] = useState(8);
 
-  // Internal Node: p * P_b + (p - 1) * K <= B -> p <= (B + K) / (K + P_b)
   const internalFanout = Math.floor((blockSizeBytes + keySizeBytes) / (keySizeBytes + blockPtrSizeBytes));
-  // Leaf Node: p_leaf * (K + P) + P_b <= B -> p_leaf <= (B - P_b) / (K + P)
   const leafFanout = Math.floor((blockSizeBytes - blockPtrSizeBytes) / (keySizeBytes + recordPtrSizeBytes));
   const maxRecordsH3 = internalFanout * internalFanout * leafFanout;
 
@@ -164,18 +243,36 @@ export const VisualLab: React.FC<VisualLabProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono uppercase tracking-widest text-accent font-bold">
-                Universal GATE CS Simulation Labs
+                Targeted Simulation Lab
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </div>
             <h3 className="text-lg sm:text-xl font-display font-bold text-off-white">
-              Multi-Subject Mathematical Parameter Playground
+              {activeLab === 'emat' && "2-Level Paging & EMAT Simulator"}
+              {activeLab === 'sliding_window' && "Sliding Window (GBN/SR) Efficiency Simulator"}
+              {activeLab === 'cache' && "Cache Hierarchy (AMAT) Simulator"}
+              {activeLab === 'pipeline' && "CPU Pipelining & Speedup Simulator"}
+              {activeLab === 'disk' && "Disk Arm & Access Latency Simulator"}
+              {activeLab === 'master_theorem' && "Master Theorem Recurrence Solver"}
+              {activeLab === 'subnet' && "CIDR Subnetting & IP Range Simulator"}
+              {activeLab === 'b_tree' && "B+ Tree Index Fanout & Capacity Simulator"}
             </h3>
           </div>
         </div>
 
-        {/* 8-Subject Lab Tabs */}
-        <div className="flex gap-1.5 p-1 rounded-xl bg-[#141420] border border-white/[0.06] overflow-x-auto scrollbar-none max-w-full">
+        {/* Explore Other Labs Toggle */}
+        <button
+          type="button"
+          onClick={() => setShowAllTabs(!showAllTabs)}
+          className="text-xs font-mono text-muted-gray hover:text-off-white px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.2] bg-[#141420] transition-colors cursor-pointer"
+        >
+          {showAllTabs ? "Lock to Detected Lab" : "Explore Other Simulations →"}
+        </button>
+      </div>
+
+      {/* Optional Lab Switcher Tabs */}
+      {showAllTabs && (
+        <div className="flex gap-1.5 p-1 mb-6 rounded-xl bg-[#141420] border border-white/[0.06] overflow-x-auto scrollbar-none max-w-full">
           <button
             onClick={() => setActiveLab('emat')}
             className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
@@ -241,7 +338,7 @@ export const VisualLab: React.FC<VisualLabProps> = ({
             <Database className="w-3.5 h-3.5" /> B+ Tree Fanout
           </button>
         </div>
-      </div>
+      )}
 
       {/* ── LAB 1: Paging & EMAT ────────────────────────────────────────── */}
       {activeLab === 'emat' && (

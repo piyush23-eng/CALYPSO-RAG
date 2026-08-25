@@ -5,7 +5,7 @@ import rehypeKatex from 'rehype-katex';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders } from 'lucide-react';
 import type { QueryResponse } from '../types';
-import { VisualLab } from './VisualLab';
+import { VisualLab, detectSimulationLab } from './VisualLab';
 
 interface AnswerSectionProps {
   data: QueryResponse;
@@ -116,6 +116,7 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
   } = data;
 
   const confidenceMeta = getConfidenceMeta(relevance_score, passed_gate, reformulation_count);
+  const detectedSim = detectSimulationLab(`${query} ${reformulated_query} ${subject_hint || ''} ${final_answer}`);
 
   return (
     <motion.section
@@ -282,27 +283,52 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
           </ReactMarkdown>
         </div>
 
-        {/* Visual Lab Simulation Toggle & Embedding */}
-        <div className="mt-8 pt-6 border-t border-white/[0.06]">
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => setShowLab(!showLab)}
-              className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2 rounded-xl border border-accent/40 bg-accent/10 text-accent hover:bg-accent hover:text-white transition-all shadow-[0_0_16px_rgba(61,90,254,0.2)] cursor-pointer"
-            >
-              <Sliders className="w-4 h-4" />
-              <span>{showLab ? "Hide Visual Simulation Lab" : "Open Interactive Parameter Lab (Sliders)"}</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            </button>
-            <span className="text-[11px] font-mono text-muted-gray hidden sm:inline">
-              Simulate dynamic EMAT, GBN Window & Cache variations
-            </span>
-          </div>
+        {/* Visual Lab Simulation Toggle & Targeted Auto-Detection */}
+        {detectedSim ? (
+          <div className="mt-8 pt-6 border-t border-white/[0.06]">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLab(!showLab)}
+                className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2.5 rounded-xl border border-accent/40 bg-accent/15 text-accent hover:bg-accent hover:text-white transition-all shadow-[0_0_16px_rgba(61,90,254,0.25)] cursor-pointer"
+              >
+                <Sliders className="w-4 h-4" />
+                <span>{showLab ? `Hide ${detectedSim.title}` : `⚡ Open ${detectedSim.title} (Sliders)`}</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              </button>
+              <span className="text-[11px] font-mono text-muted-gray hidden sm:inline">
+                {detectedSim.description}
+              </span>
+            </div>
 
-          {showLab && (
-            <VisualLab queryTopicHint={`${query} ${subject_hint || ''}`} />
-          )}
-        </div>
+            {showLab && (
+              <VisualLab 
+                forceSpecificLab={detectedSim.type} 
+                queryTopicHint={`${query} ${subject_hint || ''}`} 
+              />
+            )}
+          </div>
+        ) : (
+          <div className="mt-8 pt-6 border-t border-white/[0.06]">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLab(!showLab)}
+                className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2 rounded-xl border border-white/[0.1] bg-[#14141f] text-muted-gray hover:text-off-white hover:border-white/[0.2] transition-all cursor-pointer"
+              >
+                <Sliders className="w-4 h-4" />
+                <span>{showLab ? "Hide Formula Simulation Suite" : "Explore Quantitative GATE CS Simulations"}</span>
+              </button>
+              <span className="text-[11px] font-mono text-muted-gray hidden sm:inline">
+                8 interactive parameter sweep laboratories
+              </span>
+            </div>
+
+            {showLab && (
+              <VisualLab queryTopicHint={`${query} ${subject_hint || ''}`} />
+            )}
+          </div>
+        )}
       </motion.div>
 
       {/* Hover-Reveal Source Cards */}
