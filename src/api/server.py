@@ -11,6 +11,8 @@ from fastapi.responses import FileResponse
 from src.ingestion.indexer import DualIndexManager
 from src.agent.orchestrator import CalypsoAgentOrchestrator
 from src.api.quiz_routes import quiz_router
+from src.api.vision_routes import vision_router
+from src.api.models import QueryRequest, QueryResponse
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
@@ -30,6 +32,7 @@ app.add_middleware(
 )
 
 app.include_router(quiz_router)
+app.include_router(vision_router)
 
 # Lazy-loaded singletons
 _index_manager: Optional[DualIndexManager] = None
@@ -46,25 +49,6 @@ def get_orchestrator() -> CalypsoAgentOrchestrator:
         _index_manager.load_indices()
         _orchestrator = CalypsoAgentOrchestrator(index_manager=_index_manager)
     return _orchestrator
-
-
-class QueryRequest(BaseModel):
-    query: str
-
-
-class QueryResponse(BaseModel):
-    query: str
-    reformulated_query: str
-    subject_hint: Optional[str]
-    final_answer: str
-    citations: List[Dict[str, Any]]
-    rerank_results: List[Dict[str, Any]]
-    retrieval_results: List[Dict[str, Any]]
-    relevance_score: float
-    reformulation_count: int
-    passed_gate: bool
-    is_low_confidence: bool
-    telemetry: Dict[str, Any]
 
 
 @app.get("/api/health")

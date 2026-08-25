@@ -12,6 +12,7 @@ from src.generation.citation_mapper import CitationMapper, GenerationOutput, Sen
 
 
 from src.retrieval.parent_retriever import ParentDocumentRetriever
+from src.retrieval.knowledge_graph import gate_kg
 
 
 class AgentState(TypedDict):

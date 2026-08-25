@@ -23,6 +23,23 @@ export async function submitQuery(query: string): Promise<QueryResponse> {
   return response.json();
 }
 
+export async function submitVisionQuery(image: string, query?: string): Promise<QueryResponse> {
+  const response = await fetch(`${API_BASE}/api/vision/solve`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ image, query }),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.detail || `Vision analysis failed with status ${response.status}`);
+  }
+
+  return response.json();
+}
+
 export async function getTopics(): Promise<string[]> {
   try {
     const response = await fetch(`${API_BASE}/api/topics`);

@@ -7,7 +7,7 @@ import { QuizView } from './components/QuizView';
 import { SubjectFilter, type SubjectPreset } from './components/SubjectFilter';
 import { HistoryDrawer, type HistoryItem } from './components/HistoryDrawer';
 import { Footer } from './components/Footer';
-import { submitQuery, getTopics } from './services/api';
+import { submitQuery, submitVisionQuery, getTopics } from './services/api';
 import type { QueryResponse } from './types';
 import { AlertCircle, History } from 'lucide-react';
 
@@ -57,19 +57,19 @@ export function App() {
     } catch {}
   }, [bookmarks]);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, image?: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await submitQuery(query);
+      const res = image ? await submitVisionQuery(image, query) : await submitQuery(query);
       setResult(res);
 
       // Add to Session History (Item 6)
       const newHistoryItem: HistoryItem = {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-        query: query,
+        query: image ? `[Diagram] ${query}` : query,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        subject_hint: res.subject_hint || "General CS",
+        subject_hint: res.subject_hint || "Vision RAG",
         relevance_score: res.relevance_score,
         data: res
       };
