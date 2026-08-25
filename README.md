@@ -39,8 +39,9 @@ Solving technical exam problems in **GATE Computer Science & Information Technol
 ---
 
 ### 3. Interactive GATE CS Timed Practice Exam (`/quiz`)
-*Authentic examination simulator loaded with **1,056 verified, clean GATE CS questions spanning 1991–2025**, complete with **MCQs**, **MSQs with multi-selection**, and **NAT with numerical input**, real-time negative marking (+1.0/+2.0, -0.33/-0.66), pattern filters, and instant step-by-step score reports:*
+*Authentic examination simulator loaded with **100% verified, pure GATE CS questions** preserving exact mathematical notations, LaTeX formulas, official options `(A)-(D)`, and IIT Professor analytical derivations across MCQs, MSQs, and NATs:*
 ![CALYPSO-RAG GATE Mock Exam](docs/assets/quiz_mock_exam_view.png)
+
 
 
 

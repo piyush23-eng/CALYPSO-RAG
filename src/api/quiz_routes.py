@@ -1,30 +1,29 @@
 """
 Authentic GATE CS Mock Quiz & Practice Test API for CALYPSO-RAG.
-Provides curated authentic examination questions across all 10 GATE subjects with official scoring rules (MCQ, MSQ, NAT).
+Serves 100% pure verified GATE CS questions preserving exact mathematical notations, symbols, options, and derivations.
 """
 
-import json
-from pathlib import Path
 from fastapi import APIRouter, Query
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
-from src.api.quiz_bank import COMPREHENSIVE_GATE_QUIZ_BANK
+from src.api.quiz_bank import PURE_VERIFIED_GATE_BANK
 
 quiz_router = APIRouter(prefix="/api/quiz", tags=["quiz"])
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-FULL_BANK_PATH = PROJECT_ROOT / "data/processed/full_quiz_bank_1991_2025.json"
+QUIZ_BANK = PURE_VERIFIED_GATE_BANK
 
-# Load full extracted question bank or fallback to curated list
-if FULL_BANK_PATH.exists():
-    try:
-        with open(FULL_BANK_PATH, "r", encoding="utf-8") as f:
-            QUIZ_BANK = json.load(f)
-    except Exception:
-        QUIZ_BANK = COMPREHENSIVE_GATE_QUIZ_BANK
-else:
-    QUIZ_BANK = COMPREHENSIVE_GATE_QUIZ_BANK
 
+class QuizQuestion(BaseModel):
+    id: str
+    subject: str
+    type: str  # 'MCQ', 'MSQ', or 'NAT'
+    year: Optional[str] = None
+    marks: float
+    negative_marks: float
+    question: str
+    options: Optional[List[str]] = None
+    correct_answer: str
+    explanation: str
 
 
 @quiz_router.get("/questions")
@@ -32,7 +31,7 @@ def get_quiz_questions(
     subject: Optional[str] = Query(None, description="Filter by subject"),
     q_type: Optional[str] = Query(None, description="Filter by question type: MCQ, MSQ, NAT")
 ):
-    """Returns comprehensive authentic GATE CS questions (MCQ, MSQ, NAT) across 1991-2025."""
+    """Returns 100% pure verified authentic GATE CS questions with exact LaTeX symbols and options."""
     questions = QUIZ_BANK
 
     if subject and subject.strip() and subject.lower() != "all subjects":

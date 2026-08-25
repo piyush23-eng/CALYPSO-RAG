@@ -189,9 +189,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
           Practice Mock Exam.
         </h1>
         <p className="text-sm sm:text-base text-muted-gray font-light max-w-2xl">
-          Authentic examination simulator loaded with <strong>{totalInBank.toLocaleString()} official GATE CS questions (1991–2025)</strong> across MCQs, MSQs (multi-select), and NAT (numerical type).
+          Authentic examination simulator loaded with <strong>100% verified, pure GATE CS questions ({totalInBank} items)</strong> preserving exact mathematical notation, official options, and rigorous analytical derivations.
         </p>
       </div>
+
 
       {/* Type & Subject Filter Bar */}
       {!isSubmitted && (
