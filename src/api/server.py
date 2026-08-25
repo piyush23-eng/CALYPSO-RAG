@@ -12,6 +12,7 @@ from src.ingestion.indexer import DualIndexManager
 from src.agent.orchestrator import CalypsoAgentOrchestrator
 from src.api.quiz_routes import quiz_router
 from src.api.vision_routes import vision_router
+from src.api.voice_routes import voice_router
 from src.api.models import QueryRequest, QueryResponse
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -33,6 +34,7 @@ app.add_middleware(
 
 app.include_router(quiz_router)
 app.include_router(vision_router)
+app.include_router(voice_router)
 
 # Lazy-loaded singletons
 _index_manager: Optional[DualIndexManager] = None

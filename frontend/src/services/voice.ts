@@ -1,8 +1,29 @@
 /**
- * IIT Professor Voice Engine for CALYPSO-RAG.
- * Implements Web Speech API Speech-to-Text (SpeechRecognition) and
- * natural mathematical Text-to-Speech (SpeechSynthesis).
+ * IIT Professor Neural Voice Engine for CALYPSO-RAG.
+ * Implements:
+ * 1. Web Speech API Speech-to-Text for live voice queries.
+ * 2. Studio-Grade Neural Human Audio Walkthrough via /api/voice/synthesize
+ *    (featuring realistic conversational breathing, intonation, and pitch).
  */
+
+const API_BASE = import.meta.env.VITE_API_URL || (
+  typeof window !== 'undefined' && window.location.port === '5173'
+    ? 'http://localhost:8000'
+    : ''
+);
+
+export type VoicePersona = 
+  | 'en-IN-PrabhatNeural'      // IIT CS Professor (Natural Indian English)
+  | 'en-US-ChristopherNeural' // MIT Lecturer (Deep Natural American English)
+  | 'en-GB-RyanNeural'        // Oxford Academic (Natural British English)
+  | 'en-US-JennyNeural';      // AI Scientist (Clear Natural American English)
+
+export const VOICE_OPTIONS: { id: VoicePersona; label: string; tag: string }[] = [
+  { id: 'en-IN-PrabhatNeural', label: 'Prof. Prabhat', tag: 'IIT Faculty Voice' },
+  { id: 'en-US-ChristopherNeural', label: 'Prof. Christopher', tag: 'MIT Studio Voice' },
+  { id: 'en-GB-RyanNeural', label: 'Prof. Ryan', tag: 'Oxford Academic' },
+  { id: 'en-US-JennyNeural', label: 'Dr. Jenny', tag: 'AI Researcher' }
+];
 
 // ── Part 1: Speech-to-Text (Voice Query Input) ──────────────────────────
 
@@ -89,145 +110,129 @@ export class VoiceRecognition {
 export const voiceRecognition = new VoiceRecognition();
 
 
-// ── Part 2: IIT Professor Text-to-Speech (Math Audio Narrator) ───────────
-
-/**
- * Sanitizes markdown and LaTeX equations for natural pedagogical speech.
- */
-export function cleanMathForSpeech(text: string): string {
-  if (!text) return "";
-
-  let spoken = text;
-
-  // Remove markdown headings, hashes, bullets, and citations
-  spoken = spoken.replace(/^#+\s+/gm, '');
-  spoken = spoken.replace(/\*\*([^*]+)\*\*/g, '$1');
-  spoken = spoken.replace(/\*([^*]+)\*/g, '$1');
-  spoken = spoken.replace(/`([^`]+)`/g, '$1');
-  spoken = spoken.replace(/\[\^?\d+\]/g, '');
-  spoken = spoken.replace(/---/g, ' ');
-
-  // Convert common GATE CS LaTeX symbols to spoken words
-  spoken = spoken.replace(/\\Theta/g, 'Theta');
-  spoken = spoken.replace(/\\Omega/g, 'Omega');
-  spoken = spoken.replace(/\\mathcal\{O\}/g, 'Big O');
-  spoken = spoken.replace(/\\mathcal\{([A-Za-z])\}/g, '$1');
-  spoken = spoken.replace(/\\approx/g, 'approximately equal to');
-  spoken = spoken.replace(/\\le|\\leq/g, 'less than or equal to');
-  spoken = spoken.replace(/\\ge|\\geq/g, 'greater than or equal to');
-  spoken = spoken.replace(/\\neq/g, 'not equal to');
-  spoken = spoken.replace(/\\in/g, 'is an element of');
-  spoken = spoken.replace(/\\subset|\\subseteq/g, 'subset of');
-  spoken = spoken.replace(/\\times|\\cdot/g, ' multiplied by ');
-  spoken = spoken.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 over $2');
-  spoken = spoken.replace(/\\sqrt\{([^}]+)\}/g, 'square root of $1');
-  spoken = spoken.replace(/\\log_?(\w+)?/g, 'log');
-  spoken = spoken.replace(/\\sum_?([^{]+)?\^?([^{]+)?/g, 'summation');
-  spoken = spoken.replace(/\\mu\s?s/g, 'microseconds');
-  spoken = spoken.replace(/\\mu/g, 'micro');
-  spoken = spoken.replace(/\\rightarrow|\\to/g, 'leads to');
-  spoken = spoken.replace(/\$([^$]+)\$/g, '$1');
-  spoken = spoken.replace(/\\\[([^\\]+)\\\]/g, '$1');
-
-  // Clean remaining backslashes and whitespace
-  spoken = spoken.replace(/\\([a-zA-Z]+)/g, '$1');
-  spoken = spoken.replace(/\s+/g, ' ').trim();
-
-  return spoken;
-}
+// ── Part 2: Studio-Grade Neural Human Audio Player ──────────────────────
 
 export class IITProfessorNarrator {
-  private synth: SpeechSynthesis | null = null;
+  private audioElement: HTMLAudioElement | null = null;
+  private currentAudioUrl: string | null = null;
   public isSpeaking: boolean = false;
   public isPaused: boolean = false;
+  public isLoading: boolean = false;
   private rate: number = 1.0;
+  private currentVoice: VoicePersona = 'en-IN-PrabhatNeural';
 
-  constructor() {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      this.synth = window.speechSynthesis;
-    }
-  }
-
-  public speak(
+  public async speak(
     markdownText: string,
+    voice: VoicePersona = 'en-IN-PrabhatNeural',
     onStart?: () => void,
     onEnd?: () => void,
     onError?: (err: string) => void
   ) {
-    if (!this.synth) {
-      if (onError) onError("Text-to-speech is not supported in this browser.");
-      return;
-    }
-
-    // Stop any existing playback
+    // Stop any active audio
     this.stop();
 
-    const spokenScript = cleanMathForSpeech(markdownText);
-    if (!spokenScript.trim()) return;
+    this.currentVoice = voice;
+    this.isLoading = true;
 
-    // Intro professorial preface
-    const fullAudioScript = `Here is the verified conceptual derivation from CALYPSO. ${spokenScript}`;
+    try {
+      // Request neural human MP3 synthesis from backend
+      const response = await fetch(`${API_BASE}/api/voice/synthesize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: markdownText,
+          voice: this.currentVoice
+        })
+      });
 
-    const utterance = new SpeechSynthesisUtterance(fullAudioScript);
-    utterance.rate = this.rate;
-    utterance.pitch = 0.95; // Slightly deeper, academic tone
-    utterance.lang = 'en-US';
+      if (!response.ok) {
+        throw new Error(`TTS synthesis returned status ${response.status}`);
+      }
 
-    // Pick best English voice if available
-    const voices = this.synth.getVoices();
-    const preferredVoice = voices.find(v => 
-      v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Daniel') || v.name.includes('Oliver') || v.name.includes('Alex'))
-    ) || voices.find(v => v.lang.startsWith('en'));
+      const audioBlob = await response.blob();
+      this.currentAudioUrl = URL.createObjectURL(audioBlob);
 
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
+      this.audioElement = new Audio(this.currentAudioUrl);
+      this.audioElement.playbackRate = this.rate;
+
+      this.audioElement.onplay = () => {
+        this.isSpeaking = true;
+        this.isPaused = false;
+        this.isLoading = false;
+        if (onStart) onStart();
+      };
+
+      this.audioElement.onpause = () => {
+        if (!this.audioElement?.ended) {
+          this.isPaused = true;
+        }
+      };
+
+      this.audioElement.onended = () => {
+        this.isSpeaking = false;
+        this.isPaused = false;
+        this.isLoading = false;
+        if (onEnd) onEnd();
+      };
+
+      this.audioElement.onerror = () => {
+        this.isSpeaking = false;
+        this.isPaused = false;
+        this.isLoading = false;
+        if (onError) onError("Failed to play audio stream.");
+      };
+
+      await this.audioElement.play();
+    } catch (err: any) {
+      this.isSpeaking = false;
+      this.isPaused = false;
+      this.isLoading = false;
+      if (onError) onError(err.message || "Neural audio synthesis error");
     }
-
-    utterance.onstart = () => {
-      this.isSpeaking = true;
-      this.isPaused = false;
-      if (onStart) onStart();
-    };
-
-    utterance.onend = () => {
-      this.isSpeaking = false;
-      this.isPaused = false;
-      if (onEnd) onEnd();
-    };
-
-    utterance.onerror = (e) => {
-      this.isSpeaking = false;
-      this.isPaused = false;
-      if (onError) onError(e.error || "Speech playback error");
-    };
-
-    this.synth.speak(utterance);
   }
 
   public pause() {
-    if (this.synth && this.isSpeaking && !this.isPaused) {
-      this.synth.pause();
+    if (this.audioElement && this.isSpeaking) {
+      this.audioElement.pause();
       this.isPaused = true;
     }
   }
 
   public resume() {
-    if (this.synth && this.isPaused) {
-      this.synth.resume();
+    if (this.audioElement && this.isPaused) {
+      this.audioElement.play();
       this.isPaused = false;
     }
   }
 
   public stop() {
-    if (this.synth) {
-      this.synth.cancel();
-      this.isSpeaking = false;
-      this.isPaused = false;
+    if (this.audioElement) {
+      this.audioElement.pause();
+      this.audioElement.currentTime = 0;
+      this.audioElement = null;
     }
+    if (this.currentAudioUrl) {
+      URL.revokeObjectURL(this.currentAudioUrl);
+      this.currentAudioUrl = null;
+    }
+    this.isSpeaking = false;
+    this.isPaused = false;
+    this.isLoading = false;
   }
 
   public setRate(rate: number) {
     this.rate = rate;
+    if (this.audioElement) {
+      this.audioElement.playbackRate = rate;
+    }
+  }
+
+  public setVoice(voice: VoicePersona) {
+    this.currentVoice = voice;
+  }
+
+  public getVoice(): VoicePersona {
+    return this.currentVoice;
   }
 }
 

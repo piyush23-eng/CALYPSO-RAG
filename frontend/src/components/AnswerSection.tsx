@@ -3,10 +3,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders, Volume2, Pause, Play, Square } from 'lucide-react';
+import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders, Volume2, Pause, Play, Square, Loader2 } from 'lucide-react';
 import type { QueryResponse } from '../types';
 import { VisualLab, detectSimulationLab } from './VisualLab';
-import { professorNarrator } from '../services/voice';
+import { professorNarrator, VOICE_OPTIONS, type VoicePersona } from '../services/voice';
 
 interface AnswerSectionProps {
   data: QueryResponse;
@@ -102,7 +102,9 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
   const [showLab, setShowLab] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isLoadingVoice, setIsLoadingVoice] = useState(false);
   const [speechRate, setSpeechRate] = useState(1.0);
+  const [selectedVoice, setSelectedVoice] = useState<VoicePersona>('en-IN-PrabhatNeural');
 
   const {
     query,
@@ -128,10 +130,11 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
       professorNarrator.stop();
       setIsSpeaking(false);
       setIsPaused(false);
+      setIsLoadingVoice(false);
     };
   }, [query]);
 
-  const handlePlayVoice = () => {
+  const handlePlayVoice = async () => {
     if (isSpeaking && !isPaused) {
       professorNarrator.pause();
       setIsPaused(true);
@@ -143,12 +146,14 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
       return;
     }
 
+    setIsLoadingVoice(true);
     professorNarrator.setRate(speechRate);
-    professorNarrator.speak(
+    await professorNarrator.speak(
       final_answer,
-      () => { setIsSpeaking(true); setIsPaused(false); },
-      () => { setIsSpeaking(false); setIsPaused(false); },
-      () => { setIsSpeaking(false); setIsPaused(false); }
+      selectedVoice,
+      () => { setIsSpeaking(true); setIsPaused(false); setIsLoadingVoice(false); },
+      () => { setIsSpeaking(false); setIsPaused(false); setIsLoadingVoice(false); },
+      () => { setIsSpeaking(false); setIsPaused(false); setIsLoadingVoice(false); }
     );
   };
 
@@ -156,6 +161,7 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
     professorNarrator.stop();
     setIsSpeaking(false);
     setIsPaused(false);
+    setIsLoadingVoice(false);
   };
 
   const handleSetRate = (rate: number) => {
@@ -276,11 +282,33 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
             </span>
           </div>
 
-          {/* IIT Professor Audio Narration Toolbar */}
-          <div className="flex items-center gap-2">
+          {/* IIT Professor Neural Audio Narration Toolbar */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Voice Persona Selector */}
+            <select
+              value={selectedVoice}
+              onChange={(e) => {
+                const v = e.target.value as VoicePersona;
+                setSelectedVoice(v);
+                if (isSpeaking) {
+                  professorNarrator.stop();
+                  setIsSpeaking(false);
+                }
+              }}
+              className="px-2.5 py-1.5 rounded-lg border border-white/[0.08] bg-[#141420] text-xs font-mono text-off-white focus:outline-none focus:border-accent cursor-pointer"
+            >
+              {VOICE_OPTIONS.map((opt) => (
+                <option key={opt.id} value={opt.id} className="bg-[#11111a] text-off-white">
+                  {opt.label} ({opt.tag})
+                </option>
+              ))}
+            </select>
+
+            {/* Play/Pause Button */}
             <button
               type="button"
               onClick={handlePlayVoice}
+              disabled={isLoadingVoice}
               className={`inline-flex items-center gap-2 text-xs font-mono px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
                 isSpeaking && !isPaused
                   ? 'border-accent bg-accent/20 text-accent font-semibold shadow-[0_0_15px_rgba(61,90,254,0.35)]'
@@ -289,10 +317,15 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
                     : 'border-white/[0.08] text-muted-gray hover:text-off-white hover:border-accent/40 bg-[#141420]'
               }`}
             >
-              {isSpeaking && !isPaused ? (
+              {isLoadingVoice ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-accent" />
+                  <span>Synthesizing Voice...</span>
+                </>
+              ) : isSpeaking && !isPaused ? (
                 <>
                   <Pause className="w-3.5 h-3.5" />
-                  <span>Pause Voice</span>
+                  <span>Pause</span>
                   {/* Equalizer animation */}
                   <span className="flex items-center gap-0.5 ml-1">
                     <span className="w-1 h-3 bg-accent animate-pulse rounded-full" />
@@ -303,12 +336,12 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
               ) : isPaused ? (
                 <>
                   <Play className="w-3.5 h-3.5" />
-                  <span>Resume Voice</span>
+                  <span>Resume</span>
                 </>
               ) : (
                 <>
                   <Volume2 className="w-3.5 h-3.5 text-accent" />
-                  <span>🎙️ Listen to Professor Walkthrough</span>
+                  <span>🎙️ Listen to Walkthrough</span>
                 </>
               )}
             </button>
