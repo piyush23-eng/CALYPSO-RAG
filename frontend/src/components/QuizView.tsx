@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { ArrowLeft, Timer, CheckCircle2, XCircle, Award, RotateCcw, HelpCircle, Flag } from 'lucide-react';
 import { GATE_SUBJECTS } from './SubjectFilter';
+
 
 interface QuizQuestion {
   id: string;
@@ -294,10 +298,12 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                 </div>
               </div>
 
-              {/* Question Body */}
-              <p className="text-base sm:text-lg font-light text-off-white leading-relaxed mb-8">
-                {currentQ.question}
-              </p>
+              {/* Question Body with LaTeX Math Rendering in Match Font */}
+              <div className="text-base sm:text-lg font-sans font-normal text-off-white/95 leading-relaxed mb-8 answer-markdown">
+                <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                  {currentQ.question}
+                </ReactMarkdown>
+              </div>
 
               {/* Question Inputs: NAT vs MSQ vs MCQ */}
               {currentQ.type === 'NAT' ? (
@@ -310,7 +316,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                     value={userAnswers[currentQ.id] || ''}
                     onChange={(e) => handleSelectOption(currentQ.id, e.target.value.trim())}
                     placeholder="Enter numerical answer..."
-                    className="w-full max-w-sm px-4 py-3 rounded-lg border border-cyan-500/40 bg-[#121420] text-off-white font-mono text-base focus:outline-none focus:border-cyan-400"
+                    className="w-full max-w-sm px-4 py-3 rounded-lg border border-cyan-500/40 bg-[#121420] text-off-white font-sans text-base focus:outline-none focus:border-cyan-400"
                   />
                 </div>
               ) : currentQ.type === 'MSQ' ? (
@@ -319,7 +325,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                     Multiple Select Question (MSQ) — Select All Options That Apply:
                   </span>
                   {currentQ.options?.map((opt) => {
-                    const optKey = opt.charAt(0);
+                    const optKey = opt.charAt(1) || opt.charAt(0);
                     const currentSelected = (userAnswers[currentQ.id] || '').split(',').filter(Boolean);
                     const isChecked = currentSelected.includes(optKey);
 
@@ -342,9 +348,13 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                             : 'border-white/[0.08] border-t-white/[0.12] bg-[#14141c] hover:border-purple-500/50 text-off-white/90'
                         }`}
                       >
-                        <span className="text-sm font-mono">{opt}</span>
-                        <span className={`w-4 h-4 rounded border flex items-center justify-center ${
-                          isChecked ? 'border-purple-500 bg-purple-500 text-black font-bold text-[10px]' : 'border-white/20'
+                        <div className="text-sm sm:text-base font-sans font-normal leading-relaxed answer-markdown flex-1 pr-3">
+                          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                            {opt}
+                          </ReactMarkdown>
+                        </div>
+                        <span className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center ${
+                          isChecked ? 'border-purple-500 bg-purple-500 text-black font-bold text-xs' : 'border-white/20'
                         }`}>
                           {isChecked && '✓'}
                         </span>
@@ -356,7 +366,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                 /* Standard MCQ */
                 <div className="space-y-3">
                   {currentQ.options?.map((opt) => {
-                    const optKey = opt.charAt(0);
+                    const optKey = opt.charAt(1) || opt.charAt(0);
                     const isSelected = userAnswers[currentQ.id] === optKey;
 
                     return (
@@ -370,17 +380,22 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                             : 'border-white/[0.08] border-t-white/[0.12] bg-[#14141c] hover:border-accent/50 text-off-white/90'
                         }`}
                       >
-                        <span className="text-sm font-mono">{opt}</span>
-                        <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                        <div className="text-sm sm:text-base font-sans font-normal leading-relaxed answer-markdown flex-1 pr-3">
+                          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                            {opt}
+                          </ReactMarkdown>
+                        </div>
+                        <span className={`w-5 h-5 rounded-full border flex-shrink-0 flex items-center justify-center ${
                           isSelected ? 'border-accent bg-accent' : 'border-white/20'
                         }`}>
-                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                          {isSelected && <span className="w-2 h-2 rounded-full bg-white" />}
                         </span>
                       </button>
                     );
                   })}
                 </div>
               )}
+
 
 
               {/* Navigation & Action Buttons */}
@@ -616,9 +631,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                     </div>
                   </div>
 
-                  <p className="text-base text-off-white font-light leading-relaxed">
-                    {q.question}
-                  </p>
+                  <div className="text-base font-sans font-normal text-off-white/95 leading-relaxed answer-markdown">
+                    <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                      {q.question}
+                    </ReactMarkdown>
+                  </div>
 
                   <div className="grid sm:grid-cols-2 gap-2 text-xs font-mono">
                     <div className="p-3 rounded-lg bg-[#151520] border border-white/[0.04]">
@@ -629,22 +646,26 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                     </div>
                     <div className="p-3 rounded-lg bg-[#151520] border border-white/[0.04]">
                       <span className="text-muted-gray block text-[10px] mb-1">Correct Answer:</span>
-                      <strong className="text-accent">{q.correct_answer}</strong>
+                      <strong className="text-emerald-400">{q.correct_answer}</strong>
                     </div>
                   </div>
 
-                  {/* Verified CALYPSO Derivation */}
-                  <div className="p-4 rounded-xl border border-accent/20 bg-accent/[0.05] space-y-2">
-                    <span className="text-[10px] font-mono text-accent uppercase tracking-widest font-bold block">
-                      CALYPSO Verified Step-by-Step Derivation & Invariants:
-                    </span>
-                    <p className="text-xs font-mono text-off-white/90 leading-relaxed whitespace-pre-line">
-                      {q.explanation}
-                    </p>
-                  </div>
+                  {q.explanation && (
+                    <div className="p-4 rounded-xl border border-white/[0.06] bg-[#14141c] text-xs font-sans text-muted-gray space-y-2 answer-markdown">
+                      <span className="text-off-white font-mono font-semibold block text-[11px] uppercase tracking-wider text-accent">
+                        Step-by-Step Analytical Derivation:
+                      </span>
+                      <div className="font-normal text-off-white/90 leading-relaxed">
+                        <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                          {q.explanation}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
+
           </div>
         </div>
       )}
