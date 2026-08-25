@@ -1,7 +1,8 @@
 """
-Curated, 100% Verified Pure Authentic GATE CS Questions (1990 - 2026).
-Every question preserves exact mathematical equations, LaTeX notation, authentic GATE options, and rigorous IIT derivations.
+Curated, Verified GATE CS Question Bank (1990 - 2026).
+Every question preserves exact mathematical equations, LaTeX notation, authentic GATE options, and analytical derivations.
 """
+
 
 from typing import List, Dict, Any
 

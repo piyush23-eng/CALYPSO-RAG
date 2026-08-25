@@ -1,7 +1,8 @@
 """
 Authentic GATE CS Mock Quiz & Practice Test API for CALYPSO-RAG.
-Serves 100% pure verified GATE CS questions preserving exact mathematical notations, symbols, options, and derivations.
+Serves curated, verified GATE CS questions preserving exact mathematical notations, symbols, options, and derivations.
 """
+
 
 from fastapi import APIRouter, Query
 from typing import List, Dict, Any, Optional

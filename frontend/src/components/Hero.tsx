@@ -151,8 +151,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
         {/* Small Restrained Subhead */}
         <p className="text-base sm:text-lg text-muted-gray max-w-2xl font-normal leading-relaxed mb-12">
           Fine-tuned Qwen 1.5B (QLoRA) paired with hybrid Reciprocal Rank Fusion,
-          cross-encoder reranking, Knowledge Graph reasoning, Voice Tutor, and Vision-RAG for zero-hallucination exam prep.
+          cross-encoder reranking, Knowledge Graph reasoning, Voice Tutor, and Vision-RAG for retrieval-grounded exam preparation.
         </p>
+
       </motion.div>
 
       {/* Oversized Input Field with Drag & Drop, Voice Input & Screenshot Paste */}

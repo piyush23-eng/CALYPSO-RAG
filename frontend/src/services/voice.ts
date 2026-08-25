@@ -1,10 +1,11 @@
 /**
- * IIT Professor Neural Voice Engine for CALYPSO-RAG.
+ * Neural Voice Engine for CALYPSO-RAG.
  * Implements:
  * 1. Web Speech API Speech-to-Text for live voice queries.
- * 2. Studio-Grade Neural Human Audio Walkthrough via /api/voice/synthesize
- *    (featuring realistic conversational breathing, intonation, and pitch).
+ * 2. Neural Audio Walkthrough via /api/voice/synthesize
+ *    (featuring structured unit pronunciation, formula reading, and intonation).
  */
+
 
 const API_BASE = import.meta.env.VITE_API_URL || (
   typeof window !== 'undefined' && window.location.port === '5173'

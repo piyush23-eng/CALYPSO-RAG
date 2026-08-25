@@ -278,8 +278,9 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack, onNavigateToMastery 
           Practice Mock Exam.
         </h1>
         <p className="text-sm sm:text-base text-muted-gray font-light max-w-2xl">
-          Authentic examination simulator loaded with <strong>100% verified, pure GATE CS questions ({totalInBank} items)</strong> preserving exact mathematical notation, official options, and rigorous analytical derivations.
+          Curated practice examination environment with <strong>{totalInBank} verified GATE CS questions</strong> featuring exact mathematical notation, official option keys, and step-by-step analytical derivations.
         </p>
+
       </div>
 
 
