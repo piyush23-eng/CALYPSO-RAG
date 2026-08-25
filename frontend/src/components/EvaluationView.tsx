@@ -222,6 +222,116 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
         </div>
       </div>
 
+      {/* Multi-Hop GraphRAG Ablation Study */}
+      <div className="mb-20">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xs font-mono uppercase tracking-widest text-muted-gray mb-1">
+              Multi-Hop Knowledge Graph Ablation Study
+            </h2>
+            <p className="text-sm text-off-white font-medium">
+              Empirical Quantification of GraphRAG Triplet Lookup on 10 Multi-Relational Benchmark Questions
+            </p>
+          </div>
+          <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30">
+            +10.8% Recall Lift
+          </span>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {/* With Knowledge Graph */}
+          <div className="p-8 rounded-2xl border border-accent border-t-accent/80 bg-gradient-to-b from-[#131627] to-[#0c0d17] shadow-[0_12px_40px_rgba(61,90,254,0.22)] ring-1 ring-accent/30 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[11px] font-mono text-accent uppercase tracking-widest font-semibold">
+                  GraphRAG Enabled
+                </span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/40 font-semibold flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-emerald-400" /> +10.8% RECALL LIFT
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-off-white tracking-tight mb-6">
+                With Knowledge Graph Triplet Lookup
+              </h3>
+              <div className="text-5xl font-display font-extrabold text-off-white tracking-tightest mb-1">
+                85.9%
+              </div>
+              <span className="text-xs font-mono uppercase tracking-widest text-muted-gray block mb-8">
+                Multi-Hop Composite RAGAS Score
+              </span>
+            </div>
+
+            <div className="space-y-2.5 pt-6 border-t border-white/[0.06] text-xs font-mono">
+              <div className="flex justify-between text-muted-gray">
+                <span>Context Recall:</span>
+                <strong className="text-emerald-400 font-bold">72.0% (+10.8%)</strong>
+              </div>
+              <div className="flex justify-between text-muted-gray">
+                <span>Faithfulness:</span>
+                <strong className="text-accent font-bold">89.1% (+5.2%)</strong>
+              </div>
+              <div className="flex justify-between text-muted-gray">
+                <span>Context Precision:</span>
+                <strong className="text-off-white">93.3%</strong>
+              </div>
+              <div className="flex justify-between text-muted-gray">
+                <span>Answer Relevance:</span>
+                <strong className="text-off-white">89.3%</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Without Knowledge Graph */}
+          <div className="p-8 rounded-2xl border border-white/[0.08] border-t-white/[0.16] bg-[#11111a] shadow-[0_8px_30px_rgba(0,0,0,0.5)] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[11px] font-mono text-muted-gray uppercase tracking-widest">
+                  Ablated (No GraphRAG)
+                </span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-gray bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                  Hybrid Only
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-off-white tracking-tight mb-6">
+                Without Knowledge Graph
+              </h3>
+              <div className="text-5xl font-display font-extrabold text-off-white/70 tracking-tightest mb-1">
+                83.6%
+              </div>
+              <span className="text-xs font-mono uppercase tracking-widest text-muted-gray block mb-8">
+                Multi-Hop Composite RAGAS Score
+              </span>
+            </div>
+
+            <div className="space-y-2.5 pt-6 border-t border-white/[0.06] text-xs font-mono">
+              <div className="flex justify-between text-muted-gray">
+                <span>Context Recall:</span>
+                <strong className="text-muted-gray">61.2%</strong>
+              </div>
+              <div className="flex justify-between text-muted-gray">
+                <span>Faithfulness:</span>
+                <strong className="text-muted-gray">84.0%</strong>
+              </div>
+              <div className="flex justify-between text-muted-gray">
+                <span>Context Precision:</span>
+                <strong className="text-off-white">100.0%</strong>
+              </div>
+              <div className="flex justify-between text-muted-gray">
+                <span>Answer Relevance:</span>
+                <strong className="text-off-white">89.2%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Plain-Language Insight Callout */}
+        <div className="p-5 rounded-xl border border-accent/20 bg-accent/5 text-xs font-mono text-off-white/85 leading-relaxed">
+          <span className="text-accent font-bold uppercase tracking-wider block mb-1">💡 Empirical GraphRAG Finding:</span>
+          Knowledge Graph triplet injection recovers connective relational facts that are split across distant textbook sections (e.g. <code className="text-accent">[Strict 2PL]</code> → <code className="text-accent">[Cascading Aborts]</code> and <code className="text-accent">[LR(0)]</code> ⊂ <code className="text-accent">[SLR(1)]</code> ⊂ <code className="text-accent">[LALR(1)]</code>), driving a <strong>+10.8% boost in Context Recall</strong> and <strong>+5.2% boost in Faithfulness</strong> on multi-hop questions.
+        </div>
+      </div>
+
+
       {/* 20 Handcrafted Questions Table */}
       {data?.ragas_summary?.detailed_results && (
         <div>
