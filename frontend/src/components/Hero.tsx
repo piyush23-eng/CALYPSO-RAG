@@ -32,7 +32,13 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
   };
 
   return (
-    <section className="pt-24 pb-16 px-6 max-w-5xl mx-auto">
+    <section className="relative pt-24 pb-16 px-6 max-w-5xl mx-auto">
+      {/* Subtle Blue Radial Glow strictly behind the Hero */}
+      <div 
+        className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-12 w-[650px] sm:w-[900px] h-[420px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(61,90,254,0.14),rgba(61,90,254,0.03)_50%,transparent_75%)] pointer-events-none -z-10 blur-2xl" 
+        aria-hidden="true"
+      />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -104,7 +110,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
             type="button"
             onClick={() => handleSelectPreset(preset.query)}
             disabled={isLoading}
-            className="text-xs font-mono text-muted-gray hover:text-off-white px-3 py-1.5 rounded-md border border-white/[0.06] hover:border-accent/50 bg-[#121212] transition-all duration-200"
+            className="text-xs font-mono text-muted-gray hover:text-off-white px-3 py-1.5 rounded-lg border border-white/[0.08] border-t-white/[0.16] hover:border-accent/70 hover:bg-accent/[0.08] bg-[#11111a] shadow-[0_2px_8px_rgba(0,0,0,0.4)] transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-1 focus:ring-accent"
           >
             {preset.label} →
           </button>

@@ -33,10 +33,10 @@ export const Marquee: React.FC<MarqueeProps> = ({
   const marqueeItems = [...displayTopics, ...displayTopics, ...displayTopics];
 
   return (
-    <div className="w-full border-y border-white/[0.07] bg-[#0c0c0c] py-3.5 overflow-hidden select-none marquee-container relative">
-      {/* Subtle vignette gradients on left & right */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+    <div className="w-full border-y border-white/[0.07] bg-[#0c0c14] py-3.5 overflow-hidden select-none marquee-container relative">
+      {/* Subtle vignette gradients on left & right matching #0a0a0f */}
+      <div className="absolute left-0 top-0 bottom-0 w-28 bg-gradient-to-r from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-28 bg-gradient-to-l from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent z-10 pointer-events-none" />
 
       <div
         className={`flex whitespace-nowrap marquee-content ${
@@ -48,20 +48,20 @@ export const Marquee: React.FC<MarqueeProps> = ({
           return (
             <div
               key={`${topic}-${idx}`}
-              className="inline-flex items-center mx-3 group cursor-default"
+              className="inline-flex items-center mx-3 flex-shrink-0 group cursor-default"
             >
               <span
-                className={`text-[11px] font-mono uppercase tracking-[0.14em] px-3 py-1 rounded-full border transition-all duration-300 ${
+                className={`text-[11px] font-mono uppercase tracking-[0.14em] px-3.5 py-1.5 rounded-full border transition-all duration-300 whitespace-nowrap ${
                   isActive
-                    ? 'border-accent bg-accent/15 text-accent font-semibold shadow-[0_0_12px_rgba(61,90,254,0.35)]'
+                    ? 'border-accent bg-accent/15 text-accent font-semibold shadow-[0_0_12px_rgba(61,90,254,0.35)] ring-1 ring-accent/30'
                     : isLoading
-                    ? 'border-accent/40 text-accent/80 animate-pulse'
-                    : 'border-white/[0.08] text-muted-gray hover:text-off-white hover:border-white/20'
+                    ? 'border-accent/40 text-accent/80 animate-pulse bg-accent/[0.04]'
+                    : 'border-white/[0.08] border-t-white/[0.14] text-muted-gray hover:text-off-white hover:border-accent/40 bg-[#11111a]'
                 }`}
               >
                 {topic}
               </span>
-              <span className="text-white/10 ml-3 text-xs">/</span>
+              <span className="text-white/15 ml-3 text-xs">/</span>
             </div>
           );
         })}
