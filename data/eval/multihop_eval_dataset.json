@@ -1,0 +1,157 @@
+[
+  {
+    "question_id": "GATE_MULTIHOP_01",
+    "subject": "Database Management Systems",
+    "topic": "Transactions & Concurrency Control",
+    "question": "Which concurrency control protocol prevents cascading aborts and guarantees conflict serializability while ensuring strict recoverability?",
+    "ground_truth_answer": "Strict Two-Phase Locking (Strict 2PL) prevents cascading aborts and guarantees both conflict serializability and strict recoverability by requiring that all exclusive (write) locks are held until the transaction explicitly commits or aborts.",
+    "ground_truth_context_keywords": [
+      "strict 2pl",
+      "cascading aborts",
+      "conflict serializability",
+      "strict recoverability",
+      "exclusive locks"
+    ],
+    "expected_source_file": "dbms_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_02",
+    "subject": "Operating Systems",
+    "topic": "Virtual Memory & Page Replacement",
+    "question": "Which page replacement algorithms are mathematically classified as stack algorithms and therefore provably immune to Belady's Anomaly?",
+    "ground_truth_answer": "Least Recently Used (LRU) and Optimal (OPT) page replacement algorithms are stack algorithms where the set of pages in a memory of size m is always a subset of pages in a memory of size m+1, provably preventing Belady's Anomaly unlike FIFO.",
+    "ground_truth_context_keywords": [
+      "lru",
+      "optimal page replacement",
+      "stack algorithms",
+      "belady's anomaly",
+      "fifo"
+    ],
+    "expected_source_file": "os_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_03",
+    "subject": "Computer Networks",
+    "topic": "Data Link Layer & Sliding Window",
+    "question": "In sliding window flow control with m-bit sequence numbers, what are the maximum sender and receiver window sizes for Go-Back-N versus Selective Repeat to prevent sequence number wrap-around ambiguity?",
+    "ground_truth_answer": "For Go-Back-N, the maximum sender window is Ws = 2^m - 1 with receiver window Wr = 1. For Selective Repeat, the maximum sender and receiver windows are Ws = 2^(m-1) and Wr = 2^(m-1), ensuring Ws + Wr <= 2^m to prevent sequence wrap-around ambiguity.",
+    "ground_truth_context_keywords": [
+      "go-back-n",
+      "selective repeat",
+      "sequence numbers",
+      "sender window",
+      "receiver window",
+      "wrap-around"
+    ],
+    "expected_source_file": "networks_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_04",
+    "subject": "Algorithms",
+    "topic": "Graph Algorithms & Shortest Paths",
+    "question": "Why does Dijkstra's algorithm fail on graphs with negative edge weights, and which algorithm both handles negative edge weights and detects negative weight cycles?",
+    "ground_truth_answer": "Dijkstra's greedy choice assumes that once a vertex is finalized, its shortest distance cannot decrease, which is violated by negative edge weights. The Bellman-Ford algorithm handles negative edge weights in O(V*E) time and detects negative cycles by checking if distances can be relaxed on the V-th iteration.",
+    "ground_truth_context_keywords": [
+      "dijkstra",
+      "negative edge weights",
+      "bellman-ford",
+      "negative weight cycles",
+      "relaxation"
+    ],
+    "expected_source_file": "algorithms_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_05",
+    "subject": "Theory of Computation",
+    "topic": "Pushdown Automata & Formal Languages",
+    "question": "How does the expressive power of Deterministic Pushdown Automata (DPDA) compare to Non-Deterministic Pushdown Automata (NPDA), and how does this impact language closure properties?",
+    "ground_truth_answer": "DPDA accepts Deterministic Context-Free Languages (DCFL) and is strictly less expressive than NPDA, which accepts all CFLs. Consequently, DCFLs are closed under complementation, whereas general CFLs are not closed under complementation or intersection.",
+    "ground_truth_context_keywords": [
+      "dpda",
+      "npda",
+      "deterministic context-free",
+      "closure properties",
+      "complementation"
+    ],
+    "expected_source_file": "toc_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_06",
+    "subject": "Compiler Design",
+    "topic": "Bottom-Up Parsing & Conflicts",
+    "question": "What structural relationship exists between LR(0), SLR(1), and LALR(1) parsing tables, and what specific type of conflict can arise when merging states in LALR(1)?",
+    "ground_truth_answer": "LR(0) is a subset of SLR(1), which is a subset of LALR(1), which is a subset of Canonical LR(1). When merging identical core item sets to form LALR(1) tables, Reduce-Reduce conflicts may be introduced, but Shift-Reduce conflicts can never be created.",
+    "ground_truth_context_keywords": [
+      "lr(0)",
+      "slr(1)",
+      "lalr(1)",
+      "canonical lr(1)",
+      "reduce-reduce conflicts",
+      "state merging"
+    ],
+    "expected_source_file": "compiler_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_07",
+    "subject": "Operating Systems",
+    "topic": "Deadlocks & Resource Allocation Graphs",
+    "question": "Under what resource conditions is a cycle in a Resource Allocation Graph both necessary and sufficient for deadlock, and how does this change with multiple instances?",
+    "ground_truth_answer": "In a system where every resource type has exactly a single instance, a cycle in the Resource Allocation Graph (RAG) is both necessary and sufficient for deadlock. With multiple resource instances, a cycle is necessary but not sufficient, requiring Banker's safety algorithm for verification.",
+    "ground_truth_context_keywords": [
+      "resource allocation graph",
+      "single instance",
+      "multiple instances",
+      "cycle",
+      "necessary and sufficient",
+      "deadlock"
+    ],
+    "expected_source_file": "os_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_08",
+    "subject": "Database Management Systems",
+    "topic": "Relational Normalization & Dependencies",
+    "question": "What fundamental trade-off exists between BCNF and 3NF regarding functional dependency preservation and lossless join decomposition?",
+    "ground_truth_answer": "Any relational schema can always be decomposed into 3NF while simultaneously guaranteeing both lossless join and functional dependency preservation. However, BCNF guarantees lossless join and eliminates all redundancy based on FDs, but cannot always preserve all functional dependencies.",
+    "ground_truth_context_keywords": [
+      "bcnf",
+      "3nf",
+      "dependency preservation",
+      "lossless join",
+      "functional dependencies"
+    ],
+    "expected_source_file": "dbms_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_09",
+    "subject": "Computer Organization and Architecture",
+    "topic": "Pipelining & Hazards",
+    "question": "How does operand forwarding mitigate data hazards in a 5-stage RISC pipeline, and what remaining condition still requires a load-use stall bubble?",
+    "ground_truth_answer": "Operand forwarding feeds execution stage ALU results directly to preceding instruction ALU inputs without waiting for the Writeback stage, eliminating RAW hazards for consecutive ALU operations. However, a load-use data hazard where an instruction immediately follows a Load and uses the loaded register still requires 1 stall bubble because memory data is only available after the MEM stage.",
+    "ground_truth_context_keywords": [
+      "operand forwarding",
+      "data hazard",
+      "raw hazard",
+      "load-use stall",
+      "risc pipeline"
+    ],
+    "expected_source_file": "coa_notes.md"
+  },
+  {
+    "question_id": "GATE_MULTIHOP_10",
+    "subject": "Discrete Mathematics",
+    "topic": "Set Theory & Relations",
+    "question": "What mathematical relation properties define a poset, and what is the relationship between linear extensions of a poset and topological sorting of its DAG representation?",
+    "ground_truth_answer": "A partially ordered set (poset) is defined by a relation that is reflexive, antisymmetric, and transitive. A linear extension is a total ordering consistent with the poset, and every linear extension corresponds directly to a valid topological sort of the directed acyclic graph (DAG) derived from the poset's Hasse diagram.",
+    "ground_truth_context_keywords": [
+      "poset",
+      "partial order",
+      "reflexive",
+      "antisymmetric",
+      "transitive",
+      "linear extension",
+      "topological sort"
+    ],
+    "expected_source_file": "discrete_notes.md"
+  }
+]

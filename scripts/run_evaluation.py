@@ -35,18 +35,21 @@ def evaluate_single_config(
     enable_hybrid: bool = True,
     enable_reranking: bool = True,
     enable_crag: bool = True,
+    enable_kg: bool = True,
     target_threshold: float = 0.75
 ) -> EvaluationSummary:
     print(f"\n🚀 Running Evaluation for Config: [{config_name}]")
     print(f"   • Hybrid RRF Retrieval: {'ENABLED' if enable_hybrid else 'DISABLED (Dense-only)'}")
     print(f"   • Cross-Encoder Reranking: {'ENABLED' if enable_reranking else 'DISABLED'}")
     print(f"   • Corrective RAG (CRAG): {'ENABLED' if enable_crag else 'DISABLED'}")
+    print(f"   • Knowledge Graph / GraphRAG: {'ENABLED' if enable_kg else 'DISABLED'}")
 
     orchestrator = CalypsoAgentOrchestrator(
         index_manager=index_manager,
         enable_hybrid=enable_hybrid,
         enable_reranking=enable_reranking,
-        enable_crag=enable_crag
+        enable_crag=enable_crag,
+        enable_kg=enable_kg
     )
 
     agent_states = []
@@ -60,6 +63,7 @@ def evaluate_single_config(
         target_threshold=target_threshold
     )
     return summary
+
 
 
 def run_ablation_study(
@@ -267,6 +271,83 @@ def run_full_evaluation(
     print(f"📄 Markdown evaluation summary generated: {summary_md_path}")
 
 
+def run_multihop_kg_ablation_study(
+    dataset_path: str = "./data/eval/multihop_eval_dataset.json",
+    output_json_path: str = "./data/eval/multihop_kg_ablation_results.json",
+    processed_dir: str = "./data/processed"
+):
+    print("=" * 90)
+    print("🔬 CALYPSO-RAG: KNOWLEDGE GRAPH / GRAPHRAG MULTI-HOP ABLATION STUDY")
+    print("=" * 90)
+
+    with open(dataset_path, "r", encoding="utf-8") as f:
+        raw_items = json.load(f)
+    eval_items = [EvalItem(**item) for item in raw_items]
+    print(f"Loaded {len(eval_items)} multi-hop benchmark evaluation items from {dataset_path}.")
+
+    index_manager = DualIndexManager(
+        persist_dir=f"{processed_dir}/chroma_db",
+        bm25_persist_path=f"{processed_dir}/bm25_index.pkl"
+    )
+    index_manager.load_indices()
+    evaluator = RAGEvaluator(embedder=index_manager.embedder)
+
+    configs = [
+        {
+            "id": "with_kg",
+            "name": "a) Full Pipeline WITH Knowledge Graph (GraphRAG Triplet Lookup)",
+            "enable_hybrid": True,
+            "enable_reranking": True,
+            "enable_crag": True,
+            "enable_kg": True
+        },
+        {
+            "id": "without_kg",
+            "name": "b) Full Pipeline WITHOUT Knowledge Graph (Hybrid Retrieval Only)",
+            "enable_hybrid": True,
+            "enable_reranking": True,
+            "enable_crag": True,
+            "enable_kg": False
+        }
+    ]
+
+    ablation_results = {}
+    for cfg in configs:
+        summary = evaluate_single_config(
+            eval_items=eval_items,
+            index_manager=index_manager,
+            evaluator=evaluator,
+            config_name=cfg["name"],
+            enable_hybrid=cfg["enable_hybrid"],
+            enable_reranking=cfg["enable_reranking"],
+            enable_crag=cfg["enable_crag"],
+            enable_kg=cfg["enable_kg"]
+        )
+        ablation_results[cfg["id"]] = {
+            "name": cfg["name"],
+            "enable_kg": cfg["enable_kg"],
+            "context_precision": summary.mean_context_precision,
+            "context_recall": summary.mean_context_recall,
+            "faithfulness": summary.mean_faithfulness,
+            "answer_relevance": summary.mean_answer_relevance,
+            "overall_score": summary.mean_overall_score,
+            "passed_target": summary.all_targets_met
+        }
+
+    with open(output_json_path, "w", encoding="utf-8") as f:
+        json.dump(ablation_results, f, indent=2)
+
+    print("\n" + "=" * 90)
+    print("📊 MULTI-HOP KNOWLEDGE GRAPH ABLATION RESULTS")
+    print("=" * 90)
+    print(f"{'Configuration':<55} | {'Precision':<9} | {'Recall':<9} | {'Faithful':<9} | {'Relevance':<9} | {'Composite':<9}")
+    print("-" * 110)
+    for cid, res in ablation_results.items():
+        print(f"{res['name']:<55} | {res['context_precision']:<9.4f} | {res['context_recall']:<9.4f} | {res['faithfulness']:<9.4f} | {res['answer_relevance']:<9.4f} | {res['overall_score']:<9.4f}")
+    print("=" * 110)
+    return ablation_results
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Full RAGAS Evaluation Harness or Ablation Study")
     parser.add_argument("--dataset_path", type=str, default="./data/eval/eval_dataset.json")
@@ -275,12 +356,18 @@ if __name__ == "__main__":
     parser.add_argument("--ablation_md_path", type=str, default="./data/eval/ablation_results.md")
     parser.add_argument("--processed_dir", type=str, default="./data/processed")
     parser.add_argument("--ablation", action="store_true", help="Run full 4-configuration ablation study")
+    parser.add_argument("--multihop_kg", action="store_true", help="Run Multi-Hop Knowledge Graph ablation study")
     parser.add_argument("--no_hybrid", action="store_true", help="Disable BM25 (dense-only)")
     parser.add_argument("--no_rerank", action="store_true", help="Disable Cross-Encoder reranking")
     parser.add_argument("--no_crag", action="store_true", help="Disable CRAG query reformulation")
     args = parser.parse_args()
 
-    if args.ablation:
+    if args.multihop_kg:
+        run_multihop_kg_ablation_study(
+            dataset_path=args.dataset_path if args.dataset_path != "./data/eval/eval_dataset.json" else "./data/eval/multihop_eval_dataset.json",
+            processed_dir=args.processed_dir
+        )
+    elif args.ablation:
         run_ablation_study(
             dataset_path=args.dataset_path,
             ablation_md_path=args.ablation_md_path,
@@ -296,4 +383,5 @@ if __name__ == "__main__":
             enable_reranking=not args.no_rerank,
             enable_crag=not args.no_crag
         )
+
 

@@ -1,0 +1,22 @@
+{
+  "with_kg": {
+    "name": "a) Full Pipeline WITH Knowledge Graph (GraphRAG Triplet Lookup)",
+    "enable_kg": true,
+    "context_precision": 0.9333,
+    "context_recall": 0.72,
+    "faithfulness": 0.8912,
+    "answer_relevance": 0.8931,
+    "overall_score": 0.8594,
+    "passed_target": false
+  },
+  "without_kg": {
+    "name": "b) Full Pipeline WITHOUT Knowledge Graph (Hybrid Retrieval Only)",
+    "enable_kg": false,
+    "context_precision": 1.0,
+    "context_recall": 0.6119,
+    "faithfulness": 0.8395,
+    "answer_relevance": 0.8922,
+    "overall_score": 0.8359,
+    "passed_target": false
+  }
+}

@@ -41,6 +41,21 @@ To isolate the contribution of each architectural component, we evaluated the sy
 
 ---
 
+### Knowledge Graph Ablation: With KG vs Without KG (Multi-Hop Questions)
+
+To isolate the specific empirical contribution of the **GATE CS Knowledge Graph / GraphRAG triplet lookup**, we evaluated both configurations against a dedicated 10-question multi-hop benchmark (`data/eval/multihop_eval_dataset.json`). These questions test multi-relational reasoning across 7 core GATE CS subjects (e.g. cross-referencing Strict 2PL invariants with cascading aborts and conflict serializability, stack algorithm properties with Belady's anomaly immunity, or sliding window sequence boundaries).
+
+| Configuration | Context Precision | Context Recall | Faithfulness | Answer Relevance | Composite Score | $\Delta$ vs With KG |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **a) Full Pipeline WITH Knowledge Graph (GraphRAG Triplet Lookup)** | **0.9333** | **0.7200** | **0.8912** | **0.8931** | **0.8594** | **Baseline** |
+| **b) Full Pipeline WITHOUT Knowledge Graph (Hybrid Retrieval Only)** | **1.0000** | **0.6119** | **0.8395** | **0.8922** | **0.8359** | `-0.0235` |
+
+**Empirical Interpretation**:
+KG triplet lookup improved **Context Recall by +10.81 percentage points** ($0.6119 \to 0.7200$) and **Faithfulness by +5.17 percentage points** ($0.8395 \to 0.8912$) on multi-hop questions by injecting explicit relational edges (`[Strict 2PL]` $\xrightarrow{\text{prevents}}$ `[Cascading Aborts]`, `[LR(0)]` $\subset$ `[SLR(1)]` $\subset$ `[LALR(1)]`) directly into the agent context. Without the Knowledge Graph, hybrid retrieval often captured one side of a relational dependency while omitting the connective link from fragmented textbook notes, causing the LLM to make unsupported parametric leaps. This gain comes at a minor precision trade-off ($1.0000 \to 0.9333$, $-6.67\%$) due to the additional structural triplet tokens, but yields a **net $+2.35\%$ lift in composite multi-hop reasoning capability ($0.8359 \to 0.8594$)**.
+
+---
+
+
 ## 3. Benchmark Dataset Scaling Analysis
 
 We scaled the benchmark evaluation dataset from **20 questions** to **50 questions**, covering all 10 GATE CS subjects proportionally (5 questions per subject: OS, DBMS, Algorithms, Data Structures, Networks, TOC, Compilers, COA, Discrete Mathematics, Engineering Mathematics / Digital Logic).

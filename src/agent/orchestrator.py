@@ -60,7 +60,8 @@ class CalypsoAgentOrchestrator:
         max_reformulations: int = 2,
         enable_hybrid: bool = True,
         enable_reranking: bool = True,
-        enable_crag: bool = True
+        enable_crag: bool = True,
+        enable_kg: bool = True
     ):
         self.index_manager = index_manager or DualIndexManager()
         self.retriever = retriever or HybridRetriever(index_manager=self.index_manager, rrf_k=60)
@@ -82,6 +83,7 @@ class CalypsoAgentOrchestrator:
         self.enable_hybrid = enable_hybrid
         self.enable_reranking = enable_reranking
         self.enable_crag = enable_crag
+        self.enable_kg = enable_kg
 
         # Compile the LangGraph agent state machine
         self.graph = self._build_graph()
@@ -150,6 +152,26 @@ class CalypsoAgentOrchestrator:
         # Expand granular chunks into enclosing parent sections for higher Context Recall
         expanded_chunks = self.parent_retriever.expand_chunks(fused)
 
+        # GraphRAG / Knowledge Graph Multi-Hop Triplet Augmentation
+        kg_triplet_count = 0
+        if self.enable_kg:
+            triplets = gate_kg.find_related_triplets(active_query, max_triplets=4)
+            kg_triplet_count = len(triplets)
+            for i, (s, r, t, subj) in enumerate(triplets):
+                kg_chunk = RetrievedChunk(
+                    chunk_id=f"kg_rel_{subj.lower()}_{i}",
+                    content=f"Knowledge Graph Relational Fact: [{s}] --[{r.replace('_', ' ')}]--> [{t}]. In {subj}, {s} {r.replace('_', ' ')} {t}.",
+                    topic=subj,
+                    subtopic="GraphRAG Relational Triplet",
+                    source_type="notes",
+                    source_file="gate_knowledge_graph.json",
+                    dense_score=0.96,
+                    bm25_score=14.0,
+                    rrf_score=0.030,
+                    rerank_score=0.94
+                )
+                expanded_chunks.append(kg_chunk)
+
         elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
         timing = dict(state.get("telemetry", {}).get("timing", {}))
         timing["retrieval_ms"] = timing.get("retrieval_ms", 0.0) + elapsed_ms
@@ -158,7 +180,9 @@ class CalypsoAgentOrchestrator:
             "retrieval_results": expanded_chunks,
             "telemetry": {
                 **state.get("telemetry", {}),
-                "timing": timing
+                "timing": timing,
+                "kg_enabled": self.enable_kg,
+                "kg_triplets_retrieved": kg_triplet_count
             }
         }
 
