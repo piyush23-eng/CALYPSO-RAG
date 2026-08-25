@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowRight, Sparkles, Image as ImageIcon, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, Sparkles, Image as ImageIcon, X, Mic, MicOff } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { voiceRecognition } from '../services/voice';
 
 interface HeroProps {
   onSearch: (query: string, image?: string) => void;
@@ -20,6 +21,8 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
   const [inputVal, setInputVal] = useState("");
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle clipboard screenshot paste (Ctrl+V / Cmd+V)
@@ -76,8 +79,43 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
     }
   };
 
+  const handleToggleVoice = () => {
+    if (isListening) {
+      voiceRecognition.stop();
+      setIsListening(false);
+      setVoiceStatus(null);
+      return;
+    }
+
+    setVoiceStatus("Listening... Speak your GATE question");
+    setIsListening(true);
+
+    voiceRecognition.start(
+      (transcript: string, isFinal: boolean) => {
+        setInputVal(transcript);
+        if (isFinal) {
+          setVoiceStatus(null);
+          setIsListening(false);
+        }
+      },
+      (err: string) => {
+        setVoiceStatus(`Voice error: ${err}`);
+        setIsListening(false);
+        setTimeout(() => setVoiceStatus(null), 3500);
+      },
+      () => {
+        setIsListening(false);
+        setVoiceStatus(null);
+      }
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isListening) {
+      voiceRecognition.stop();
+      setIsListening(false);
+    }
     if ((inputVal.trim() || attachedImage) && !isLoading) {
       onSearch(inputVal.trim() || "Solve the attached GATE CS diagram problem.", attachedImage || undefined);
     }
@@ -113,11 +151,11 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
         {/* Small Restrained Subhead */}
         <p className="text-base sm:text-lg text-muted-gray max-w-2xl font-normal leading-relaxed mb-12">
           Fine-tuned Qwen 1.5B (QLoRA) paired with hybrid Reciprocal Rank Fusion,
-          cross-encoder reranking, Knowledge Graph reasoning, and Vision-RAG for zero-hallucination exam prep.
+          cross-encoder reranking, Knowledge Graph reasoning, Voice Tutor, and Vision-RAG for zero-hallucination exam prep.
         </p>
       </motion.div>
 
-      {/* Oversized Input Field with Drag & Drop & Screenshot Paste */}
+      {/* Oversized Input Field with Drag & Drop, Voice Input & Screenshot Paste */}
       <motion.form
         onSubmit={handleSubmit}
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
@@ -127,11 +165,28 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
         className={`relative mb-8 p-3 rounded-2xl transition-all duration-300 ${
-          isDragging 
-            ? 'border-2 border-dashed border-accent bg-accent/10 shadow-[0_0_30px_rgba(61,90,254,0.3)]' 
-            : 'border-b-2 border-white/20 focus-within:border-accent'
+          isListening 
+            ? 'border-2 border-red-500 bg-red-500/10 shadow-[0_0_30px_rgba(239,68,68,0.3)] ring-2 ring-red-500/30'
+            : isDragging 
+              ? 'border-2 border-dashed border-accent bg-accent/10 shadow-[0_0_30px_rgba(61,90,254,0.3)]' 
+              : 'border-b-2 border-white/20 focus-within:border-accent'
         }`}
       >
+        {/* Voice Listening Banner */}
+        <AnimatePresence>
+          {voiceStatus && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              className="mb-2 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-mono"
+            >
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+              <span>{voiceStatus}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Attached Diagram Preview Pill */}
         {attachedImage && (
           <div className="mb-3 inline-flex items-center gap-3 p-2 rounded-xl bg-[#14141f] border border-accent/40 shadow-[0_0_12px_rgba(61,90,254,0.25)]">
@@ -156,8 +211,14 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
             disabled={isLoading}
-            placeholder={attachedImage ? "Add optional question for diagram..." : "Type GATE query, or paste (Ctrl+V) / drop diagram screenshot..."}
-            className="w-full bg-transparent text-xl sm:text-3xl font-light text-off-white placeholder:text-muted-gray/40 focus:outline-none pr-28 tracking-tight"
+            placeholder={
+              isListening 
+                ? "Listening to your voice..." 
+                : attachedImage 
+                  ? "Add optional question for diagram..." 
+                  : "Type GATE query, speak (Mic), or paste (Ctrl+V) screenshot..."
+            }
+            className="w-full bg-transparent text-xl sm:text-3xl font-light text-off-white placeholder:text-muted-gray/40 focus:outline-none pr-36 tracking-tight"
           />
 
           <div className="absolute right-0 bottom-1 flex items-center gap-2">
@@ -169,6 +230,21 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, isLoading }) => {
               accept="image/*"
               className="hidden"
             />
+
+            {/* Voice Microphone Input Button */}
+            <button
+              type="button"
+              onClick={handleToggleVoice}
+              disabled={isLoading}
+              title={isListening ? "Stop listening" : "Click to speak your GATE question (Voice Input)"}
+              className={`p-2.5 rounded-full transition-all duration-200 cursor-pointer ${
+                isListening 
+                  ? 'text-white bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.6)] animate-pulse' 
+                  : 'text-muted-gray hover:text-off-white hover:bg-white/[0.05]'
+              }`}
+            >
+              {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            </button>
 
             {/* Upload Image Button */}
             <button

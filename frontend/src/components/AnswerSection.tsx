@@ -3,9 +3,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders } from 'lucide-react';
+import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders, Volume2, Pause, Play, Square } from 'lucide-react';
 import type { QueryResponse } from '../types';
 import { VisualLab, detectSimulationLab } from './VisualLab';
+import { professorNarrator } from '../services/voice';
 
 interface AnswerSectionProps {
   data: QueryResponse;
@@ -99,6 +100,9 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
 }) => {
   const [showTrace, setShowTrace] = useState(false);
   const [showLab, setShowLab] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [speechRate, setSpeechRate] = useState(1.0);
 
   const {
     query,
@@ -117,6 +121,47 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
 
   const confidenceMeta = getConfidenceMeta(relevance_score, passed_gate, reformulation_count);
   const detectedSim = detectSimulationLab(`${query} ${reformulated_query} ${subject_hint || ''} ${final_answer}`);
+
+  // Stop narration if query changes
+  useEffect(() => {
+    return () => {
+      professorNarrator.stop();
+      setIsSpeaking(false);
+      setIsPaused(false);
+    };
+  }, [query]);
+
+  const handlePlayVoice = () => {
+    if (isSpeaking && !isPaused) {
+      professorNarrator.pause();
+      setIsPaused(true);
+      return;
+    }
+    if (isPaused) {
+      professorNarrator.resume();
+      setIsPaused(false);
+      return;
+    }
+
+    professorNarrator.setRate(speechRate);
+    professorNarrator.speak(
+      final_answer,
+      () => { setIsSpeaking(true); setIsPaused(false); },
+      () => { setIsSpeaking(false); setIsPaused(false); },
+      () => { setIsSpeaking(false); setIsPaused(false); }
+    );
+  };
+
+  const handleStopVoice = () => {
+    professorNarrator.stop();
+    setIsSpeaking(false);
+    setIsPaused(false);
+  };
+
+  const handleSetRate = (rate: number) => {
+    setSpeechRate(rate);
+    professorNarrator.setRate(rate);
+  };
 
   return (
     <motion.section
@@ -221,13 +266,82 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
         variants={itemVariants}
         className="mb-16 p-8 sm:p-10 rounded-2xl border border-white/[0.08] border-t-white/[0.18] bg-[#11111a] shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
       >
-        <div className="flex items-center justify-between pb-6 mb-6 border-b border-white/[0.06]">
-          <h2 className="text-xs font-mono uppercase tracking-widest text-muted-gray">
-            Verified Mathematical Derivation & Proof
-          </h2>
-          <span className="text-[11px] font-mono text-accent bg-accent/10 px-2.5 py-0.5 rounded border border-accent/20">
-            Proven Zero-Hallucination
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-6 mb-6 border-b border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xs font-mono uppercase tracking-widest text-muted-gray">
+              Verified Mathematical Derivation & Proof
+            </h2>
+            <span className="text-[11px] font-mono text-accent bg-accent/10 px-2.5 py-0.5 rounded border border-accent/20">
+              Proven Zero-Hallucination
+            </span>
+          </div>
+
+          {/* IIT Professor Audio Narration Toolbar */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePlayVoice}
+              className={`inline-flex items-center gap-2 text-xs font-mono px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                isSpeaking && !isPaused
+                  ? 'border-accent bg-accent/20 text-accent font-semibold shadow-[0_0_15px_rgba(61,90,254,0.35)]'
+                  : isPaused
+                    ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
+                    : 'border-white/[0.08] text-muted-gray hover:text-off-white hover:border-accent/40 bg-[#141420]'
+              }`}
+            >
+              {isSpeaking && !isPaused ? (
+                <>
+                  <Pause className="w-3.5 h-3.5" />
+                  <span>Pause Voice</span>
+                  {/* Equalizer animation */}
+                  <span className="flex items-center gap-0.5 ml-1">
+                    <span className="w-1 h-3 bg-accent animate-pulse rounded-full" />
+                    <span className="w-1 h-4 bg-accent animate-pulse rounded-full" style={{ animationDelay: '0.15s' }} />
+                    <span className="w-1 h-2 bg-accent animate-pulse rounded-full" style={{ animationDelay: '0.3s' }} />
+                  </span>
+                </>
+              ) : isPaused ? (
+                <>
+                  <Play className="w-3.5 h-3.5" />
+                  <span>Resume Voice</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-accent" />
+                  <span>🎙️ Listen to Professor Walkthrough</span>
+                </>
+              )}
+            </button>
+
+            {isSpeaking && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleStopVoice}
+                  title="Stop Audio"
+                  className="p-1.5 rounded-lg border border-white/[0.08] hover:border-red-400 text-muted-gray hover:text-red-400 transition-colors bg-[#141420] cursor-pointer"
+                >
+                  <Square className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Speed Selector */}
+                <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[#141420] border border-white/[0.06] text-[10px] font-mono">
+                  {[0.9, 1.0, 1.25].map(rate => (
+                    <button
+                      key={rate}
+                      type="button"
+                      onClick={() => handleSetRate(rate)}
+                      className={`px-1.5 py-0.5 rounded cursor-pointer ${
+                        speechRate === rate ? 'bg-accent text-white font-bold' : 'text-muted-gray hover:text-off-white'
+                      }`}
+                    >
+                      {rate}x
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="text-base sm:text-lg font-normal leading-relaxed text-off-white/95 space-y-6 answer-markdown">
