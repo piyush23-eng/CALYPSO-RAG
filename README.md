@@ -1,4 +1,6 @@
-# CALYPSO-RAG: Agentic Retrieval-Augmented Generation & Reasoning for GATE Computer Science
+# CALYPSO — Multimodal Agentic RAG System for GATE CS/IT
+
+> **Hybrid retrieval, GraphRAG, CRAG, QLoRA, and symbolic verification for GATE-oriented question answering.**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![LangGraph](https://img.shields.io/badge/orchestration-LangGraph%20Agent-orange.svg)](https://github.com/langchain-ai/langgraph)
@@ -19,7 +21,8 @@ Technical question answering in **GATE Computer Science & Information Technology
 2. **Lexical & Acronym Dispersion**: Dense embedding retrieval alone can disperse queries containing dense acronyms and specific algorithmic variables (e.g., `Strict 2PL`, `LR(0)` vs `SLR(1)`, `ssthresh`, `3NF`).
 3. **Multi-Hop Relational Invariants**: Complex syllabus questions often span multiple conceptual rules (e.g., *Which concurrency control protocol prevents cascading aborts while guaranteeing conflict serializability?*).
 
-**CALYPSO-RAG** is a modular **Agentic Retrieval-Augmented Generation & Simulation System** designed for the GATE CS/IT syllabus. It integrates hybrid lexical-dense search, cross-encoder reranking, Corrective-RAG (CRAG) query reformulation loops, AST-restricted Python computation for supported mathematical problems, a relational GATE Knowledge Graph (GraphRAG), step-level Process Reward Model (PRM) verification, multimodal diagram parsing, and neural speech synthesis for walkthrough narration.
+**CALYPSO-RAG** is a modular **Multimodal Agentic Retrieval-Augmented Generation & Simulation System** designed for the GATE CS/IT syllabus. It integrates hybrid lexical-dense search, cross-encoder reranking, Corrective-RAG (CRAG) query reformulation loops, AST-restricted Python computation for supported mathematical problems, a relational GATE Knowledge Graph (GraphRAG), step-level Process Reward Model (PRM) verification, multimodal diagram parsing, and neural speech synthesis for walkthrough narration.
+
 
 ---
 

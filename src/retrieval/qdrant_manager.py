@@ -17,8 +17,8 @@ from src.ingestion.chunker import DocumentChunk
 
 class QdrantHybridManager:
     """
-    Production-grade Qdrant Vector DB Manager supporting local disk persistence
-    or distributed remote clusters.
+    Qdrant Vector DB Manager for CALYPSO-RAG.
+    Supports local disk persistence and external cluster connections.
     """
 
     def __init__(

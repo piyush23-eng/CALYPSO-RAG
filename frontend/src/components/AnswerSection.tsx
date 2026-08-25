@@ -212,9 +212,10 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
           {/* Phase 1: Semantic Cache Badge */}
           {data.is_semantic_cache_hit && (
             <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30 shadow-[0_0_12px_rgba(52,211,153,0.2)]">
-              <Zap className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> Semantic Cache (&lt;10ms, {Math.round((data.cache_similarity || 0.99) * 100)}% Sim)
+              <Zap className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> Semantic Cache ({Math.round((data.cache_similarity || 0.99) * 100)}% Sim)
             </span>
           )}
+
 
           {/* Phase 2: SymPy & Pint Dimensional Invariants Badge */}
           {data.dimensional_verification?.verified && (
@@ -366,15 +367,16 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
         <div className="flex flex-wrap items-center justify-between gap-3 pb-6 mb-6 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
             <h2 className="text-xs font-mono uppercase tracking-widest text-muted-gray">
-              Verified Mathematical Derivation & Proof
+              Grounded Mathematical Derivation & Proof
             </h2>
             <span className="text-[11px] font-mono text-accent bg-accent/10 px-2.5 py-0.5 rounded border border-accent/20">
-              Proven Zero-Hallucination
+              Retrieval-Grounded Proof
             </span>
           </div>
 
-          {/* IIT Professor Neural Audio Narration Toolbar */}
+          {/* Neural Voice Tutor Audio Toolbar */}
           <div className="flex flex-wrap items-center gap-2">
+
             {/* Voice Persona Selector */}
             <select
               value={selectedVoice}

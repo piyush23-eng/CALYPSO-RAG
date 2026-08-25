@@ -14,17 +14,18 @@ const API_BASE = import.meta.env.VITE_API_URL || (
 );
 
 export type VoicePersona = 
-  | 'en-IN-PrabhatNeural'      // IIT CS Professor (Natural Indian English)
-  | 'en-US-ChristopherNeural' // MIT Lecturer (Deep Natural American English)
-  | 'en-GB-RyanNeural'        // Oxford Academic (Natural British English)
-  | 'en-US-JennyNeural';      // AI Scientist (Clear Natural American English)
+  | 'en-IN-PrabhatNeural'      // Natural Indian English
+  | 'en-US-ChristopherNeural' // Natural American English (Deep)
+  | 'en-GB-RyanNeural'        // Natural British English
+  | 'en-US-JennyNeural';      // Natural American English (Clear)
 
 export const VOICE_OPTIONS: { id: VoicePersona; label: string; tag: string }[] = [
-  { id: 'en-IN-PrabhatNeural', label: 'Prof. Prabhat', tag: 'IIT Faculty Voice' },
-  { id: 'en-US-ChristopherNeural', label: 'Prof. Christopher', tag: 'MIT Studio Voice' },
-  { id: 'en-GB-RyanNeural', label: 'Prof. Ryan', tag: 'Oxford Academic' },
-  { id: 'en-US-JennyNeural', label: 'Dr. Jenny', tag: 'AI Researcher' }
+  { id: 'en-IN-PrabhatNeural', label: 'Prabhat (Indian)', tag: 'Natural Indian English' },
+  { id: 'en-US-ChristopherNeural', label: 'Christopher (US)', tag: 'Natural American English' },
+  { id: 'en-GB-RyanNeural', label: 'Ryan (UK)', tag: 'Natural British English' },
+  { id: 'en-US-JennyNeural', label: 'Jenny (US)', tag: 'Clear American English' }
 ];
+
 
 // ── Part 1: Speech-to-Text (Voice Query Input) ──────────────────────────
 

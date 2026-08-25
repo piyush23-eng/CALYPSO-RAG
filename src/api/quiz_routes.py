@@ -32,7 +32,8 @@ def get_quiz_questions(
     subject: Optional[str] = Query(None, description="Filter by subject"),
     q_type: Optional[str] = Query(None, description="Filter by question type: MCQ, MSQ, NAT")
 ):
-    """Returns 100% pure verified authentic GATE CS questions with exact LaTeX symbols and options."""
+    """Returns verified GATE CS questions with exact LaTeX symbols and options."""
+
     questions = QUIZ_BANK
 
     if subject and subject.strip() and subject.lower() != "all subjects":

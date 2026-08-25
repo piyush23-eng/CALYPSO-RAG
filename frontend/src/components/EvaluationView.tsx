@@ -36,9 +36,10 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
         <div className="inline-flex items-center gap-2 mb-4">
           <Award className="w-4 h-4 text-accent" />
           <span className="text-xs font-mono uppercase tracking-widest text-accent font-semibold">
-            RAGAS Evaluation Harness • 20 GATE CS Benchmarks
+            RAGAS Evaluation Harness • 50 Stratified GATE CS Benchmarks
           </span>
         </div>
+
 
         <h1 className="text-6xl sm:text-8xl font-display font-extrabold tracking-tightest leading-none text-off-white mb-6">
           The Numbers.
