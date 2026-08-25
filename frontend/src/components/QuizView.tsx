@@ -20,7 +20,8 @@ interface QuizViewProps {
 
 export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [totalInBank, setTotalInBank] = useState(1532);
+  const [totalInBank, setTotalInBank] = useState(1056);
+
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<string>("All Subjects");
   const [selectedType, setSelectedType] = useState<string>("All Types");
