@@ -26,3 +26,5 @@ class QueryResponse(BaseModel):
     is_semantic_cache_hit: bool = False
     cache_similarity: Optional[float] = None
     dimensional_verification: Optional[Dict[str, Any]] = None
+    self_consistency: Optional[Dict[str, Any]] = None
+    serving_engine: Optional[str] = None

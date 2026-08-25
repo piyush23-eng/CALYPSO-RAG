@@ -56,6 +56,13 @@ export interface QueryResponse {
     details?: string;
     error?: string;
   };
+  self_consistency?: {
+    agreement_ratio: number;
+    is_unanimous: boolean;
+    sample_count: number;
+    voting_distribution: Record<string, number>;
+  };
+  serving_engine?: string;
 }
 
 export interface ModelStat {

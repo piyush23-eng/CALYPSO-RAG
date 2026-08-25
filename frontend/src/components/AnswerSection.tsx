@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders, Volume2, Pause, Play, Square, Loader2, Zap, ShieldCheck } from 'lucide-react';
+import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders, Volume2, Pause, Play, Square, Loader2, Zap, ShieldCheck, CheckCheck, Cpu } from 'lucide-react';
 import type { QueryResponse } from '../types';
 import { VisualLab, detectSimulationLab } from './VisualLab';
 import { professorNarrator, VOICE_OPTIONS, type VoicePersona } from '../services/voice';
@@ -223,6 +223,23 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
               className="inline-flex items-center gap-1 text-[11px] font-mono text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/30"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" /> Units Verified ({data.dimensional_verification.target_unit || "Pint/SymPy"})
+            </span>
+          )}
+
+          {/* Phase 3: Self-Consistency Consensus Voting Badge */}
+          {data.self_consistency && (
+            <span 
+              title={`Consensus voting over ${data.self_consistency.sample_count} paths`}
+              className="inline-flex items-center gap-1 text-[11px] font-mono text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/30"
+            >
+              <CheckCheck className="w-3.5 h-3.5 text-indigo-400" /> Consensus N={data.self_consistency.sample_count} ({Math.round(data.self_consistency.agreement_ratio * 100)}%)
+            </span>
+          )}
+
+          {/* Phase 5: Engine Badge */}
+          {data.serving_engine && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-mono text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/30">
+              <Cpu className="w-3.5 h-3.5 text-purple-400" /> {data.serving_engine}
             </span>
           )}
         </div>

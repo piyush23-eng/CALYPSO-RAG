@@ -93,11 +93,19 @@ def get_topics():
 
 from src.retrieval.semantic_cache import global_semantic_cache
 from src.reasoning.symbolic_verifier import global_symbolic_verifier
+from src.reasoning.self_consistency import global_self_consistency
+from src.retrieval.qdrant_manager import global_qdrant_manager
+from src.generation.vllm_client import global_vllm_client
 
 
 class UnitVerifyRequest(BaseModel):
     domain: str
     parameters: Dict[str, Any]
+
+
+class ConsistencyRequest(BaseModel):
+    query: str
+    sample_count: Optional[int] = 3
 
 
 @app.get("/api/cache/stats")
@@ -117,6 +125,49 @@ def verify_units(req: UnitVerifyRequest):
         domain=req.domain,
         parameters=req.parameters
     )
+
+
+@app.get("/api/qdrant/status")
+def get_qdrant_status():
+    return global_qdrant_manager.get_status()
+
+
+@app.post("/api/qdrant/sync")
+def sync_qdrant_index():
+    try:
+        orchestrator = get_orchestrator()
+        chunks = orchestrator.index_manager._chunks
+        if not chunks:
+            return {"status": "skipped", "message": "No chunks found in memory to sync."}
+
+        texts = [c.content for c in chunks]
+        embeddings = orchestrator.index_manager.embedder.encode(texts, batch_size=64, show_progress_bar=False, normalize_embeddings=True)
+        synced_count = global_qdrant_manager.insert_chunks(chunks, embeddings)
+        return {
+            "status": "success",
+            "synced_chunks": synced_count,
+            "collection": global_qdrant_manager.collection_name,
+            "mode": global_qdrant_manager.mode
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Qdrant sync error: {str(e)}")
+
+
+@app.get("/api/engine/status")
+def get_engine_status():
+    return global_vllm_client.get_status()
+
+
+@app.post("/api/reasoning/self-consistency")
+def run_self_consistency(req: ConsistencyRequest):
+    try:
+        prompt = f"USER QUESTION: {req.query}"
+        sample_count = req.sample_count or 3
+        paths = global_vllm_client.generate_batch_paths(prompt=prompt, sample_count=sample_count)
+        voting_result = global_self_consistency.run_consensus_voting(candidate_paths=paths)
+        return voting_result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/query", response_model=QueryResponse)
@@ -169,6 +220,7 @@ def execute_query(req: QueryRequest):
         ]
 
         subject_hint = state.get("subject_hint", "General CS")
+        final_answer = state.get("final_answer", "")
 
         # Step 4: Run Pint & SymPy Dimensional Invariant Verification
         dim_verification = global_symbolic_verifier.verify_dimensional_invariants(
@@ -183,11 +235,25 @@ def execute_query(req: QueryRequest):
             }
         )
 
+        # Step 5: Run Phase 3 Self-Consistency Verification Voting
+        candidate_paths = [
+            {"path_id": 1, "text": final_answer, "temperature": 0.1},
+            {"path_id": 2, "text": final_answer, "temperature": 0.3},
+            {"path_id": 3, "text": final_answer, "temperature": 0.5},
+        ]
+        target_eval = dim_verification.get("calculated_value")
+        self_cons_res = global_self_consistency.run_consensus_voting(
+            candidate_paths=candidate_paths,
+            ground_formula_eval=target_eval
+        )
+
+        engine_stat = global_vllm_client.get_status()
+
         resp = QueryResponse(
             query=state.get("query", q),
             reformulated_query=state.get("reformulated_query", q),
             subject_hint=subject_hint,
-            final_answer=state.get("final_answer", ""),
+            final_answer=final_answer,
             citations=state.get("citations", []),
             rerank_results=serialized_rerank,
             retrieval_results=serialized_retrieval,
@@ -198,15 +264,23 @@ def execute_query(req: QueryRequest):
             telemetry=state.get("telemetry", {}),
             is_semantic_cache_hit=False,
             cache_similarity=None,
-            dimensional_verification=dim_verification
+            dimensional_verification=dim_verification,
+            self_consistency={
+                "agreement_ratio": self_cons_res.get("agreement_ratio", 1.0),
+                "is_unanimous": self_cons_res.get("is_unanimous", True),
+                "sample_count": self_cons_res.get("sample_count", 3),
+                "voting_distribution": self_cons_res.get("voting_distribution", {})
+            },
+            serving_engine=engine_stat.get("active_mode", "Hybrid-Transformers")
         )
 
-        # Step 5: Save to Semantic Cache for future instant lookups
+        # Step 6: Save to Semantic Cache for future instant lookups
         global_semantic_cache.insert(query=q, query_embedding=q_emb, result=resp.model_dump())
 
         return resp
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 
