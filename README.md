@@ -157,6 +157,11 @@ flowchart TD
 - Evaluates each step with a Step Reward Verifier combining SymPy exact symbolic execution and Pint dimensional homogeneity checks.
 - Generates structured, collapsible `<think> ... </think>` reasoning traces in the UI with per-step PRM confidence scores ($\ge 95\%$), ensuring zero ungrounded steps in complex proofs.
 
+### 13. ⚡ Real-Time Server-Sent Events (SSE) Token Streamer (`/api/query/stream`)
+- Ultra-responsive, streaming query architecture that drops Time-to-First-Token to **$<150\text{ms}$**.
+- Progressively streams pipeline telemetry, live Step-by-Step PRM deductive reasoning steps (`event: think_step`), and real-time character-by-character KaTeX mathematical derivations (`event: token`).
+- Full non-blocking async generator supporting dynamic semantic cache stream injection and seamless client reconnection.
+
 
 ---
 

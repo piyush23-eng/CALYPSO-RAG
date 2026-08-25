@@ -23,6 +23,77 @@ export async function submitQuery(query: string): Promise<QueryResponse> {
   return response.json();
 }
 
+export interface StreamCallbacks {
+  onStatus?: (status: { phase: string; message: string }) => void;
+  onTelemetry?: (telemetry: { subject_hint: string; relevance_score: number; passed_gate: boolean }) => void;
+  onThinkStep?: (step: any) => void;
+  onToken?: (token: string) => void;
+  onCacheHit?: (data: { similarity: number; message: string }) => void;
+  onDone?: (fullResult: QueryResponse) => void;
+  onError?: (error: string) => void;
+}
+
+export async function submitStreamingQuery(query: string, callbacks: StreamCallbacks): Promise<void> {
+  const response = await fetch(`${API_BASE}/api/query/stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.detail || `Streaming failed with status ${response.status}`);
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("Response body is not readable");
+
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    let currentEvent = 'message';
+
+    for (const line of lines) {
+      if (line.startsWith('event: ')) {
+        currentEvent = line.slice(7).trim();
+      } else if (line.startsWith('data: ')) {
+        const rawData = line.slice(6).trim();
+        try {
+          const parsed = JSON.parse(rawData);
+          if (currentEvent === 'status' && callbacks.onStatus) {
+            callbacks.onStatus(parsed);
+          } else if (currentEvent === 'telemetry' && callbacks.onTelemetry) {
+            callbacks.onTelemetry(parsed);
+          } else if (currentEvent === 'think_step' && callbacks.onThinkStep) {
+            callbacks.onThinkStep(parsed);
+          } else if (currentEvent === 'token' && callbacks.onToken) {
+            callbacks.onToken(parsed.token);
+          } else if (currentEvent === 'cache_hit' && callbacks.onCacheHit) {
+            callbacks.onCacheHit(parsed);
+          } else if (currentEvent === 'done' && callbacks.onDone) {
+            callbacks.onDone(parsed);
+          } else if (currentEvent === 'error' && callbacks.onError) {
+            callbacks.onError(parsed.error);
+          }
+        } catch {
+          // ignore partial parse
+        }
+      }
+    }
+  }
+}
+
+
 export async function submitVisionQuery(image: string, query?: string): Promise<QueryResponse> {
   const response = await fetch(`${API_BASE}/api/vision/solve`, {
     method: 'POST',
