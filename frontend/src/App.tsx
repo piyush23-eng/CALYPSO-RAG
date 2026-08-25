@@ -12,7 +12,21 @@ import type { QueryResponse } from './types';
 import { AlertCircle, History } from 'lucide-react';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'solver' | 'evaluation' | 'quiz'>('solver');
+  const [currentView, setCurrentView] = useState<'solver' | 'evaluation' | 'quiz'>(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname === '/quiz') return 'quiz';
+      if (window.location.pathname === '/evaluation') return 'evaluation';
+    }
+    return 'solver';
+  });
+
+  useEffect(() => {
+    const targetPath = currentView === 'solver' ? '/' : `/${currentView}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({}, '', targetPath);
+    }
+  }, [currentView]);
+
   const [topics, setTopics] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<QueryResponse | null>(null);
