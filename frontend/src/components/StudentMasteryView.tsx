@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Target, Compass, Sparkles, RefreshCw } from 'lucide-react';
+import { Brain, Target, Compass, Sparkles, RefreshCw, ArrowLeft } from 'lucide-react';
 import { fetchStudentMastery } from '../services/api';
 import type { StudentMasteryProfile } from '../types';
 
-export const StudentMasteryView: React.FC = () => {
+interface StudentMasteryViewProps {
+  onBack?: () => void;
+}
+
+export const StudentMasteryView: React.FC<StudentMasteryViewProps> = ({ onBack }) => {
   const [profile, setProfile] = useState<StudentMasteryProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +39,7 @@ export const StudentMasteryView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-6 py-20 text-center font-mono text-muted-gray">
+      <div className="pt-32 pb-28 max-w-5xl mx-auto px-6 text-center font-mono text-muted-gray">
         <RefreshCw className="w-6 h-6 animate-spin mx-auto text-accent mb-3" />
         <span>Computing Bayesian Knowledge Tracing (BKT) Cognitive Profile...</span>
       </div>
@@ -45,7 +49,18 @@ export const StudentMasteryView: React.FC = () => {
   if (!profile) return null;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="pt-24 pb-28 px-4 sm:px-6 max-w-5xl mx-auto">
+      {/* Return to Solver / Top Navigation Bar */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-gray hover:text-accent transition-colors mb-8 cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Return to Solver</span>
+        </button>
+      )}
+
       {/* Header */}
       <div className="mb-10 text-center sm:text-left border-b border-white/[0.08] pb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -58,6 +73,7 @@ export const StudentMasteryView: React.FC = () => {
           <h1 className="text-3xl sm:text-4xl font-display font-bold text-off-white tracking-tight">
             Personalized GATE CS Cognitive Mastery Radar
           </h1>
+
           <p className="text-sm font-mono text-muted-gray mt-1">
             Dynamic Bayesian Knowledge Tracing (BKT) tracking prior understanding, learning transitions, and slip probability.
           </p>

@@ -313,10 +313,11 @@ export function App() {
         {currentView === 'quiz' ? (
           <QuizView onBack={() => setCurrentView('solver')} />
         ) : currentView === 'mastery' ? (
-          <StudentMasteryView />
+          <StudentMasteryView onBack={() => setCurrentView('solver')} />
         ) : currentView === 'evaluation' ? (
           <EvaluationView onBack={() => setCurrentView('solver')} />
         ) : (
+
 
           <div>
             <Hero onSearch={handleSearch} isLoading={isLoading} />
