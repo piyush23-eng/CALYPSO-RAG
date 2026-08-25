@@ -6,13 +6,15 @@ interface QuizQuestion {
   id: string;
   subject: string;
   type: string;
+  year?: string;
   marks: number;
   negative_marks: number;
   question: string;
-  options: string[];
+  options?: string[];
   correct_answer: string;
   explanation: string;
 }
+
 
 interface QuizViewProps {
   onBack: () => void;
@@ -262,6 +264,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                   <span className="text-[10px] font-mono text-accent uppercase tracking-widest px-2.5 py-1 rounded bg-accent/10 border border-accent/20 font-bold">
                     Q{currentIdx + 1} OF {questions.length}
                   </span>
+                  {currentQ.year && (
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                      {currentQ.year}
+                    </span>
+                  )}
                   <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded border font-bold ${
                     currentQ.type === 'MSQ'
                       ? 'border-purple-500/40 bg-purple-500/10 text-purple-400'
@@ -275,6 +282,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                     {currentQ.subject}
                   </span>
                 </div>
+
                 <div className="flex items-center gap-3 text-xs font-mono">
                   <span className="text-accent font-semibold">+{currentQ.marks.toFixed(1)} Marks</span>
                   {currentQ.negative_marks > 0 ? (
@@ -581,8 +589,14 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack }) => {
                       <span className="text-[10px] font-mono text-accent font-bold px-2 py-0.5 rounded bg-accent/10 border border-accent/20">
                         Q{idx + 1}
                       </span>
+                      {q.year && (
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                          {q.year}
+                        </span>
+                      )}
                       <span className="text-xs font-mono text-muted-gray">{q.subject}</span>
                     </div>
+
 
                     <div>
                       {isCorrect ? (
