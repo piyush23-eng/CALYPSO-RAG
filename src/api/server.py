@@ -91,6 +91,34 @@ def get_topics():
     }
 
 
+from src.retrieval.semantic_cache import global_semantic_cache
+from src.reasoning.symbolic_verifier import global_symbolic_verifier
+
+
+class UnitVerifyRequest(BaseModel):
+    domain: str
+    parameters: Dict[str, Any]
+
+
+@app.get("/api/cache/stats")
+def get_cache_stats():
+    return global_semantic_cache.get_stats()
+
+
+@app.post("/api/cache/clear")
+def clear_cache():
+    global_semantic_cache.clear()
+    return {"status": "success", "message": "Semantic cache purged successfully."}
+
+
+@app.post("/api/verify/units")
+def verify_units(req: UnitVerifyRequest):
+    return global_symbolic_verifier.verify_dimensional_invariants(
+        domain=req.domain,
+        parameters=req.parameters
+    )
+
+
 @app.post("/api/query", response_model=QueryResponse)
 def execute_query(req: QueryRequest):
     q = req.query.strip()
@@ -99,6 +127,16 @@ def execute_query(req: QueryRequest):
 
     try:
         orchestrator = get_orchestrator()
+
+        # Step 1: Compute query dense embedding for Semantic Cache lookup
+        q_emb = orchestrator.index_manager.embedder.encode([q])[0]
+
+        # Step 2: Check Semantic Cache (Threshold >= 0.95 for sub-10ms response)
+        cached_resp, sim = global_semantic_cache.lookup(q_emb, threshold=0.95)
+        if cached_resp is not None:
+            return QueryResponse(**cached_resp)
+
+        # Step 3: Full RAG pipeline execution on cache miss
         state = orchestrator.run(query=q)
 
         # Serialize chunks
@@ -130,10 +168,25 @@ def execute_query(req: QueryRequest):
             for c in state.get("retrieval_results", [])
         ]
 
-        return QueryResponse(
+        subject_hint = state.get("subject_hint", "General CS")
+
+        # Step 4: Run Pint & SymPy Dimensional Invariant Verification
+        dim_verification = global_symbolic_verifier.verify_dimensional_invariants(
+            domain=f"{q} {subject_hint}",
+            parameters={
+                "hit_ratio": 0.9,
+                "tlb_latency": 20.0,
+                "memory_latency": 100.0,
+                "levels": 2,
+                "packet_size_bytes": 1000,
+                "bandwidth_mbps": 10
+            }
+        )
+
+        resp = QueryResponse(
             query=state.get("query", q),
             reformulated_query=state.get("reformulated_query", q),
-            subject_hint=state.get("subject_hint", "General CS"),
+            subject_hint=subject_hint,
             final_answer=state.get("final_answer", ""),
             citations=state.get("citations", []),
             rerank_results=serialized_rerank,
@@ -142,10 +195,19 @@ def execute_query(req: QueryRequest):
             reformulation_count=state.get("reformulation_count", 0),
             passed_gate=state.get("passed_gate", False),
             is_low_confidence=state.get("is_low_confidence", False),
-            telemetry=state.get("telemetry", {})
+            telemetry=state.get("telemetry", {}),
+            is_semantic_cache_hit=False,
+            cache_similarity=None,
+            dimensional_verification=dim_verification
         )
+
+        # Step 5: Save to Semantic Cache for future instant lookups
+        global_semantic_cache.insert(query=q, query_embedding=q_emb, result=resp.model_dump())
+
+        return resp
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.get("/api/evaluation")

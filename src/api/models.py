@@ -23,3 +23,6 @@ class QueryResponse(BaseModel):
     passed_gate: bool
     is_low_confidence: bool
     telemetry: Dict[str, Any]
+    is_semantic_cache_hit: bool = False
+    cache_similarity: Optional[float] = None
+    dimensional_verification: Optional[Dict[str, Any]] = None

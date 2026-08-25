@@ -108,13 +108,25 @@ class PythonSandbox:
             'tuple': tuple, 'zip': zip
         }
 
+        import sympy as sp
+        from src.reasoning.symbolic_verifier import global_symbolic_verifier
+
         exec_globals = {
             "__builtins__": safe_builtins,
             "math": math,
             "itertools": itertools,
             "collections": collections,
             "fractions": fractions,
-            "Fraction": fractions.Fraction
+            "Fraction": fractions.Fraction,
+            "sympy": sp,
+            "sp": sp,
+            "Symbol": sp.Symbol,
+            "symbols": sp.symbols,
+            "Rational": sp.Rational,
+            "solve": sp.solve,
+            "simplify": sp.simplify,
+            "Matrix": sp.Matrix,
+            "symbolic_verifier": global_symbolic_verifier
         }
 
         if custom_globals:

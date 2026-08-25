@@ -45,6 +45,17 @@ export interface QueryResponse {
     citation_coverage?: number;
     latency_ms?: number;
   };
+  is_semantic_cache_hit?: boolean;
+  cache_similarity?: number;
+  dimensional_verification?: {
+    verified: boolean;
+    target_unit?: string;
+    dimensional_type?: string;
+    calculated_value?: number;
+    dimension_formula?: string;
+    details?: string;
+    error?: string;
+  };
 }
 
 export interface ModelStat {

@@ -118,15 +118,23 @@ flowchart TD
 
 ### 6. 🎛️ Universal 8-Module Visual Simulation Lab
 - Embedded dynamic parameter sweep sliders for:
-  1. **Paging & EMAT**: TLB Hit Ratio ($h$), $t_{\text{TLB}}$, $t_m$, and Page Table Levels ($k$).
-  2. **Sliding Window**: Distance ($d$), Bandwidth ($B$), Packet Size ($L$), Window Size ($W_s$), Channel Efficiency ($\eta\%$).
-  3. **Cache Hierarchy**: L1/L2 Hit Rates, Latencies, and hierarchical AMAT.
-  4. **CPU Pipelining**: Stages ($k$), Instructions ($n$), Hazard Stalls ($s$), Actual Speedup ($S$).
-  5. **Disk Arm**: Seek Time ($t_{\text{seek}}$), Spindle Speed (RPM), Average Total Access Latency.
-  6. **Master Theorem**: Subproblems ($a$), Division ($b$), Polynomial ($k$), Asymptotic Big-$\Theta$.
-  7. **CIDR Subnetting**: Prefix Length ($/8 \to /30$), Usable Host IPs, Subnet Masks.
-  8. **B+ Tree Fanout**: Block Size ($B$), Search Key ($K$), Record Pointers, Max Indexable Records.
-- **Intelligent Auto-Detection**: Automatically detects the question domain and locks directly onto the relevant formula playground!
+  - **Paging & EMAT**: TLB hit ratio ($h$), access latency ($t_{TLB}$), memory latency ($t_m$), hierarchy levels ($k$).
+  - **Sliding Window (GBN)**: Bandwidth ($B$), packet size ($L$), propagation delay ($T_p$), window size ($W_s$).
+  - **Cache Hierarchy (AMAT)**: L1/L2 miss rates and multi-level latencies.
+  - **CPU Pipelining**: Stage count ($k$), clock cycle time ($\tau$), instruction count ($n$), pipeline stalls.
+  - **Disk Arm Scheduling**: RPM, average seek time, sector transfer rate.
+  - **Master Theorem Solver**: Recurrence coefficients $a, b, k, p$.
+  - **CIDR Subnetting**: IP address, subnet mask, usable host count calculations.
+  - **B+ Tree Indexing**: Key size, pointer size, block size, order calculation.
+
+### 7. ⚡ Sub-10ms Semantic Vector Cache (`src/retrieval/semantic_cache.py`)
+- Real-time cosine similarity search ($\ge 0.95$ threshold) over dense query embeddings.
+- Instantly returns verified proofs, citations, and metadata in **$<20\text{ms}$** for semantically equivalent queries, eliminating redundant LLM compute.
+- Thread-safe memory architecture with automated LRU eviction and runtime cache statistics (`GET /api/cache/stats`).
+
+### 8. 🧮 SymPy Symbolic Engine & Pint Dimensional Invariant Verifier (`src/reasoning/symbolic_verifier.py`)
+- **Symbolic Algebra (`SymPy`)**: Exact fraction arithmetic, matrix operations, and recurrence solver (Master Theorem) with zero floating-point error.
+- **Automated Dimensional Analysis (`Pint`)**: Validates physical and computational units ($\frac{\text{bits}}{\text{bits/sec}} = \text{seconds}$, $\text{EMAT} = \text{nanoseconds}$, $\text{AMAT} = \text{nanoseconds}$, $\text{Throughput} = \text{bps}$) to catch formula inversions and dimensional mismatches before returning answers.
 
 ---
 

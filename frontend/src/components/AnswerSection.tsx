@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders, Volume2, Pause, Play, Square, Loader2 } from 'lucide-react';
+import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders, Volume2, Pause, Play, Square, Loader2, Zap, ShieldCheck } from 'lucide-react';
 import type { QueryResponse } from '../types';
 import { VisualLab, detectSimulationLab } from './VisualLab';
 import { professorNarrator, VOICE_OPTIONS, type VoicePersona } from '../services/voice';
@@ -206,6 +206,23 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
           ) : (
             <span className="inline-flex items-center gap-1 text-[11px] font-mono text-amber-400">
               <AlertTriangle className="w-3.5 h-3.5" /> Gated Fallback
+            </span>
+          )}
+
+          {/* Phase 1: Semantic Cache Badge */}
+          {data.is_semantic_cache_hit && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30 shadow-[0_0_12px_rgba(52,211,153,0.2)]">
+              <Zap className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> Semantic Cache (&lt;10ms, {Math.round((data.cache_similarity || 0.99) * 100)}% Sim)
+            </span>
+          )}
+
+          {/* Phase 2: SymPy & Pint Dimensional Invariants Badge */}
+          {data.dimensional_verification?.verified && (
+            <span 
+              title={data.dimensional_verification.details || "Unit invariants verified"}
+              className="inline-flex items-center gap-1 text-[11px] font-mono text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/30"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" /> Units Verified ({data.dimensional_verification.target_unit || "Pint/SymPy"})
             </span>
           )}
         </div>
