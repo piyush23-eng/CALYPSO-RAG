@@ -27,31 +27,31 @@ Solving technical exam problems in **GATE Computer Science & Information Technol
 
 ### 1. Minimal Editorial Query Interface (Voice & Multimodal Ready)
 *Dark editorial UI featuring Speech-to-Text voice query input (`🎙️`), Vision-RAG diagram attachment (`📷`), and benchmark quick-select presets:*
-![CALYPSO-RAG Hero Query Interface](docs/assets/hero_query_view.svg)
+![CALYPSO-RAG Hero Query Interface](docs/assets/hero_query_view.png)
 
 ---
 
 ### 2. Step-by-Step Derivation with Voice Tutor & Targeted Simulation Sliders
 *KaTeX derivations accompanied by sentence-level semantic attribution receipts, authentic IIT Professor audio narration, and real-time formula parameter sliders:*
-![CALYPSO-RAG Answer Derivation & Simulation](docs/assets/answer_trace_view.svg)
+![CALYPSO-RAG Answer Derivation & Simulation](docs/assets/answer_trace_view.png)
 
 ---
 
 ### 3. Interactive GATE CS Timed Practice Exam (`/quiz`)
 *Authentic 10-minute practice exam with official negative marking (+1.0/+2.0, -0.33/-0.66), color-coded question palette, and instant step-by-step score report:*
-![CALYPSO-RAG GATE Mock Exam](docs/assets/quiz_mock_exam_view.svg)
+![CALYPSO-RAG GATE Mock Exam](docs/assets/quiz_mock_exam_view.png)
 
 ---
 
 ### 4. Universal 8-Module Multi-Subject Simulation Suite
 *Parametric mathematical playground with real-time sliders for Paging EMAT, Sliding Window GBN, Cache AMAT, CPU Pipelining, Disk Arm, Master Theorem, CIDR Subnetting, and B+ Trees:*
-![CALYPSO-RAG Universal Simulation Labs](docs/assets/visual_simulation_lab_view.svg)
+![CALYPSO-RAG Universal Simulation Labs](docs/assets/visual_simulation_lab_view.png)
 
 ---
 
 ### 5. Empirical RAGAS Audit & 10-Subject Benchmark Dashboard (`/evaluation`)
 *Rigorous empirical evaluation comparing Base Qwen vs Fine-Tuned QLoRA vs CALYPSO-RAG across all 10 GATE CS domains:*
-![CALYPSO-RAG Evaluation Dashboard](docs/assets/evaluation_dashboard.svg)
+![CALYPSO-RAG Evaluation Dashboard](docs/assets/evaluation_dashboard.png)
 
 ---
 

@@ -1,77 +1,91 @@
-#!/usr/bin/env python3
 """
-Captures real pixel-perfect screenshots of CALYPSO-RAG React UI from live browser execution.
+Capture 100% authentic, pixel-accurate screenshots from the live CALYPSO-RAG application
+using Playwright Headless Chromium at Retina 2x resolution.
 """
 
-import time
-from pathlib import Path
 from playwright.sync_api import sync_playwright
+import time
+import os
+
+OUTPUT_DIR = os.path.abspath("docs/assets")
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
 
 def capture():
-    output_dir = Path("docs/assets")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
+        # Create high-DPI context for retina-crisp screenshots
         context = browser.new_context(
-            viewport={"width": 1440, "height": 900},
-            device_scale_factor=2,
-            color_scheme="dark"
+            viewport={"width": 1440, "height": 960},
+            device_scale_factor=2
         )
         page = context.new_page()
-        
-        print("🌐 Navigating to http://localhost:8000...")
+
+        print("[1/5] Capturing Hero Query View...")
         page.goto("http://localhost:8000", wait_until="networkidle")
-        time.sleep(2)
-        
-        # 1. Capture Hero View
-        hero_png = output_dir / "hero_query_view.png"
-        page.screenshot(path=str(hero_png), full_page=False)
-        print(f"✅ Saved real Hero screenshot to {hero_png}")
-        
-        # 2. Submit query directly via input and wait for /api/query network response
-        print("⚡ Submitting GATE CS Query via Input...")
-        input_el = page.locator("input").first
-        input_el.fill("How is Effective Memory Access Time calculated in 2-level paging with TLB hit ratio?")
-        
-        with page.expect_response("**/api/query", timeout=30000) as response_info:
-            input_el.press("Enter")
-            
-        print("⏳ Received /api/query response! Waiting for KaTeX rendering...")
-        time.sleep(3)
-        
-        # Expand Retrieval Trace Accordion
-        trace_button = page.locator("button:has-text('Retrieval Trace')").first
-        if trace_button.is_visible():
-            trace_button.click()
-            time.sleep(1)
-            
-        # Scroll to position answer, formulas, and receipts
-        page.evaluate("window.scrollTo(0, 420)")
-        time.sleep(1)
-        
-        answer_png = output_dir / "answer_trace_view.png"
-        page.screenshot(path=str(answer_png), full_page=False)
-        print(f"✅ Saved real Answer screenshot to {answer_png}")
-        
-        # 3. Capture Evaluation View
-        print("📊 Navigating to /evaluation...")
-        eval_button = page.locator("button:has-text('Evaluation'), button:has-text('/evaluation')").first
-        if eval_button.is_visible():
-            eval_button.click()
+        time.sleep(2.0)
+        hero_path = os.path.join(OUTPUT_DIR, "hero_query_view.png")
+        page.screenshot(path=hero_path, full_page=False)
+        print(f"  -> Saved: {hero_path}")
+
+        print("[2/5] Clicking Preset Query and capturing Answer & Simulation View...")
+        preset_btn = page.locator("button:has-text('OS: 2-Level Paging')").first
+        if preset_btn.count() > 0:
+            preset_btn.click()
         else:
-            page.goto("http://localhost:8000/evaluation", wait_until="networkidle")
-            
-        time.sleep(2)
-        page.evaluate("window.scrollTo(0, 0)")
-        time.sleep(1)
-        
-        eval_png = output_dir / "evaluation_dashboard.png"
-        page.screenshot(path=str(eval_png), full_page=False)
-        print(f"✅ Saved real Evaluation Dashboard screenshot to {eval_png}")
-        
+            page.locator("button[type='submit']").click()
+
+        # Wait for the answer section to appear
+        print("  Waiting for answer derivation...")
+        page.wait_for_selector(".answer-markdown", timeout=30000)
+        time.sleep(3.0)
+
+        # Open the simulation lab
+        sim_btn = page.locator("button:has-text('Simulator')").first
+        if sim_btn.count() > 0:
+            sim_btn.click()
+            time.sleep(2.0)
+
+        # Scroll to display the full answer card with voice player and simulation sliders
+        page.evaluate("window.scrollTo(0, 320)")
+        time.sleep(1.5)
+        answer_path = os.path.join(OUTPUT_DIR, "answer_trace_view.png")
+        page.screenshot(path=answer_path, full_page=False)
+        print(f"  -> Saved: {answer_path}")
+
+        print("[3/5] Capturing Universal Visual Simulation Lab...")
+        # Scroll down directly to the parameter playground
+        page.evaluate("window.scrollTo(0, 780)")
+        time.sleep(1.5)
+        sim_path = os.path.join(OUTPUT_DIR, "visual_simulation_lab_view.png")
+        page.screenshot(path=sim_path, full_page=False)
+        print(f"  -> Saved: {sim_path}")
+
+        print("[4/5] Capturing GATE CS Mock Exam View (/quiz)...")
+        page.goto("http://localhost:8000/quiz", wait_until="networkidle")
+        time.sleep(2.0)
+        # Select an option on Question 1
+        option_btns = page.locator("button[type='button']")
+        for i in range(option_btns.count()):
+            btn_text = option_btns.nth(i).inner_text()
+            if "B)" in btn_text or "140 ns" in btn_text or "142 ns" in btn_text or "C)" in btn_text:
+                option_btns.nth(i).click()
+                break
+        time.sleep(1.0)
+        quiz_path = os.path.join(OUTPUT_DIR, "quiz_mock_exam_view.png")
+        page.screenshot(path=quiz_path, full_page=False)
+        print(f"  -> Saved: {quiz_path}")
+
+        print("[5/5] Capturing RAGAS Evaluation Dashboard (/evaluation)...")
+        page.goto("http://localhost:8000/evaluation", wait_until="networkidle")
+        time.sleep(2.0)
+        eval_path = os.path.join(OUTPUT_DIR, "evaluation_dashboard.png")
+        page.screenshot(path=eval_path, full_page=False)
+        print(f"  -> Saved: {eval_path}")
+
         browser.close()
-        print("\n🎉 ALL 3 AUTHENTIC BROWSER SCREENSHOTS CAPTURED PERFECTLY!")
+        print("\nAll 5 authentic real browser screenshots captured successfully!")
+
 
 if __name__ == "__main__":
     capture()
