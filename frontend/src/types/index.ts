@@ -90,6 +90,18 @@ export interface ModelStat {
   overall: number;
 }
 
+
+export interface StudentMasteryProfile {
+  overall_mastery: number;
+  overall_mastery_percentage: number;
+  subject_mastery: Record<string, number>;
+  subject_stats: Record<string, { attempts: number; correct: number; queries: number }>;
+  weakest_domains: string[];
+  strongest_domains: string[];
+  recommended_focus: string;
+  readiness_verdict: string;
+}
+
 export interface EvaluationData {
   models: ModelStat[];
   ragas_summary: {

@@ -4,6 +4,7 @@ import { Marquee } from './components/Marquee';
 import { AnswerSection } from './components/AnswerSection';
 import { EvaluationView } from './components/EvaluationView';
 import { QuizView } from './components/QuizView';
+import { StudentMasteryView } from './components/StudentMasteryView';
 import { SubjectFilter, type SubjectPreset } from './components/SubjectFilter';
 import { HistoryDrawer, type HistoryItem } from './components/HistoryDrawer';
 import { Footer } from './components/Footer';
@@ -12,13 +13,15 @@ import type { QueryResponse } from './types';
 import { AlertCircle, History } from 'lucide-react';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'solver' | 'evaluation' | 'quiz'>(() => {
+  const [currentView, setCurrentView] = useState<'solver' | 'evaluation' | 'quiz' | 'mastery'>(() => {
     if (typeof window !== 'undefined') {
       if (window.location.pathname === '/quiz') return 'quiz';
       if (window.location.pathname === '/evaluation') return 'evaluation';
+      if (window.location.pathname === '/mastery') return 'mastery';
     }
     return 'solver';
   });
+
 
   useEffect(() => {
     const targetPath = currentView === 'solver' ? '/' : `/${currentView}`;
@@ -252,6 +255,14 @@ export function App() {
                 Mock Exam (/quiz)
               </button>
               <button
+                onClick={() => setCurrentView('mastery')}
+                className={`transition-colors cursor-pointer ${
+                  currentView === 'mastery' ? 'text-accent font-semibold' : 'text-muted-gray hover:text-off-white'
+                }`}
+              >
+                Cognitive Radar (/mastery)
+              </button>
+              <button
                 onClick={() => setCurrentView('evaluation')}
                 className={`transition-colors cursor-pointer ${
                   currentView === 'evaluation' ? 'text-accent font-semibold' : 'text-muted-gray hover:text-off-white'
@@ -301,9 +312,12 @@ export function App() {
       <main className="flex-grow">
         {currentView === 'quiz' ? (
           <QuizView onBack={() => setCurrentView('solver')} />
+        ) : currentView === 'mastery' ? (
+          <StudentMasteryView />
         ) : currentView === 'evaluation' ? (
           <EvaluationView onBack={() => setCurrentView('solver')} />
         ) : (
+
           <div>
             <Hero onSearch={handleSearch} isLoading={isLoading} />
 

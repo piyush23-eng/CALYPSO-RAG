@@ -16,6 +16,8 @@ from src.api.vision_routes import vision_router
 from src.api.voice_routes import voice_router
 from src.api.models import QueryRequest, QueryResponse
 from src.reasoning.step_verifier import global_prm_verifier
+from src.student_model.knowledge_tracer import global_knowledge_tracer
+
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
@@ -475,7 +477,24 @@ def get_evaluation_metrics():
     return comparison
 
 
+@app.post("/api/student/mastery")
+def get_student_mastery(payload: Dict[str, Any]):
+    """
+    Bayesian Knowledge Tracing (BKT) Student Mastery API.
+    Computes personalized mastery vectors, weakness radar metrics, and focus recommendations.
+    """
+    quiz_history = payload.get("quiz_history", [])
+    query_history = payload.get("query_history", [])
+
+    profile = global_knowledge_tracer.compute_student_profile(
+        quiz_history=quiz_history,
+        query_history=query_history
+    )
+    return profile
+
+
 # Mount React build for production static serving
+
 dist_dir = PROJECT_ROOT / "frontend/dist"
 if dist_dir.exists():
     app.mount("/assets", StaticFiles(directory=str(dist_dir / "assets")), name="assets")
