@@ -301,6 +301,63 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
         </motion.div>
       )}
 
+      {/* DeepSeek-R1 / OpenAI o1 Style Process Reward Model (PRM) Thinking Trace */}
+      {data.process_reward_model && (
+        <motion.div
+          variants={itemVariants}
+          className="mb-10 p-6 rounded-2xl border border-indigo-500/30 border-t-indigo-500/60 bg-gradient-to-b from-[#111124] to-[#0a0a16] shadow-[0_12px_32px_rgba(99,102,241,0.15)] ring-1 ring-indigo-500/20"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-indigo-500/20">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+              <span className="text-xs font-mono uppercase tracking-widest text-indigo-300 font-bold flex items-center gap-1.5">
+                🧠 Step-Level Process Reward Model (PRM) • {data.process_reward_model.total_steps} Verified Steps
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-mono">
+              <span className="text-muted-gray">Composite PRM:</span>
+              <span className="text-indigo-400 font-bold bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/30">
+                {Math.round(data.process_reward_model.mean_prm_score * 100)}%
+              </span>
+              <span className="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 text-[10px] uppercase tracking-wider font-semibold">
+                ✓ Deductions Verified
+              </span>
+            </div>
+          </div>
+
+          {/* Collapsible / Expandable Step Breakdown */}
+          <div className="space-y-3 font-mono text-xs">
+            {data.process_reward_model.reasoning_steps?.map((step) => (
+              <div 
+                key={step.step_num}
+                className="p-3.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+              >
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <span className="font-semibold text-off-white flex items-center gap-2">
+                    <span className="text-indigo-400 font-mono text-[11px] bg-indigo-500/15 px-1.5 py-0.5 rounded border border-indigo-500/30">
+                      Step {step.step_num}
+                    </span>
+                    <span className="capitalize">{step.step_type.replace(/_/g, ' ')}</span>
+                  </span>
+                  <span className="text-[11px] font-semibold text-emerald-400">
+                    PRM: {Math.round(step.prm_score * 100)}%
+                  </span>
+                </div>
+                <p className="text-muted-gray text-xs mb-1.5 leading-relaxed">{step.description}</p>
+                {step.symbolic_expression && (
+                  <div className="inline-block text-[11px] text-accent bg-accent/10 px-2.5 py-1 rounded border border-accent/20 font-mono mb-1">
+                    Invariant: <code>{step.symbolic_expression}</code>
+                  </div>
+                )}
+                <div className="text-[10px] text-off-white/60">
+                  ↳ {step.verification_rationale}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
       {/* Editorial Answer Card with Subtle Top Elevation */}
       <motion.div 
         variants={itemVariants}

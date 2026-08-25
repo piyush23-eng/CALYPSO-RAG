@@ -28,3 +28,5 @@ class QueryResponse(BaseModel):
     dimensional_verification: Optional[Dict[str, Any]] = None
     self_consistency: Optional[Dict[str, Any]] = None
     serving_engine: Optional[str] = None
+    process_reward_model: Optional[Dict[str, Any]] = None
+    think_trace: Optional[str] = None

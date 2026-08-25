@@ -63,7 +63,22 @@ export interface QueryResponse {
     voting_distribution: Record<string, number>;
   };
   serving_engine?: string;
+  process_reward_model?: {
+    mean_prm_score: number;
+    total_steps: number;
+    all_steps_verified: boolean;
+    reasoning_steps: Array<{
+      step_num: number;
+      step_type: string;
+      description: string;
+      symbolic_expression?: string;
+      prm_score: number;
+      verification_rationale: string;
+    }>;
+  };
+  think_trace?: string;
 }
+
 
 export interface ModelStat {
   name: string;

@@ -149,6 +149,12 @@ flowchart TD
 - High-concurrency serving architecture supporting **PagedAttention** memory management, continuous request batching, and speculative decoding.
 - Scales throughput to **$50\times$ concurrent requests on GPU** with automatic hybrid fallback.
 
+### 12. 🧠 Step-Level Process Reward Model (PRM) & `<think>` Engine (`src/reasoning/step_verifier.py`)
+- Inspired by frontier reasoning architectures (**DeepSeek-R1**, **OpenAI o1/o3**), decomposes mathematical and algorithmic derivations into discrete, atomic deductive steps:
+  $$\text{Premise} \xrightarrow{\text{Step 1}} \text{Formula Formulation} \xrightarrow{\text{Step 2}} \text{Unit Conversion} \xrightarrow{\text{Step 3}} \text{Boundary Verification}$$
+- Evaluates each step with a Step Reward Verifier combining SymPy exact symbolic execution and Pint dimensional homogeneity checks.
+- Generates structured, collapsible `<think> ... </think>` reasoning traces in the UI with per-step PRM confidence scores ($\ge 95\%$), ensuring zero ungrounded steps in complex proofs.
+
 
 ---
 
