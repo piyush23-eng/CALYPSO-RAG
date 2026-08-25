@@ -3,8 +3,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck } from 'lucide-react';
+import { ChevronRight, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Bookmark, BookmarkCheck, Sliders } from 'lucide-react';
 import type { QueryResponse } from '../types';
+import { VisualLab } from './VisualLab';
 
 interface AnswerSectionProps {
   data: QueryResponse;
@@ -97,6 +98,7 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
   isBookmarked = false 
 }) => {
   const [showTrace, setShowTrace] = useState(false);
+  const [showLab, setShowLab] = useState(false);
 
   const {
     query,
@@ -278,6 +280,28 @@ export const AnswerSection: React.FC<AnswerSectionProps> = ({
           >
             {final_answer}
           </ReactMarkdown>
+        </div>
+
+        {/* Visual Lab Simulation Toggle & Embedding */}
+        <div className="mt-8 pt-6 border-t border-white/[0.06]">
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setShowLab(!showLab)}
+              className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2 rounded-xl border border-accent/40 bg-accent/10 text-accent hover:bg-accent hover:text-white transition-all shadow-[0_0_16px_rgba(61,90,254,0.2)] cursor-pointer"
+            >
+              <Sliders className="w-4 h-4" />
+              <span>{showLab ? "Hide Visual Simulation Lab" : "Open Interactive Parameter Lab (Sliders)"}</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            </button>
+            <span className="text-[11px] font-mono text-muted-gray hidden sm:inline">
+              Simulate dynamic EMAT, GBN Window & Cache variations
+            </span>
+          </div>
+
+          {showLab && (
+            <VisualLab queryTopicHint={`${query} ${subject_hint || ''}`} />
+          )}
         </div>
       </motion.div>
 
