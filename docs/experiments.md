@@ -14,6 +14,8 @@ All experiments evaluate the system's ability to retrieve relevant context, elim
 - **Dense Embedding Model**: `BAAI/bge-small-en-v1.5` (384 dimensions, normalized cosine similarity).
 - **Cross-Encoder Reranker**: `cross-encoder/ms-marco-MiniLM-L-6-v2` (sigmoid-normalized relevance score).
 - **Evaluation Framework**: Multi-dimensional RAGAS metric formulation (Context Precision, Context Recall, Faithfulness, Answer Relevance).
+- **Variance Note**: Scores reported throughout this document represent single evaluation runs per configuration across the benchmark sets (`data/eval/eval_dataset.json` and `data/eval/multihop_eval_dataset.json`). Multi-seed re-running to report variance intervals is a planned future improvement.
+
 
 ---
 
