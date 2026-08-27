@@ -65,7 +65,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
             highlight: false
           },
           {
-            name: "Fine-Tuned Checkpoint (QLoRA)",
+            name: "CALYPSO (QLoRA)",
             subtitle: "Intermediate fine-tuned checkpoint — internal baseline",
             tag: "Internal Baseline",
             overall: "63.0%",
@@ -76,7 +76,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
             highlight: false
           },
           {
-            name: "Full LORCEN-RAG Pipeline",
+            name: "LORCEN-RAG",
             subtitle: "Agentic RAG + verifiers + QLoRA",
             tag: "Full System",
             overall: "84.3%",
@@ -152,7 +152,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
       {/* Target vs Actual Grid */}
       <div className="mb-20">
         <h2 className="text-xs font-mono uppercase tracking-widest text-muted-gray mb-8">
-          Target Thresholds vs Lorcen-RAG Actuals
+          Target Thresholds vs LORCEN-RAG Actuals
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
