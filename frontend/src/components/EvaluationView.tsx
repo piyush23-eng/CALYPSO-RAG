@@ -65,8 +65,8 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
             highlight: false
           },
           {
-            name: "CALYPSO (QLoRA)",
-            subtitle: "Intermediate fine-tuned checkpoint — internal baseline",
+            name: "LORCEN (QLoRA Checkpoint)",
+            subtitle: "Intermediate fine-tuned baseline (No RAG / Verifiers)",
             tag: "Internal Baseline",
             overall: "63.0%",
             precision: "61.0%",
@@ -76,8 +76,8 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
             highlight: false
           },
           {
-            name: "LORCEN-RAG",
-            subtitle: "Agentic RAG + verifiers + QLoRA",
+            name: "LORCEN-RAG (Full Pipeline)",
+            subtitle: "Full System (Agentic RAG + SymPy + Verifiers)",
             tag: "Full System",
             overall: "84.3%",
             precision: "95.3%",

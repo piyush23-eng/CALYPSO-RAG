@@ -454,7 +454,7 @@ def get_evaluation_metrics():
                 "overall": 0.4725
             },
             {
-                "name": "CALYPSO (Fine-Tuned QLoRA)",
+                "name": "LORCEN (QLoRA Checkpoint)",
                 "tag": "Internal Baseline",
                 "precision": 0.6100,
                 "recall": 0.5500,
@@ -463,7 +463,7 @@ def get_evaluation_metrics():
                 "overall": 0.6300
             },
             {
-                "name": "LORCEN-RAG (Agentic System)",
+                "name": "LORCEN-RAG (Full Pipeline)",
                 "tag": "Agentic RAG + CRAG",
                 "precision": results.get("mean_context_precision", 0.8500),
                 "recall": results.get("mean_context_recall", 0.7500),
