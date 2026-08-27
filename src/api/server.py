@@ -454,8 +454,8 @@ def get_evaluation_metrics():
                 "overall": 0.4725
             },
             {
-                "name": "Lorcen (Fine-Tuned QLoRA)",
-                "tag": "Parametric Only",
+                "name": "CALYPSO (Fine-Tuned QLoRA)",
+                "tag": "Internal Baseline",
                 "precision": 0.6100,
                 "recall": 0.5500,
                 "faithfulness": 0.6400,
@@ -474,6 +474,7 @@ def get_evaluation_metrics():
         ],
         "ragas_summary": results
     }
+
     return comparison
 
 
