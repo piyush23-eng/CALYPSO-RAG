@@ -58,7 +58,7 @@ def get_orchestrator() -> LorcenAgentOrchestrator:
 
 
 @app.get("/api/health")
-def health():
+def health_check():
     return {
         "status": "healthy",
         "service": "LORCEN-RAG",
