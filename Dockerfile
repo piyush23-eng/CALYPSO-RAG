@@ -25,9 +25,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python requirements
+# Install CPU-only lightweight PyTorch to keep memory footprint under 200MB (prevent 512MB OOM)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# Install remaining Python requirements
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
 
 # Copy source code, data indices, and built frontend assets
 COPY src/ ./src/
