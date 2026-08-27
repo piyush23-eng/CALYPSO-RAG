@@ -33,11 +33,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
 COPY data/ ./data/
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+COPY start.sh ./
+RUN chmod +x start.sh
 
 EXPOSE 10000 8000 7860
 
-# Run FastAPI production server (explicitly binding to 0.0.0.0 and dynamic cloud $PORT)
-CMD uvicorn src.api.server:app --host 0.0.0.0 --port ${PORT:-10000}
+# Run FastAPI production server via dedicated start.sh
+CMD ["./start.sh"]
+
+
 
 
 
