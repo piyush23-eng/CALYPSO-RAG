@@ -5,7 +5,7 @@
 
   <!-- Header -->
   <g transform="translate(60, 45)">
-    <text x="0" y="0" fill="#f5f5f0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900">CALYPSO<tspan fill="#3d5afe">-RAG</tspan></text>
+    <text x="0" y="0" fill="#f5f5f0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900">LORCEN<tspan fill="#3d5afe">-RAG</tspan></text>
     <rect x="160" y="-15" width="220" height="24" rx="6" fill="#181828" stroke="#3d5afe" stroke-opacity="0.4" stroke-width="1"/>
     <text x="270" y="1" fill="#3d5afe" font-family="monospace" font-size="11" font-weight="700" text-anchor="middle">Empirical RAGAS Audit Suite</text>
 
@@ -88,9 +88,9 @@
         <rect x="0" y="10" width="340" height="20" rx="4" fill="#6366f1"/>
       </g>
 
-      <!-- Bar Group 4: Full CALYPSO-RAG (GraphRAG + CRAG + Sandbox) -->
+      <!-- Bar Group 4: Full LORCEN-RAG (GraphRAG + CRAG + Sandbox) -->
       <g transform="translate(25, 275)">
-        <text x="0" y="0" fill="#ffffff" font-family="monospace" font-size="11" font-weight="bold">4. CALYPSO-RAG (GraphRAG + CRAG + Sandbox)</text>
+        <text x="0" y="0" fill="#ffffff" font-family="monospace" font-size="11" font-weight="bold">4. LORCEN-RAG (GraphRAG + CRAG + Sandbox)</text>
         <text x="470" y="0" fill="#3d5afe" font-family="monospace" font-size="12" font-weight="bold" text-anchor="end">84.3%</text>
         <rect x="0" y="10" width="470" height="24" rx="4" fill="#181826" stroke="#3d5afe" stroke-width="1"/>
         <rect x="0" y="10" width="396" height="24" rx="4" fill="#3d5afe"/>
