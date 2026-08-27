@@ -55,6 +55,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
         {[
           {
             name: "Base Qwen 1.5B",
+            subtitle: "Unadapted base model",
             tag: "Zero-Shot Base",
             overall: "47.3%",
             precision: "42.0%",
@@ -64,8 +65,9 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
             highlight: false
           },
           {
-            name: "Calypso (QLoRA)",
-            tag: "Fine-Tuned Model",
+            name: "Fine-Tuned Checkpoint (QLoRA)",
+            subtitle: "Intermediate fine-tuned checkpoint — internal baseline",
+            tag: "Internal Baseline",
             overall: "63.0%",
             precision: "61.0%",
             recall: "55.0%",
@@ -74,8 +76,9 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
             highlight: false
           },
           {
-            name: "CALYPSO-RAG",
-            tag: "Agentic CRAG Pipeline",
+            name: "Full CALYPSO-RAG Pipeline",
+            subtitle: "Agentic RAG + verifiers + QLoRA",
+            tag: "Full System",
             overall: "84.3%",
             precision: "95.3%",
             recall: "62.3%",
@@ -107,9 +110,13 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
                   </span>
                 )}
               </div>
-              <h3 className="text-xl font-bold text-off-white tracking-tight mb-6">
+              <h3 className="text-xl font-bold text-off-white tracking-tight mb-1">
                 {config.name}
               </h3>
+              <p className="text-xs font-mono text-muted-gray mb-6">
+                {config.subtitle}
+              </p>
+
 
               {/* Big Typographic Number */}
               <div className="text-5xl sm:text-6xl font-display font-extrabold text-off-white tracking-tightest mb-1">
