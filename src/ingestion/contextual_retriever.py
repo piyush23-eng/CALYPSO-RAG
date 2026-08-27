@@ -1,5 +1,5 @@
 """
-Anthropic Contextual Retrieval Engine for CALYPSO-RAG.
+Anthropic Contextual Retrieval Engine for LORCEN-RAG.
 
 Inspired by Anthropic's Contextual Retrieval breakthrough:
 1. Synthesizes a situating, chunk-specific contextual preface using document-level taxonomy and chapter metadata.
@@ -15,7 +15,7 @@ from src.ingestion.chunker import DocumentChunk
 
 class ContextualRetriever:
     """
-    Contextual Embedding Pre-Processor and Query Situator for CALYPSO-RAG.
+    Contextual Embedding Pre-Processor and Query Situator for LORCEN-RAG.
     """
 
     def __init__(self):

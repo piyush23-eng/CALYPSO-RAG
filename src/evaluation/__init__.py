@@ -1,4 +1,4 @@
-"""Evaluation Harness Module for CALYPSO-RAG"""
+"""Evaluation Harness Module for LORCEN-RAG"""
 from src.evaluation.evaluator import (
     EvalItem,
     QuestionEvalScore,

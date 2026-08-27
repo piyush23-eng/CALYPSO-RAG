@@ -5,7 +5,7 @@ from pathlib import Path
 # Ensure src in python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.agent.orchestrator import CalypsoAgentOrchestrator
+from src.agent.orchestrator import LorcenAgentOrchestrator
 from src.ingestion.indexer import DualIndexManager
 
 
@@ -27,7 +27,7 @@ TEST_QUERIES = [
 
 def run_agent_demonstration(processed_dir: str = "./data/processed"):
     print("=" * 85)
-    print("🤖 CALYPSO-RAG: LANGGRAPH AGENTIC STATE MACHINE ORCHESTRATION")
+    print("🤖 LORCEN-RAG: LANGGRAPH AGENTIC STATE MACHINE ORCHESTRATION")
     print("=" * 85)
 
     index_manager = DualIndexManager(
@@ -36,7 +36,7 @@ def run_agent_demonstration(processed_dir: str = "./data/processed"):
     )
     index_manager.load_indices()
 
-    orchestrator = CalypsoAgentOrchestrator(index_manager=index_manager)
+    orchestrator = LorcenAgentOrchestrator(index_manager=index_manager)
 
     print("\n--- ARCHITECTURE MERMAID FLOWCHART ---")
     print(orchestrator.export_mermaid())

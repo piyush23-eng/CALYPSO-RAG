@@ -45,7 +45,7 @@ def extract_text_from_pdf(pdf_path: Path) -> str:
 
 def structure_gate_content(raw_text: str, subject_hint: Optional[str] = None, source_filename: str = "") -> str:
     """
-    Structures extracted raw PDF text into CALYPSO-compatible markdown format.
+    Structures extracted raw PDF text into LORCEN-compatible markdown format.
     """
     lines = raw_text.split("\n")
     cleaned_lines = []
@@ -122,7 +122,7 @@ def process_single_pdf(pdf_path: Path, output_dir: Path, subject_hint: Optional[
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Ingest GATE CS PDF files or folders into CALYPSO-RAG knowledge base")
+    parser = argparse.ArgumentParser(description="Ingest GATE CS PDF files or folders into LORCEN-RAG knowledge base")
     parser.add_argument("--pdf", type=str, default=None, help="Path to a single PDF file")
     parser.add_argument("--folder", type=str, default=None, help="Path to a folder containing multiple PDFs (e.g. 1991-2005 PYQs)")
     parser.add_argument("--subject", type=str, default="Computer Science", help="Optional default subject name")

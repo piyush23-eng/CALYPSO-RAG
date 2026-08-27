@@ -1,1 +1,1 @@
-"""CALYPSO-RAG Core Source Package"""
+"""LORCEN-RAG Core Source Package"""

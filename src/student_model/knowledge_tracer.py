@@ -1,5 +1,5 @@
 """
-Deep Knowledge Tracing (DKT) & Bayesian Student Mastery Engine for CALYPSO-RAG.
+Deep Knowledge Tracing (DKT) & Bayesian Student Mastery Engine for LORCEN-RAG.
 
 Maintains an evolving cognitive student model across all 10 GATE CS domains:
 1. Computes Bayesian Knowledge Tracing (BKT) mastery probabilities P(M_k) in [0, 1].

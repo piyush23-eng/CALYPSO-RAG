@@ -1,5 +1,5 @@
 """
-Screenshot Capture Automation & Visual Asset Integrity for CALYPSO-RAG.
+Screenshot Capture Automation & Visual Asset Integrity for LORCEN-RAG.
 
 NOTE ON VISUAL ASSETS:
 - All `.png` files in `docs/assets/` are 100% authentic, pixel-accurate screenshots captured

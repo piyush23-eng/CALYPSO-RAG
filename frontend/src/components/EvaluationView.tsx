@@ -76,7 +76,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
             highlight: false
           },
           {
-            name: "Full CALYPSO-RAG Pipeline",
+            name: "Full LORCEN-RAG Pipeline",
             subtitle: "Agentic RAG + verifiers + QLoRA",
             tag: "Full System",
             overall: "84.3%",
@@ -152,7 +152,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({ onBack }) => {
       {/* Target vs Actual Grid */}
       <div className="mb-20">
         <h2 className="text-xs font-mono uppercase tracking-widest text-muted-gray mb-8">
-          Target Thresholds vs Calypso-RAG Actuals
+          Target Thresholds vs Lorcen-RAG Actuals
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

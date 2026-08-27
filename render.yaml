@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: calypso-rag
+    name: lorcen-rag
     env: python
     buildCommand: |
       pip install -r requirements.txt

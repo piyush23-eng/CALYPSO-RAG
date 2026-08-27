@@ -1,4 +1,4 @@
-# Multi-Stage Dockerfile for CALYPSO-RAG (Production Serving)
+# Multi-Stage Dockerfile for LORCEN-RAG (Production Serving)
 
 # ── Stage 1: Build React Production Frontend ───────────────────────
 FROM node:20-alpine AS frontend-builder

@@ -9,7 +9,7 @@ from src.ingestion.indexer import DualIndexManager
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.retrieval.reranker import CrossEncoderReranker
 from src.retrieval.relevance_gate import CorrectiveRelevanceGate
-from src.generation.calypso_client import CalypsoClient
+from src.generation.lorcen_client import LorcenClient
 from src.generation.citation_mapper import CitationMapper
 
 
@@ -44,7 +44,7 @@ GENERATION_TEST_QUERIES = [
 
 def run_generation_suite(processed_dir: str = "./data/processed"):
     print("=" * 85)
-    print("🧠 CALYPSO-RAG: GENERATION & SENTENCE-LEVEL CITATION MAPPING TEST SUITE")
+    print("🧠 LORCEN-RAG: GENERATION & SENTENCE-LEVEL CITATION MAPPING TEST SUITE")
     print("=" * 85)
 
     index_manager = DualIndexManager(
@@ -62,7 +62,7 @@ def run_generation_suite(processed_dir: str = "./data/processed"):
         max_attempts=2
     )
 
-    client = CalypsoClient(endpoint_url="https://calypso-m1rz.onrender.com", mock_mode=False)
+    client = LorcenClient(endpoint_url="https://lorcen-m1rz.onrender.com", mock_mode=False)
     citation_mapper = CitationMapper(embedder=index_manager.embedder, similarity_threshold=0.60)
 
     for item in GENERATION_TEST_QUERIES:
@@ -78,7 +78,7 @@ def run_generation_suite(processed_dir: str = "./data/processed"):
         # 1. Corrective Retrieval
         gated_result = gate.retrieve_with_gate(query=query)
 
-        # 2. Generation via Calypso Client
+        # 2. Generation via Lorcen Client
         answer_text = client.generate(
             query=query,
             chunks=gated_result.chunks,

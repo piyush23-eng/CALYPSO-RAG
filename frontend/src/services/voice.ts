@@ -1,5 +1,5 @@
 /**
- * Neural Voice Engine for CALYPSO-RAG.
+ * Neural Voice Engine for LORCEN-RAG.
  * Implements:
  * 1. Web Speech API Speech-to-Text for live voice queries.
  * 2. Neural Audio Walkthrough via /api/voice/synthesize

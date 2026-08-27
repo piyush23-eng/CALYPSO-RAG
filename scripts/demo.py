@@ -13,7 +13,7 @@ from rich.text import Text
 from rich.prompt import Prompt
 
 from src.ingestion.indexer import DualIndexManager
-from src.agent.orchestrator import CalypsoAgentOrchestrator
+from src.agent.orchestrator import LorcenAgentOrchestrator
 
 
 console = Console()
@@ -38,7 +38,7 @@ SHOWCASE_QUERIES = [
 ]
 
 
-def run_single_query_demo(orchestrator: CalypsoAgentOrchestrator, query: str):
+def run_single_query_demo(orchestrator: LorcenAgentOrchestrator, query: str):
     console.print()
     console.print(Panel(f"[bold cyan]USER QUERY:[/bold cyan] [white]{query}[/white]", title="[bold yellow]Step 1: Query Input[/bold yellow]", border_style="yellow"))
 
@@ -101,7 +101,7 @@ def run_single_query_demo(orchestrator: CalypsoAgentOrchestrator, query: str):
 
     # 4. Verified Solution & Answer
     ans_markdown = Markdown(state.get("final_answer", ""))
-    console.print(Panel(ans_markdown, title="[bold green]Step 3: Calypso Fine-Tuned Verified Solution[/bold green]", border_style="green"))
+    console.print(Panel(ans_markdown, title="[bold green]Step 3: Lorcen Fine-Tuned Verified Solution[/bold green]", border_style="green"))
 
     # 5. Sentence-Level Citations Table
     citations = state.get("citations", [])
@@ -143,13 +143,13 @@ def run_single_query_demo(orchestrator: CalypsoAgentOrchestrator, query: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="CALYPSO-RAG Interactive & Showcase Demo")
+    parser = argparse.ArgumentParser(description="LORCEN-RAG Interactive & Showcase Demo")
     parser.add_argument("--interactive", action="store_true", help="Launch interactive CLI prompt")
     parser.add_argument("--processed_dir", type=str, default="./data/processed", help="Path to index data")
     args = parser.parse_args()
 
     console.print(Panel.fit(
-        "[bold cyan]CALYPSO-RAG[/bold cyan]: [bold white]Agentic Retrieval-Augmented Generation for GATE Computer Science[/bold white]\n"
+        "[bold cyan]LORCEN-RAG[/bold cyan]: [bold white]Agentic Retrieval-Augmented Generation for GATE Computer Science[/bold white]\n"
         "[dim]Hybrid RRF Retrieval (k=60) • Cross-Encoder Reranking • Corrective-RAG (CRAG) • LangGraph State Graph • Sentence Attribution[/dim]",
         border_style="cyan"
     ))
@@ -160,13 +160,13 @@ def main():
             bm25_persist_path=f"{args.processed_dir}/bm25_index.pkl"
         )
         index_manager.load_indices()
-        orchestrator = CalypsoAgentOrchestrator(index_manager=index_manager)
+        orchestrator = LorcenAgentOrchestrator(index_manager=index_manager)
 
     if args.interactive:
         console.print("[bold green]Type your GATE CS question below (or 'exit' to quit):[/bold green]")
         while True:
             try:
-                user_q = Prompt.ask("\n[bold yellow]Ask CALYPSO-RAG[/bold yellow]")
+                user_q = Prompt.ask("\n[bold yellow]Ask LORCEN-RAG[/bold yellow]")
                 if user_q.strip().lower() in ["exit", "quit", "q"]:
                     console.print("[bold cyan]Exiting demo. Good luck with GATE prep![/bold cyan]")
                     break

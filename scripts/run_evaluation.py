@@ -8,7 +8,7 @@ from tqdm import tqdm
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.ingestion.indexer import DualIndexManager
-from src.agent.orchestrator import CalypsoAgentOrchestrator
+from src.agent.orchestrator import LorcenAgentOrchestrator
 from src.evaluation.evaluator import EvalItem, RAGEvaluator, EvaluationSummary
 
 
@@ -23,7 +23,7 @@ from typing import Dict, Any, List, Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.ingestion.indexer import DualIndexManager
-from src.agent.orchestrator import CalypsoAgentOrchestrator
+from src.agent.orchestrator import LorcenAgentOrchestrator
 from src.evaluation.evaluator import EvalItem, RAGEvaluator, EvaluationSummary
 
 
@@ -44,7 +44,7 @@ def evaluate_single_config(
     print(f"   • Corrective RAG (CRAG): {'ENABLED' if enable_crag else 'DISABLED'}")
     print(f"   • Knowledge Graph / GraphRAG: {'ENABLED' if enable_kg else 'DISABLED'}")
 
-    orchestrator = CalypsoAgentOrchestrator(
+    orchestrator = LorcenAgentOrchestrator(
         index_manager=index_manager,
         enable_hybrid=enable_hybrid,
         enable_reranking=enable_reranking,
@@ -73,7 +73,7 @@ def run_ablation_study(
     processed_dir: str = "./data/processed"
 ):
     print("=" * 90)
-    print("🔬 CALYPSO-RAG: COMPONENT ABLATION STUDY (4 SYSTEM CONFIGURATIONS)")
+    print("🔬 LORCEN-RAG: COMPONENT ABLATION STUDY (4 SYSTEM CONFIGURATIONS)")
     print("=" * 90)
 
     with open(dataset_path, "r", encoding="utf-8") as f:
@@ -153,7 +153,7 @@ def run_ablation_study(
     full = ablation_results["full_system"]["summary"]
     
     md_lines = [
-        "# 🔬 CALYPSO-RAG: Component Ablation Study",
+        "# 🔬 LORCEN-RAG: Component Ablation Study",
         "",
         f"**Benchmark Dataset**: `{dataset_path}` ({len(eval_items)} Questions)  ",
         "**Target Metric**: RAGAS Multi-Dimensional Evaluation (Target \u2265 0.75)  ",
@@ -206,7 +206,7 @@ def run_full_evaluation(
     enable_crag: bool = True
 ):
     print("=" * 85)
-    print("📊 CALYPSO-RAG: COMPREHENSIVE RAGAS EVALUATION HARNESS")
+    print("📊 LORCEN-RAG: COMPREHENSIVE RAGAS EVALUATION HARNESS")
     print("=" * 85)
 
     with open(dataset_path, "r", encoding="utf-8") as f:
@@ -239,7 +239,7 @@ def run_full_evaluation(
 
     # Generate Markdown summary table
     md_lines = [
-        "# 📊 CALYPSO-RAG: Evaluation Report",
+        "# 📊 LORCEN-RAG: Evaluation Report",
         "",
         f"**Total Benchmark Questions**: {summary.total_questions}  ",
         f"**Target Quality Threshold**: {summary.target_threshold} (75%)  ",
@@ -277,7 +277,7 @@ def run_multihop_kg_ablation_study(
     processed_dir: str = "./data/processed"
 ):
     print("=" * 90)
-    print("🔬 CALYPSO-RAG: KNOWLEDGE GRAPH / GRAPHRAG MULTI-HOP ABLATION STUDY")
+    print("🔬 LORCEN-RAG: KNOWLEDGE GRAPH / GRAPHRAG MULTI-HOP ABLATION STUDY")
     print("=" * 90)
 
     with open(dataset_path, "r", encoding="utf-8") as f:

@@ -1,5 +1,5 @@
 """
-Process Reward Model (PRM) & Step-Level Mathematical Verifier for CALYPSO-RAG.
+Process Reward Model (PRM) & Step-Level Mathematical Verifier for LORCEN-RAG.
 
 Inspired by Process-Supervised Reward Models (Lightman et al., DeepSeek-R1, OpenAI o1/o3):
 1. Decomposes mathematical & algorithmic reasoning trajectories into discrete, atomic derivation steps.
@@ -33,7 +33,7 @@ class ReasoningStep(Dict[str, Any]):
 
 class ProcessRewardVerifier:
     """
-    Step-Level Process Reward Model (PRM) Engine for CALYPSO-RAG.
+    Step-Level Process Reward Model (PRM) Engine for LORCEN-RAG.
     """
 
     def __init__(self, acceptance_threshold: float = 0.70):

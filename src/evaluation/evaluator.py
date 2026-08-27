@@ -45,7 +45,7 @@ class EvaluationSummary(BaseModel):
 
 class RAGEvaluator:
     """
-    Transparent, Inspectable Evaluation Engine for CALYPSO-RAG.
+    Transparent, Inspectable Evaluation Engine for LORCEN-RAG.
     Computes standard RAG metrics from first principles:
     1. Context Precision: fraction of retrieved chunks that are relevant.
     2. Context Recall: fraction of ground truth keywords/concepts covered in retrieved chunks.

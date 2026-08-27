@@ -1,6 +1,6 @@
 import pytest
 from src.ingestion.indexer import DualIndexManager
-from src.agent.orchestrator import CalypsoAgentOrchestrator
+from src.agent.orchestrator import LorcenAgentOrchestrator
 
 
 @pytest.fixture(scope="module")
@@ -10,7 +10,7 @@ def agent_orchestrator():
         bm25_persist_path="./data/processed/bm25_index.pkl"
     )
     index_manager.load_indices()
-    return CalypsoAgentOrchestrator(index_manager=index_manager)
+    return LorcenAgentOrchestrator(index_manager=index_manager)
 
 
 def test_agent_graph_compilation(agent_orchestrator):

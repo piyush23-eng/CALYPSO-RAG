@@ -1,4 +1,4 @@
-# CALYPSO — Multimodal Agentic RAG System for GATE CS/IT
+# LORCEN — Multimodal Agentic RAG System for GATE CS/IT
 
 > **Hybrid retrieval, GraphRAG, CRAG, QLoRA, and symbolic verification for GATE-oriented question answering.**
 
@@ -23,7 +23,7 @@ Standard autoregressive LLMs and simple vector-search RAG pipelines struggle on 
 2. **Lexical confusion on dense acronyms**: Dense vector embeddings alone often fail to distinguish near-identical syllabus terms (e.g., `Strict 2PL` vs `Rigorous 2PL` vs standard `2PL`, or `LR(0)` vs `SLR(1)` parsing tables).
 3. **Multi-hop dependencies split across chapters**: Questions frequently require connecting properties documented in separate reference chapters (e.g., linking `Strict 2PL` to `Cascading Aborts` and `Conflict Serializability`).
 
-**CALYPSO-RAG** addresses these with a multi-stage pipeline:
+**LORCEN-RAG** addresses these with a multi-stage pipeline:
 - **Hybrid retrieval**: Combines BM25 lexical search with dense vector matching (`BAAI/bge-small-en-v1.5`), fused via Reciprocal Rank Fusion ($k=60$) and reranked using `cross-encoder/ms-marco-MiniLM-L-6-v2`.
 - **Context & relationship expansion**: Expands retrieved chunks to their parent section (up to 3,000 characters) and injects relationship triplets from a domain knowledge graph.
 - **Corrective loops (CRAG)**: Checks retrieval confidence before generation; if relevance falls below $\tau = 0.50$, it reformulates the query with domain terminology.
@@ -36,43 +36,43 @@ Standard autoregressive LLMs and simple vector-search RAG pipelines struggle on 
 
 ### 1. Query Interface (Voice & Multimodal Input)
 *Query input supporting typed text, Web Speech API audio recording (`🎙️`), multimodal diagram attachments (`📷`), and syllabus query presets:*
-![CALYPSO-RAG Hero Query Interface](docs/assets/hero_query_view.png)
+![LORCEN-RAG Hero Query Interface](docs/assets/hero_query_view.png)
 
 ---
 
 ### 2. Step-by-Step Derivation & Targeted Simulation Sliders
 *KaTeX derivations accompanied by sentence-level semantic attribution receipts, `edge-tts` voice narration, and parameter sliders:*
-![CALYPSO-RAG Answer Derivation & Simulation](docs/assets/answer_trace_view.png)
+![LORCEN-RAG Answer Derivation & Simulation](docs/assets/answer_trace_view.png)
 
 ---
 
 ### 3. GATE CS Practice Exam & Weak Topic Diagnostic Report (`/quiz`)
 *Practice test interface with 40 verified GATE CS questions (MCQ with negative marking, MSQ, and NAT) plus an automated topic-level accuracy breakdown:*
-![CALYPSO-RAG GATE Mock Exam & AI Diagnostics](docs/assets/quiz_mock_exam_diagnostic_view.png)
+![LORCEN-RAG GATE Mock Exam & AI Diagnostics](docs/assets/quiz_mock_exam_diagnostic_view.png)
 
 ---
 
 ### 4. 8-Module Interactive Simulation Suite
 *Parameter sweep sliders for Paging EMAT, Sliding Window GBN, Cache AMAT, CPU Pipelining, Disk Arm Scheduling, Master Theorem, CIDR Subnetting, and B+ Trees:*
-![CALYPSO-RAG Universal Simulation Labs](docs/assets/visual_simulation_lab_view.png)
+![LORCEN-RAG Universal Simulation Labs](docs/assets/visual_simulation_lab_view.png)
 
 ---
 
 ### 5. Evaluation Benchmark Dashboard (`/evaluation`)
-*Evaluation dashboard displaying RAGAS metric comparisons across Base Qwen 1.5B, Fine-Tuned QLoRA, and the full CALYPSO-RAG pipeline:*
-![CALYPSO-RAG Evaluation Dashboard](docs/assets/evaluation_dashboard.png)
+*Evaluation dashboard displaying RAGAS metric comparisons across Base Qwen 1.5B, Fine-Tuned QLoRA, and the full LORCEN-RAG pipeline:*
+![LORCEN-RAG Evaluation Dashboard](docs/assets/evaluation_dashboard.png)
 
 ---
 
 ### 6. Knowledge Tracing & Student Mastery Radar (`/mastery`)
 *Bayesian Knowledge Tracing (BKT) tracking prior understanding, learning transitions, and topic mastery across 10 GATE CS domains:*
-![CALYPSO-RAG Student Mastery Radar](docs/assets/student_mastery_radar_view.png)
+![LORCEN-RAG Student Mastery Radar](docs/assets/student_mastery_radar_view.png)
 
 ---
 
 ## System Architecture
 
-CALYPSO-RAG is implemented as a state machine workflow using **LangGraph**. The pipeline routes queries across vector indexes, knowledge graphs, AST execution environments, and vision extractors:
+LORCEN-RAG is implemented as a state machine workflow using **LangGraph**. The pipeline routes queries across vector indexes, knowledge graphs, AST execution environments, and vision extractors:
 
 ```mermaid
 flowchart TD
@@ -276,7 +276,7 @@ Measured across 50 benchmark queries using `scripts/profile_latency.py` on Apple
 5. **Hardware & Latency Variance**:
    - End-to-end execution times vary across hardware platforms, model parameter sizes, vector store depths, and deployment modes. CPU inference averages ~1.2s per full derivation; GPU-based vLLM serving is recommended for high-concurrency deployments.
 6. **Educational Scope**:
-   - CALYPSO-RAG is an interactive study and diagnostic tool designed to assist exam preparation; it should not be treated as an authoritative scoring body for official examination disputes.
+   - LORCEN-RAG is an interactive study and diagnostic tool designed to assist exam preparation; it should not be treated as an authoritative scoring body for official examination disputes.
 
 ---
 
@@ -297,8 +297,8 @@ Measured across 50 benchmark queries using `scripts/profile_latency.py` on Apple
 ### Option 1: Docker Compose (CPU Inference Mode)
 ```bash
 # Clone the repository
-git clone https://github.com/piyush23-eng/CALYPSO-RAG.git
-cd CALYPSO-RAG
+git clone https://github.com/piyush23-eng/LORCEN-RAG.git
+cd LORCEN-RAG
 
 # Build and run multi-stage container
 docker compose up --build
@@ -333,7 +333,7 @@ npm run dev
 
 ## Automated Testing
 
-CALYPSO-RAG includes a 22-test integration and unit test suite:
+LORCEN-RAG includes a 22-test integration and unit test suite:
 
 ```bash
 pytest tests/ -v
@@ -352,7 +352,7 @@ tests/test_phase3.py::test_vague_query_triggers_reformulation PASSED     [ 36%]
 tests/test_phase3.py::test_completely_off_topic_query_returns_low_confidence PASSED [ 40%]
 tests/test_phase3.py::test_jsonl_log_persistence PASSED                  [ 45%]
 tests/test_phase4.py::test_prompt_builder_structure PASSED               [ 50%]
-tests/test_phase4.py::test_calypso_client_fallback_mode PASSED           [ 54%]
+tests/test_phase4.py::test_lorcen_client_fallback_mode PASSED           [ 54%]
 tests/test_phase4.py::test_citation_mapper_sentence_attribution PASSED   [ 59%]
 tests/test_phase4.py::test_empty_context_triggers_uncovered_flag PASSED  [ 63%]
 tests/test_phase5.py::test_agent_graph_compilation PASSED                [ 68%]

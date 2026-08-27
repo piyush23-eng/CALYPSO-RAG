@@ -1,5 +1,5 @@
 """
-Authentic GATE CS Mock Quiz & Practice Test API for CALYPSO-RAG.
+Authentic GATE CS Mock Quiz & Practice Test API for LORCEN-RAG.
 Serves curated, verified GATE CS questions preserving exact mathematical notations, symbols, options, and derivations.
 """
 

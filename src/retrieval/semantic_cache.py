@@ -1,5 +1,5 @@
 """
-High-Performance Semantic Vector Cache for CALYPSO-RAG.
+High-Performance Semantic Vector Cache for LORCEN-RAG.
 
 Stores verified derivations and metadata indexed by dense semantic embeddings.
 Delivers sub-10ms response times for semantically equivalent or duplicate queries.

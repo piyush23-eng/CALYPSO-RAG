@@ -1,5 +1,5 @@
 """
-Self-Consistency & Multi-Path Verification Voting Engine for CALYPSO-RAG.
+Self-Consistency & Multi-Path Verification Voting Engine for LORCEN-RAG.
 
 Executes N=3 independent reasoning chains in parallel with temperature perturbation,
 extracts numerical/formula solutions via AST Sandbox & SymPy, and runs a majority

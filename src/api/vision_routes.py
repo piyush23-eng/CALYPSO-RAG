@@ -1,5 +1,5 @@
 """
-Vision-RAG API Route for Diagram Question Solving in CALYPSO-RAG.
+Vision-RAG API Route for Diagram Question Solving in LORCEN-RAG.
 Processes uploaded visual diagrams and passes structured extractions to the Agent Orchestrator.
 """
 

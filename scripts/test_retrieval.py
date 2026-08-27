@@ -70,7 +70,7 @@ def run_retrieval_suite(
     top_rerank: int = 3
 ):
     print("=" * 80)
-    print("🚀 CALYPSO-RAG: HYBRID RETRIEVAL & RERANKING VISUAL INSPECTION SUITE")
+    print("🚀 LORCEN-RAG: HYBRID RETRIEVAL & RERANKING VISUAL INSPECTION SUITE")
     print("=" * 80)
 
     # Initialize Index Manager, Retriever, and Reranker

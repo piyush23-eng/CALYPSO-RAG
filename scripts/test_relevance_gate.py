@@ -50,7 +50,7 @@ CRAG_TEST_CASES = [
 
 def run_crag_demonstration():
     print("=" * 85)
-    print("🔄 CALYPSO-RAG: CORRECTIVE-RAG (CRAG) RELEVANCE GATE DEMONSTRATION")
+    print("🔄 LORCEN-RAG: CORRECTIVE-RAG (CRAG) RELEVANCE GATE DEMONSTRATION")
     print("=" * 85)
 
     log_path = "./data/eval/crag_reformulation_log.jsonl"

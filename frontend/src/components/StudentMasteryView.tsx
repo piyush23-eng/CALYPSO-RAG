@@ -15,8 +15,8 @@ export const StudentMasteryView: React.FC<StudentMasteryViewProps> = ({ onBack }
   const loadProfile = async () => {
     setLoading(true);
     try {
-      const savedQuiz = localStorage.getItem('calypso_quiz_results');
-      const savedHistory = localStorage.getItem('calypso_session_history');
+      const savedQuiz = localStorage.getItem('lorcen_quiz_results');
+      const savedHistory = localStorage.getItem('lorcen_session_history');
 
       const quizHist = savedQuiz ? JSON.parse(savedQuiz) : [];
       const queryHist = savedHistory ? JSON.parse(savedHistory) : [];

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-CALYPSO-RAG: Production QLoRA Fine-Tuning Pipeline for GATE CS
+LORCEN-RAG: Production QLoRA Fine-Tuning Pipeline for GATE CS
 Target Base Model: Qwen/Qwen2.5-1.5B-Instruct
 Technique: 4-Bit NormalFloat (NF4) Double Quantization with PEFT/LoRA (Rank=16, Alpha=32)
 
 Usage:
-    python scripts/train_qlora.py --data_path data/train_gate_cs_dataset.jsonl --output_dir models/calypso_gate_qlora
+    python scripts/train_qlora.py --data_path data/train_gate_cs_dataset.jsonl --output_dir models/lorcen_gate_qlora
 """
 
 import os
@@ -52,7 +52,7 @@ from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 def train_gate_model(
     base_model_name: str = "Qwen/Qwen2.5-1.5B-Instruct",
     data_path: str = "./data/train_gate_cs_dataset.jsonl",
-    output_dir: str = "./models/calypso_gate_qlora",
+    output_dir: str = "./models/lorcen_gate_qlora",
     num_epochs: int = 4,
     batch_size: int = 2,
     gradient_accumulation_steps: int = 4,
@@ -60,7 +60,7 @@ def train_gate_model(
     lora_r: int = 16,
     lora_alpha: int = 32
 ):
-    print(f"🚀 Starting CALYPSO QLoRA Fine-Tuning on Base Model: {base_model_name}")
+    print(f"🚀 Starting LORCEN QLoRA Fine-Tuning on Base Model: {base_model_name}")
     print(f"📁 Dataset: {data_path}")
     print(f"🎯 Output Adapter: {output_dir}")
 
@@ -178,10 +178,10 @@ def train_gate_model(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="CALYPSO-RAG QLoRA Fine-Tuning")
+    parser = argparse.ArgumentParser(description="LORCEN-RAG QLoRA Fine-Tuning")
     parser.add_argument("--base_model", type=str, default="Qwen/Qwen2.5-1.5B-Instruct")
     parser.add_argument("--data_path", type=str, default="./data/train_gate_cs_dataset.jsonl")
-    parser.add_argument("--output_dir", type=str, default="./models/calypso_gate_qlora")
+    parser.add_argument("--output_dir", type=str, default="./models/lorcen_gate_qlora")
     parser.add_argument("--epochs", type=int, default=4)
     parser.add_argument("--batch_size", type=int, default=2)
     parser.add_argument("--grad_accum", type=int, default=4)

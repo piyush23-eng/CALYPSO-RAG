@@ -1,5 +1,5 @@
 """
-GATE CS Knowledge Graph & GraphRAG Multi-Hop Retrieval Module for CALYPSO-RAG.
+GATE CS Knowledge Graph & GraphRAG Multi-Hop Retrieval Module for LORCEN-RAG.
 Maintains an entity-relation ontology across all 10 GATE CS subjects and extracts
 subgraph relational triplets to resolve complex multi-hop queries.
 """

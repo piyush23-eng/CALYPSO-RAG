@@ -1,5 +1,5 @@
 """
-Hierarchical / Parent-Document Retriever for CALYPSO-RAG.
+Hierarchical / Parent-Document Retriever for LORCEN-RAG.
 Expands granular child chunk search hits into contiguous parent derivation sections
 to maximize LLM Context Recall and preserve full mathematical proofs.
 """

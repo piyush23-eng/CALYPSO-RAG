@@ -40,7 +40,7 @@ export function App() {
   // Session History State (Loaded from and saved to localStorage)
   const [history, setHistory] = useState<HistoryItem[]>(() => {
     try {
-      const saved = localStorage.getItem('calypso_session_history');
+      const saved = localStorage.getItem('lorcen_session_history');
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -50,7 +50,7 @@ export function App() {
   // Bookmarked Revision List State
   const [bookmarks, setBookmarks] = useState<QueryResponse[]>(() => {
     try {
-      const saved = localStorage.getItem('calypso_bookmarks');
+      const saved = localStorage.getItem('lorcen_bookmarks');
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -64,13 +64,13 @@ export function App() {
   // Sync session history and bookmarks to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('calypso_session_history', JSON.stringify(history));
+      localStorage.setItem('lorcen_session_history', JSON.stringify(history));
     } catch {}
   }, [history]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('calypso_bookmarks', JSON.stringify(bookmarks));
+      localStorage.setItem('lorcen_bookmarks', JSON.stringify(bookmarks));
     } catch {}
   }, [bookmarks]);
 
@@ -232,7 +232,7 @@ export function App() {
           >
             <span className="w-2.5 h-2.5 rounded-full bg-accent group-hover:scale-125 transition-transform shadow-[0_0_10px_rgba(61,90,254,0.6)]" />
             <span className="text-sm font-display font-black tracking-tight text-off-white">
-              CALYPSO<span className="text-accent">-RAG</span>
+              LORCEN<span className="text-accent">-RAG</span>
             </span>
           </button>
 

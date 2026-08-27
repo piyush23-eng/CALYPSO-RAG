@@ -1,5 +1,5 @@
 """
-Symbolic Mathematics & Dimensional Invariant Verifier for CALYPSO-RAG.
+Symbolic Mathematics & Dimensional Invariant Verifier for LORCEN-RAG.
 
 Integrates:
 1. SymPy for exact algebraic calculations, recurrence relations (Master Theorem),

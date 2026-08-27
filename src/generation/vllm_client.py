@@ -1,5 +1,5 @@
 """
-High-Throughput vLLM Continuous Batching Serving Client for CALYPSO-RAG.
+High-Throughput vLLM Continuous Batching Serving Client for LORCEN-RAG.
 
 Supports PagedAttention memory optimization, continuous asynchronous batching,
 and speculative decoding across distributed GPU clusters.
@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Optional, AsyncGenerator
 import os
 import time
 import httpx
-from src.generation.calypso_client import CalypsoClient
+from src.generation.lorcen_client import LorcenClient
 
 
 class VLLMClient:
@@ -21,7 +21,7 @@ class VLLMClient:
     def __init__(
         self,
         base_url: Optional[str] = None,
-        model_name: str = "piyush23-eng/calypso-qwen-1.5b-qlora",
+        model_name: str = "piyush23-eng/lorcen-qwen-1.5b-qlora",
         api_key: str = "EMPTY",
         timeout_sec: float = 60.0
     ):
@@ -29,15 +29,15 @@ class VLLMClient:
         self.model_name = model_name
         self.api_key = api_key
         self.timeout_sec = timeout_sec
-        self._fallback_client: Optional[CalypsoClient] = None
+        self._fallback_client: Optional[LorcenClient] = None
         self._is_vllm_alive = False
         self._total_requests_served = 0
         self._total_tokens_generated = 0
 
     @property
-    def fallback_client(self) -> CalypsoClient:
+    def fallback_client(self) -> LorcenClient:
         if self._fallback_client is None:
-            self._fallback_client = CalypsoClient()
+            self._fallback_client = LorcenClient()
         return self._fallback_client
 
     def check_vllm_health(self) -> bool:

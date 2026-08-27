@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Latency & Resource Profiler for CALYPSO-RAG
+Latency & Resource Profiler for LORCEN-RAG
 Instruments per-stage timing and resource consumption across the benchmark dataset.
 """
 
@@ -18,7 +18,7 @@ from tqdm import tqdm
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.ingestion.indexer import DualIndexManager
-from src.agent.orchestrator import CalypsoAgentOrchestrator
+from src.agent.orchestrator import LorcenAgentOrchestrator
 
 
 def profile_pipeline(
@@ -27,7 +27,7 @@ def profile_pipeline(
     processed_dir: str = "./data/processed"
 ):
     print("=" * 85)
-    print("⏱️ CALYPSO-RAG: LATENCY & RESOURCE PROFILING HARNESS")
+    print("⏱️ LORCEN-RAG: LATENCY & RESOURCE PROFILING HARNESS")
     print("=" * 85)
 
     with open(dataset_path, "r", encoding="utf-8") as f:
@@ -40,7 +40,7 @@ def profile_pipeline(
     )
     index_manager.load_indices()
 
-    orchestrator = CalypsoAgentOrchestrator(index_manager=index_manager)
+    orchestrator = LorcenAgentOrchestrator(index_manager=index_manager)
 
     # Metrics storage
     classification_times = []
@@ -120,7 +120,7 @@ def profile_pipeline(
 
     # Generate Markdown Report
     md_lines = [
-        "# ⏱️ CALYPSO-RAG: Latency & Resource Profiling Report",
+        "# ⏱️ LORCEN-RAG: Latency & Resource Profiling Report",
         "",
         f"**Benchmark Scope**: {len(eval_items)} Multi-Subject GATE CS Queries  ",
         f"**Hardware Environment**: {device_str}  ",

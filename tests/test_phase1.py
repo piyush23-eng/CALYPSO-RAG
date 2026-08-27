@@ -93,7 +93,7 @@ def test_dual_index_manager_smoke_test(temp_index_dir):
     manager = DualIndexManager(
         persist_dir=chroma_dir,
         bm25_persist_path=bm25_path,
-        collection_name="test_calypso_kb"
+        collection_name="test_lorcen_kb"
     )
 
     # 1. Build and persist indices

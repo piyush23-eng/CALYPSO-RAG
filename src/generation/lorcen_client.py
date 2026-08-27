@@ -9,14 +9,14 @@ from pydantic import BaseModel, Field
 from src.retrieval.hybrid_retriever import RetrievedChunk
 
 
-class CalypsoPromptBuilder:
+class LorcenPromptBuilder:
     """
     Constructs strict, verifiable generation prompts for GATE CS problem solving.
     Enforces the negative constraint required for faithfulness evaluation.
     """
 
     SYSTEM_INSTRUCTION = (
-        "You are CALYPSO, an expert domain-specialized GATE Computer Science reasoning assistant. "
+        "You are LORCEN, an expert domain-specialized GATE Computer Science reasoning assistant. "
         "Answer the user's question using ONLY the provided verified context chunks.\n\n"
         "STRICT GROUNDING RULES:\n"
         "1. Base your answer STRICTLY on the retrieved technical context provided below.\n"
@@ -53,9 +53,9 @@ class CalypsoPromptBuilder:
         return prompt
 
 
-class CalypsoClient:
+class LorcenClient:
     """
-    Multi-Provider Reasoning Client for CALYPSO-RAG.
+    Multi-Provider Reasoning Client for LORCEN-RAG.
     Supports:
     1. Groq API (High-speed Llama-3.3 / Qwen)
     2. OpenAI API (GPT-4o / GPT-4o-mini)
@@ -66,7 +66,7 @@ class CalypsoClient:
 
     def __init__(
         self,
-        endpoint_url: str = "https://calypso-m1rz.onrender.com",
+        endpoint_url: str = "https://lorcen-m1rz.onrender.com",
         max_retries: int = 3,
         base_backoff_sec: float = 1.5,
         request_timeout_sec: float = 30.0,
@@ -88,7 +88,7 @@ class CalypsoClient:
             payload = {
                 "model": os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile"),
                 "messages": [
-                    {"role": "system", "content": CalypsoPromptBuilder.SYSTEM_INSTRUCTION},
+                    {"role": "system", "content": LorcenPromptBuilder.SYSTEM_INSTRUCTION},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.1,
@@ -111,7 +111,7 @@ class CalypsoClient:
             payload = {
                 "model": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
                 "messages": [
-                    {"role": "system", "content": CalypsoPromptBuilder.SYSTEM_INSTRUCTION},
+                    {"role": "system", "content": LorcenPromptBuilder.SYSTEM_INSTRUCTION},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.1,
@@ -546,7 +546,7 @@ class CalypsoClient:
         if self.mock_mode:
             return self._generate_deterministic_fallback(query=query, chunks=chunks)
 
-        prompt = CalypsoPromptBuilder.build_rag_prompt(query=query, chunks=chunks)
+        prompt = LorcenPromptBuilder.build_rag_prompt(query=query, chunks=chunks)
 
         # 1. Try Groq (Ultra-fast Llama-3.3 70B / Qwen) if GROQ_API_KEY is set
         groq_ans = self._call_groq_api(prompt)

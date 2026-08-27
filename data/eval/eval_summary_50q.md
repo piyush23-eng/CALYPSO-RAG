@@ -1,4 +1,4 @@
-# 📊 CALYPSO-RAG: Evaluation Report
+# 📊 LORCEN-RAG: Evaluation Report
 
 **Total Benchmark Questions**: 50  
 **Target Quality Threshold**: 0.75 (75%)  

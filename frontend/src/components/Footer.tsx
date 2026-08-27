@@ -12,7 +12,7 @@ export const Footer: React.FC<FooterProps> = ({ onToggleEval, isEvalView }) => {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
         <div>
           <div className="text-sm font-display font-bold text-off-white tracking-tight mb-1">
-            CALYPSO-RAG
+            LORCEN-RAG
           </div>
           <p className="text-xs font-mono text-muted-gray">
             Agentic Retrieval-Augmented Generation for GATE CS/IT
@@ -29,7 +29,7 @@ export const Footer: React.FC<FooterProps> = ({ onToggleEval, isEvalView }) => {
           </button>
 
           <a
-            href="https://github.com/piyush23-eng/CALYPSO-RAG"
+            href="https://github.com/piyush23-eng/LORCEN-RAG"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-gray hover:text-off-white transition-colors flex items-center gap-1.5"

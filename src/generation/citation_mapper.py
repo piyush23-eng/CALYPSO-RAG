@@ -22,7 +22,7 @@ class SentenceCitation(BaseModel):
 
 class GenerationOutput(BaseModel):
     """
-    Standard output schema for CALYPSO-RAG generation phase.
+    Standard output schema for LORCEN-RAG generation phase.
     """
     query: str
     answer_text: str

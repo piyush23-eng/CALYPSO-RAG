@@ -7,7 +7,7 @@ from src.ingestion.indexer import DualIndexManager
 from src.retrieval.hybrid_retriever import HybridRetriever, RetrievedChunk
 from src.retrieval.reranker import CrossEncoderReranker
 from src.retrieval.relevance_gate import CorrectiveRelevanceGate, GatedRetrievalResult
-from src.generation.calypso_client import CalypsoClient
+from src.generation.lorcen_client import LorcenClient
 from src.generation.citation_mapper import CitationMapper, GenerationOutput, SentenceCitation
 
 
@@ -17,7 +17,7 @@ from src.retrieval.knowledge_graph import gate_kg
 
 class AgentState(TypedDict):
     """
-    Complete state schema for the CALYPSO-RAG LangGraph state machine.
+    Complete state schema for the LORCEN-RAG LangGraph state machine.
     """
     query: str
     reformulated_query: str
@@ -35,7 +35,7 @@ class AgentState(TypedDict):
     _start_perf_counter: float
 
 
-class CalypsoAgentOrchestrator:
+class LorcenAgentOrchestrator:
     """
     Agentic Orchestrator built using LangGraph state graph.
     
@@ -54,7 +54,7 @@ class CalypsoAgentOrchestrator:
         retriever: Optional[HybridRetriever] = None,
         reranker: Optional[CrossEncoderReranker] = None,
         relevance_gate: Optional[CorrectiveRelevanceGate] = None,
-        calypso_client: Optional[CalypsoClient] = None,
+        lorcen_client: Optional[LorcenClient] = None,
         citation_mapper: Optional[CitationMapper] = None,
         relevance_threshold: float = 0.50,
         max_reformulations: int = 2,
@@ -74,8 +74,8 @@ class CalypsoAgentOrchestrator:
             relevance_threshold=relevance_threshold,
             max_attempts=max_reformulations
         )
-        self.generator = calypso_client or CalypsoClient()
-        self.calypso_client = self.generator
+        self.generator = lorcen_client or LorcenClient()
+        self.lorcen_client = self.generator
         self.citation_mapper = citation_mapper or CitationMapper(embedder=self.index_manager.embedder)
         self.max_reformulations = max_reformulations if enable_crag else 0
         
@@ -257,7 +257,7 @@ class CalypsoAgentOrchestrator:
         reranked = state["rerank_results"]
         subject = state["subject_hint"]
         
-        answer_text = self.calypso_client.generate(
+        answer_text = self.lorcen_client.generate(
             query=state["query"],
             chunks=reranked,
             subject=subject
@@ -403,7 +403,7 @@ flowchart TD
     RelevanceCheck -- "No (Score < 0.50 & Attempt < 2)" --> Reformulate[CRAG Query Reformulation & Expansion]
     Reformulate -.-> Retrieve
     
-    RelevanceCheck -- "Yes (Score >= 0.50 OR Attempt >= 2)" --> Generate[Calypso LLM Generation with Negative Grounding]
+    RelevanceCheck -- "Yes (Score >= 0.50 OR Attempt >= 2)" --> Generate[Lorcen LLM Generation with Negative Grounding]
     Generate --> Citations[Sentence-Level Cosine Citation Mapper]
     Citations --> END([Verified Answer with Citations & Confidence])
 ```"""

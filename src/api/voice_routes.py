@@ -1,5 +1,5 @@
 """
-Neural Human Text-to-Speech API Route for CALYPSO-RAG.
+Neural Human Text-to-Speech API Route for LORCEN-RAG.
 Provides ultra-realistic, human-cadence speech synthesis with full unit expansion,
 natural mathematical pronunciation, and professorial breath pauses at punctuation.
 """

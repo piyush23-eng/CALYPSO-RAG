@@ -188,9 +188,9 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack, onNavigateToMastery 
           };
         });
 
-        const existingStr = localStorage.getItem('calypso_quiz_results');
+        const existingStr = localStorage.getItem('lorcen_quiz_results');
         const existing = existingStr ? JSON.parse(existingStr) : [];
-        localStorage.setItem('calypso_quiz_results', JSON.stringify([...attemptRecords, ...existing]));
+        localStorage.setItem('lorcen_quiz_results', JSON.stringify([...attemptRecords, ...existing]));
       } catch (e) {
         console.error('Failed to sync quiz results with BKT:', e);
       }
@@ -727,7 +727,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onBack, onNavigateToMastery 
             </div>
           </div>
 
-          {/* Question by Question Detailed CALYPSO Derivation Review */}
+          {/* Question by Question Detailed LORCEN Derivation Review */}
           <div className="space-y-6">
 
             <h3 className="text-xs font-mono uppercase tracking-widest text-muted-gray">

@@ -1,5 +1,5 @@
 """
-Secure In-Memory Python Sandbox & Code Interpreter Tool for CALYPSO-RAG.
+Secure In-Memory Python Sandbox & Code Interpreter Tool for LORCEN-RAG.
 Executes arbitrary mathematical derivations, recurrence relations, combinatorics,
 and discrete graph algorithms with AST safety checking and timeout isolation.
 """
@@ -142,7 +142,7 @@ class PythonSandbox:
         scope = dict(exec_globals)
 
         try:
-            compiled = compile(code, "<calypso_sandbox>", "exec")
+            compiled = compile(code, "<lorcen_sandbox>", "exec")
             exec(compiled, scope)
             elapsed_ms = (time.perf_counter() - start_time) * 1000.0
             stdout_str = redirected_output.getvalue().strip()

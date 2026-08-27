@@ -1,4 +1,4 @@
-# 🔬 CALYPSO-RAG: Component Ablation Study
+# 🔬 LORCEN-RAG: Component Ablation Study
 
 **Benchmark Dataset**: `./data/eval/eval_dataset.json` (20 Questions)  
 **Target Metric**: RAGAS Multi-Dimensional Evaluation (Target ≥ 0.75)  

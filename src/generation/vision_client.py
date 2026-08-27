@@ -1,5 +1,5 @@
 """
-Vision-RAG Multimodal Diagram Extraction & Reasoning Engine for CALYPSO-RAG.
+Vision-RAG Multimodal Diagram Extraction & Reasoning Engine for LORCEN-RAG.
 Processes GATE CS visual diagrams (DFA/NFA, K-Maps, Logic Gates, B+ Trees, Precedence Graphs)
 and maps visual structures to formal mathematical problem representations.
 """

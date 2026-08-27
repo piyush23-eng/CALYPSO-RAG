@@ -22,7 +22,7 @@ class DualIndexManager:
         persist_dir: str = "./data/processed/chroma_db",
         bm25_persist_path: str = "./data/processed/bm25_index.pkl",
         embedding_model_name: str = "BAAI/bge-small-en-v1.5",
-        collection_name: str = "calypso_gate_kb"
+        collection_name: str = "lorcen_gate_kb"
     ):
         self.persist_dir = Path(persist_dir)
         self.bm25_persist_path = Path(bm25_persist_path)

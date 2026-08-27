@@ -1,6 +1,6 @@
 # Experimental Results and Evaluation Rigor
 
-This document details the empirical evaluation methodology, component ablation experiments, dataset scaling analysis, latency profiling, and fine-tuning telemetry for **CALYPSO-RAG**.
+This document details the empirical evaluation methodology, component ablation experiments, dataset scaling analysis, latency profiling, and fine-tuning telemetry for **LORCEN-RAG**.
 
 ---
 
@@ -10,7 +10,7 @@ All experiments evaluate the system's ability to retrieve relevant context, elim
 
 ### Hardware & Environment
 - **Local Evaluation Environment**: Apple Silicon Mac (CPU Inference, Python 3.14 / 3.11 compatible virtual environment).
-- **Fine-Tuning Environment**: NVIDIA T4 GPU (16 GB VRAM) on Google Colab (`notebooks/train_calypso_qlora.ipynb`).
+- **Fine-Tuning Environment**: NVIDIA T4 GPU (16 GB VRAM) on Google Colab (`notebooks/train_lorcen_qlora.ipynb`).
 - **Dense Embedding Model**: `BAAI/bge-small-en-v1.5` (384 dimensions, normalized cosine similarity).
 - **Cross-Encoder Reranker**: `cross-encoder/ms-marco-MiniLM-L-6-v2` (sigmoid-normalized relevance score).
 - **Evaluation Framework**: Multi-dimensional RAGAS metric formulation (Context Precision, Context Recall, Faithfulness, Answer Relevance).
@@ -126,7 +126,7 @@ To domain-adapt the base language model (`Qwen/Qwen2.5-1.5B-Instruct`) for multi
 
 ### Before vs After Qualitative Comparison
 
-| Evaluation Metric / Scenario | Base Qwen-1.5B-Instruct | Fine-Tuned QLoRA Adapter | CALYPSO-RAG (Adapter + Agentic RAG) |
+| Evaluation Metric / Scenario | Base Qwen-1.5B-Instruct | Fine-Tuned QLoRA Adapter | LORCEN-RAG (Adapter + Agentic RAG) |
 | :--- | :--- | :--- | :--- |
 | **Hard Disk 15000 RPM Calculation** | Guesses random latency numbers; misses sector transfer derivation. | Formulates correct rotational formula ($T_{\text{rev}} = 4\text{ms}$), minor trajectory arithmetic drift. | **Exact $77.3\text{ ms}$** step-by-step derivation grounded in verified retrieved chunk. |
 | **2-Level Paging EMAT with TLB** | Confuses memory accesses on TLB miss (assumes 2 accesses instead of 3). | Generates correct formula: $EMAT = h(t_{tlb}+t_m) + (1-h)(t_{tlb}+3t_m)$. | **Exact $130\text{ ns}$ / $140\text{ ns}$ calculation** with sentence citation. |

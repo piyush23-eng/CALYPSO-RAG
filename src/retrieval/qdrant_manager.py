@@ -1,5 +1,5 @@
 """
-Distributed Qdrant Hybrid Vector Database Manager for CALYPSO-RAG.
+Distributed Qdrant Hybrid Vector Database Manager for LORCEN-RAG.
 
 Supports scaling to millions of chunks with HNSW vector indexing,
 payload metadata filtering, and native dense-sparse hybrid search.
@@ -17,13 +17,13 @@ from src.ingestion.chunker import DocumentChunk
 
 class QdrantHybridManager:
     """
-    Qdrant Vector DB Manager for CALYPSO-RAG.
+    Qdrant Vector DB Manager for LORCEN-RAG.
     Supports local disk persistence and external cluster connections.
     """
 
     def __init__(
         self,
-        collection_name: str = "calypso_gate_qdrant",
+        collection_name: str = "lorcen_gate_qdrant",
         storage_path: Optional[str] = "./data/processed/qdrant_storage",
         url: Optional[str] = None,
         api_key: Optional[str] = None,

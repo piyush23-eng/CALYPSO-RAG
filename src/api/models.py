@@ -1,5 +1,5 @@
 """
-Shared Pydantic API Models for CALYPSO-RAG.
+Shared Pydantic API Models for LORCEN-RAG.
 """
 
 from typing import List, Dict, Any, Optional

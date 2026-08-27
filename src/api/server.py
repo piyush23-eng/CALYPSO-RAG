@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 
 
 from src.ingestion.indexer import DualIndexManager
-from src.agent.orchestrator import CalypsoAgentOrchestrator
+from src.agent.orchestrator import LorcenAgentOrchestrator
 from src.api.quiz_routes import quiz_router
 from src.api.vision_routes import vision_router
 from src.api.voice_routes import voice_router
@@ -22,7 +22,7 @@ from src.student_model.knowledge_tracer import global_knowledge_tracer
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 app = FastAPI(
-    title="CALYPSO-RAG API",
+    title="LORCEN-RAG API",
     description="Agentic Retrieval-Augmented Generation API for GATE CS Examination",
     version="2.0.0"
 )
@@ -42,10 +42,10 @@ app.include_router(voice_router)
 
 # Lazy-loaded singletons
 _index_manager: Optional[DualIndexManager] = None
-_orchestrator: Optional[CalypsoAgentOrchestrator] = None
+_orchestrator: Optional[LorcenAgentOrchestrator] = None
 
 
-def get_orchestrator() -> CalypsoAgentOrchestrator:
+def get_orchestrator() -> LorcenAgentOrchestrator:
     global _index_manager, _orchestrator
     if _orchestrator is None:
         _index_manager = DualIndexManager(
@@ -53,7 +53,7 @@ def get_orchestrator() -> CalypsoAgentOrchestrator:
             bm25_persist_path=str(PROJECT_ROOT / "data/processed/bm25_index.pkl")
         )
         _index_manager.load_indices()
-        _orchestrator = CalypsoAgentOrchestrator(index_manager=_index_manager)
+        _orchestrator = LorcenAgentOrchestrator(index_manager=_index_manager)
     return _orchestrator
 
 
@@ -61,7 +61,7 @@ def get_orchestrator() -> CalypsoAgentOrchestrator:
 def health():
     return {
         "status": "healthy",
-        "service": "CALYPSO-RAG",
+        "service": "LORCEN-RAG",
         "version": "2.0.0",
         "index_ready": (PROJECT_ROOT / "data/processed/bm25_index.pkl").exists()
     }
@@ -454,7 +454,7 @@ def get_evaluation_metrics():
                 "overall": 0.4725
             },
             {
-                "name": "Calypso (Fine-Tuned QLoRA)",
+                "name": "Lorcen (Fine-Tuned QLoRA)",
                 "tag": "Parametric Only",
                 "precision": 0.6100,
                 "recall": 0.5500,
@@ -463,7 +463,7 @@ def get_evaluation_metrics():
                 "overall": 0.6300
             },
             {
-                "name": "CALYPSO-RAG (Agentic System)",
+                "name": "LORCEN-RAG (Agentic System)",
                 "tag": "Agentic RAG + CRAG",
                 "precision": results.get("mean_context_precision", 0.8500),
                 "recall": results.get("mean_context_recall", 0.7500),

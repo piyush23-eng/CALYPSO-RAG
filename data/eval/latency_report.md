@@ -1,4 +1,4 @@
-# ⏱️ CALYPSO-RAG: Latency & Resource Profiling Report
+# ⏱️ LORCEN-RAG: Latency & Resource Profiling Report
 
 **Benchmark Scope**: 50 Multi-Subject GATE CS Queries  
 **Hardware Environment**: CPU Execution (Peak RSS Memory: 566.03 MB RAM)  

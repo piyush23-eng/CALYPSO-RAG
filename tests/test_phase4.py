@@ -1,7 +1,7 @@
 import pytest
 from src.retrieval.hybrid_retriever import RetrievedChunk
 from src.retrieval.relevance_gate import GatedRetrievalResult
-from src.generation.calypso_client import CalypsoPromptBuilder, CalypsoClient
+from src.generation.lorcen_client import LorcenPromptBuilder, LorcenClient
 from src.generation.citation_mapper import CitationMapper, SentenceCitation, GenerationOutput
 
 
@@ -22,7 +22,7 @@ def test_prompt_builder_structure():
         )
     ]
     query = "What is the EMAT formula for 2-level paging?"
-    prompt = CalypsoPromptBuilder.build_rag_prompt(query=query, chunks=chunks)
+    prompt = LorcenPromptBuilder.build_rag_prompt(query=query, chunks=chunks)
 
     assert "STRICT GROUNDING RULES" in prompt
     assert "The question is not covered in retrieved material" in prompt
@@ -31,11 +31,11 @@ def test_prompt_builder_structure():
     assert query in prompt
 
 
-def test_calypso_client_fallback_mode():
+def test_lorcen_client_fallback_mode():
     """
-    Tests CalypsoClient deterministic fallback logic for offline/mock environments.
+    Tests LorcenClient deterministic fallback logic for offline/mock environments.
     """
-    client = CalypsoClient(mock_mode=True)
+    client = LorcenClient(mock_mode=True)
     chunks = [
         RetrievedChunk(
             chunk_id="chk_algo_1",

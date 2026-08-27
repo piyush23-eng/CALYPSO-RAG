@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  calypso-rag:
+  lorcen-rag:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: calypso-rag-engine
+    container_name: lorcen-rag-engine
     ports:
       - "8000:8000"
     environment:
