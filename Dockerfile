@@ -34,8 +34,10 @@ COPY src/ ./src/
 COPY data/ ./data/
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-EXPOSE 8000 7860
+EXPOSE 10000 8000 7860
 
-# Run FastAPI production server (respecting dynamic cloud $PORT or fallback to 8000/7860)
-CMD ["sh", "-c", "uvicorn src.api.server:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run FastAPI production server (explicitly binding to 0.0.0.0 and dynamic cloud $PORT)
+CMD uvicorn src.api.server:app --host 0.0.0.0 --port ${PORT:-10000}
+
+
 

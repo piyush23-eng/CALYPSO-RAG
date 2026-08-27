@@ -32,18 +32,26 @@ class QdrantHybridManager:
         self.collection_name = collection_name
         self.vector_dim = vector_dim
         self.url = url or os.getenv("QDRANT_URL")
-        self.api_key = api_key or os.getenv("QDRANT_API_KEY")
-
+        self.client = None
         if self.url:
-            self.client = QdrantClient(url=self.url, api_key=self.api_key)
-            self.mode = "remote_cluster"
+            try:
+                self.client = QdrantClient(url=self.url, api_key=self.api_key)
+                self.mode = "remote_cluster"
+            except Exception:
+                self.client = QdrantClient(":memory:")
+                self.mode = "in_memory_fallback"
         else:
-            p = Path(storage_path)
-            p.mkdir(parents=True, exist_ok=True)
-            self.client = QdrantClient(path=str(p))
-            self.mode = "local_embedded"
+            try:
+                p = Path(storage_path)
+                p.mkdir(parents=True, exist_ok=True)
+                self.client = QdrantClient(path=str(p))
+                self.mode = "local_embedded"
+            except Exception:
+                self.client = QdrantClient(":memory:")
+                self.mode = "in_memory_fallback"
 
         self._ensure_collection()
+
 
     def _ensure_collection(self) -> None:
         """Creates the Qdrant collection with HNSW cosine configuration if not present."""
