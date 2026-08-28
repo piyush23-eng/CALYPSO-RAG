@@ -9,13 +9,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse
 
 
-from src.ingestion.indexer import DualIndexManager
-from src.agent.orchestrator import LorcenAgentOrchestrator
 from src.api.quiz_routes import quiz_router
 from src.api.vision_routes import vision_router
 from src.api.voice_routes import voice_router
 from src.api.models import QueryRequest, QueryResponse
-from src.reasoning.step_verifier import global_prm_verifier
 from src.student_model.knowledge_tracer import global_knowledge_tracer
 
 
@@ -23,6 +20,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 app = FastAPI(
     title="LORCEN-RAG API",
+
     description="Agentic Retrieval-Augmented Generation API for GATE CS Examination",
     version="2.0.0"
 )
@@ -41,13 +39,15 @@ app.include_router(vision_router)
 app.include_router(voice_router)
 
 # Lazy-loaded singletons
-_index_manager: Optional[DualIndexManager] = None
-_orchestrator: Optional[LorcenAgentOrchestrator] = None
+_index_manager = None
+_orchestrator = None
 
 
-def get_orchestrator() -> LorcenAgentOrchestrator:
+def get_orchestrator():
     global _index_manager, _orchestrator
     if _orchestrator is None:
+        from src.ingestion.indexer import DualIndexManager
+        from src.agent.orchestrator import LorcenAgentOrchestrator
         _index_manager = DualIndexManager(
             persist_dir=str(PROJECT_ROOT / "data/processed/chroma_db"),
             bm25_persist_path=str(PROJECT_ROOT / "data/processed/bm25_index.pkl")
@@ -55,6 +55,7 @@ def get_orchestrator() -> LorcenAgentOrchestrator:
         _index_manager.load_indices()
         _orchestrator = LorcenAgentOrchestrator(index_manager=_index_manager)
     return _orchestrator
+
 
 
 @app.get("/api/health")
@@ -95,11 +96,35 @@ def get_topics():
     }
 
 
-from src.retrieval.semantic_cache import global_semantic_cache
-from src.reasoning.symbolic_verifier import global_symbolic_verifier
-from src.reasoning.self_consistency import global_self_consistency
-from src.retrieval.qdrant_manager import global_qdrant_manager
-from src.generation.vllm_client import global_vllm_client
+def get_semantic_cache():
+    from src.retrieval.semantic_cache import global_semantic_cache
+    return global_semantic_cache
+
+
+def get_symbolic_verifier():
+    from src.reasoning.symbolic_verifier import global_symbolic_verifier
+    return global_symbolic_verifier
+
+
+def get_self_consistency():
+    from src.reasoning.self_consistency import global_self_consistency
+    return global_self_consistency
+
+
+def get_qdrant_manager():
+    from src.retrieval.qdrant_manager import global_qdrant_manager
+    return global_qdrant_manager
+
+
+def get_vllm_client():
+    from src.generation.vllm_client import global_vllm_client
+    return global_vllm_client
+
+
+def get_prm_verifier():
+    from src.reasoning.step_verifier import global_prm_verifier
+    return global_prm_verifier
+
 
 
 class UnitVerifyRequest(BaseModel):
@@ -114,18 +139,18 @@ class ConsistencyRequest(BaseModel):
 
 @app.get("/api/cache/stats")
 def get_cache_stats():
-    return global_semantic_cache.get_stats()
+    return get_semantic_cache().get_stats()
 
 
 @app.post("/api/cache/clear")
 def clear_cache():
-    global_semantic_cache.clear()
+    get_semantic_cache().clear()
     return {"status": "success", "message": "Semantic cache purged successfully."}
 
 
 @app.post("/api/verify/units")
 def verify_units(req: UnitVerifyRequest):
-    return global_symbolic_verifier.verify_dimensional_invariants(
+    return get_symbolic_verifier().verify_dimensional_invariants(
         domain=req.domain,
         parameters=req.parameters
     )
@@ -133,7 +158,7 @@ def verify_units(req: UnitVerifyRequest):
 
 @app.get("/api/qdrant/status")
 def get_qdrant_status():
-    return global_qdrant_manager.get_status()
+    return get_qdrant_manager().get_status()
 
 
 @app.post("/api/qdrant/sync")
@@ -146,12 +171,12 @@ def sync_qdrant_index():
 
         texts = [c.content for c in chunks]
         embeddings = orchestrator.index_manager.embedder.encode(texts, batch_size=64, show_progress_bar=False, normalize_embeddings=True)
-        synced_count = global_qdrant_manager.insert_chunks(chunks, embeddings)
+        synced_count = get_qdrant_manager().insert_chunks(chunks, embeddings)
         return {
             "status": "success",
             "synced_chunks": synced_count,
-            "collection": global_qdrant_manager.collection_name,
-            "mode": global_qdrant_manager.mode
+            "collection": get_qdrant_manager().collection_name,
+            "mode": get_qdrant_manager().mode
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Qdrant sync error: {str(e)}")
@@ -159,7 +184,7 @@ def sync_qdrant_index():
 
 @app.get("/api/engine/status")
 def get_engine_status():
-    return global_vllm_client.get_status()
+    return get_vllm_client().get_status()
 
 
 @app.post("/api/reasoning/self-consistency")
@@ -167,11 +192,12 @@ def run_self_consistency(req: ConsistencyRequest):
     try:
         prompt = f"USER QUESTION: {req.query}"
         sample_count = req.sample_count or 3
-        paths = global_vllm_client.generate_batch_paths(prompt=prompt, sample_count=sample_count)
-        voting_result = global_self_consistency.run_consensus_voting(candidate_paths=paths)
+        paths = get_vllm_client().generate_batch_paths(prompt=prompt, sample_count=sample_count)
+        voting_result = get_self_consistency().run_consensus_voting(candidate_paths=paths)
         return voting_result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.post("/api/query", response_model=QueryResponse)
@@ -187,7 +213,7 @@ def execute_query(req: QueryRequest):
         q_emb = orchestrator.index_manager.embedder.encode([q])[0]
 
         # Step 2: Check Semantic Cache (Threshold >= 0.95 for sub-10ms response)
-        cached_resp, sim = global_semantic_cache.lookup(q_emb, threshold=0.95)
+        cached_resp, sim = get_semantic_cache().lookup(q_emb, threshold=0.95)
         if cached_resp is not None:
             return QueryResponse(**cached_resp)
 
@@ -227,7 +253,7 @@ def execute_query(req: QueryRequest):
         final_answer = state.get("final_answer", "")
 
         # Step 4: Run Pint & SymPy Dimensional Invariant Verification
-        dim_verification = global_symbolic_verifier.verify_dimensional_invariants(
+        dim_verification = get_symbolic_verifier().verify_dimensional_invariants(
             domain=f"{q} {subject_hint}",
             parameters={
                 "hit_ratio": 0.9,
@@ -246,15 +272,15 @@ def execute_query(req: QueryRequest):
             {"path_id": 3, "text": final_answer, "temperature": 0.5},
         ]
         target_eval = dim_verification.get("calculated_value")
-        self_cons_res = global_self_consistency.run_consensus_voting(
+        self_cons_res = get_self_consistency().run_consensus_voting(
             candidate_paths=candidate_paths,
             ground_formula_eval=target_eval
         )
 
-        engine_stat = global_vllm_client.get_status()
+        engine_stat = get_vllm_client().get_status()
 
         # Step 6: Process Reward Model (PRM) Step-by-Step Verification
-        prm_res = global_prm_verifier.decompose_and_verify(
+        prm_res = get_prm_verifier().decompose_and_verify(
             query=q,
             answer_text=final_answer,
             domain_hint=subject_hint
@@ -293,7 +319,7 @@ def execute_query(req: QueryRequest):
         )
 
         # Step 7: Save to Semantic Cache for future instant lookups
-        global_semantic_cache.insert(query=q, query_embedding=q_emb, result=resp.model_dump())
+        get_semantic_cache().insert(query=q, query_embedding=q_emb, result=resp.model_dump())
 
         return resp
 
@@ -318,38 +344,31 @@ async def stream_query_endpoint(request: QueryRequest):
 
             # 1. Quick Semantic Cache Check
             q_emb = orchestrator.index_manager.embedder.encode([q])[0]
-            cached_result, similarity = global_semantic_cache.lookup(q_emb, threshold=0.95)
-            if cached_result is not None:
-                cached_result["is_semantic_cache_hit"] = True
-                cached_result["cache_similarity"] = similarity
-                yield f"event: cache_hit\ndata: {json.dumps({'similarity': similarity, 'message': 'Instant Semantic Cache Hit (<10ms)'})}\n\n"
-                
-                # Stream cached answer tokens in small bursts
-                ans = cached_result.get("final_answer", "")
-                chunk_size = 20
-                for i in range(0, len(ans), chunk_size):
-                    token_chunk = ans[i:i+chunk_size]
-                    yield f"event: token\ndata: {json.dumps({'token': token_chunk})}\n\n"
-                    await asyncio.sleep(0.01)
-
-                yield f"event: done\ndata: {json.dumps(cached_result)}\n\n"
+            cached_resp, sim = get_semantic_cache().lookup(q_emb, threshold=0.95)
+            if cached_resp is not None:
+                yield f"event: cache_hit\ndata: {json.dumps({'similarity': sim})}\n\n"
+                yield f"event: token\ndata: {json.dumps({'token': cached_resp.get('final_answer', '')})}\n\n"
+                yield f"event: done\ndata: {json.dumps(cached_resp)}\n\n"
                 return
 
-            # 2. Run LangGraph Orchestrator
-            yield f"event: status\ndata: {json.dumps({'phase': 'retrieval', 'message': 'Executing Parallel Hybrid Retrieval & GraphRAG...'})}\n\n"
-            state = orchestrator.run(query=q)
+            # 2. Emit Real-Time Telemetry & Progress
+            yield f"event: status\ndata: {json.dumps({'stage': 'classifying', 'message': 'Classifying 10-subject syllabus domain...'})}\n\n"
             await asyncio.sleep(0.05)
 
+            yield f"event: status\ndata: {json.dumps({'stage': 'retrieval', 'message': 'Executing Parallel Hybrid Search (BM25 + Dense BGE-small)...'})}\n\n"
+            await asyncio.sleep(0.05)
 
-            subject_hint = state.get("subject_hint", "General CS")
+            # Run Orchestrator
+            state = orchestrator.run(query=q)
+
+            yield f"event: status\ndata: {json.dumps({'stage': 'reranking', 'message': 'Cross-Encoder reranking & CRAG relevance verification...'})}\n\n"
+            await asyncio.sleep(0.05)
+
             final_answer = state.get("final_answer", "")
-            relevance_score = state.get("relevance_score", 0.0)
-
-            yield f"event: telemetry\ndata: {json.dumps({'subject_hint': subject_hint, 'relevance_score': relevance_score, 'passed_gate': state.get('passed_gate', True)})}\n\n"
+            subject_hint = state.get("subject_hint", "General CS")
 
             # 3. Stream Process Reward Model (PRM) Reasoning Steps
-            yield f"event: status\ndata: {json.dumps({'phase': 'reasoning', 'message': 'Running Step-Level Process Reward Model (PRM)...'})}\n\n"
-            prm_res = global_prm_verifier.decompose_and_verify(
+            prm_res = get_prm_verifier().decompose_and_verify(
                 query=q,
                 answer_text=final_answer,
                 domain_hint=subject_hint
@@ -359,28 +378,25 @@ async def stream_query_endpoint(request: QueryRequest):
                 yield f"event: think_step\ndata: {json.dumps(step)}\n\n"
                 await asyncio.sleep(0.08)
 
-            # 4. Stream KaTeX Proof Tokens in Real-Time
-            yield f"event: status\ndata: {json.dumps({'phase': 'generation', 'message': 'Streaming Verified Mathematical Proof...'})}\n\n"
-            chunk_size = 16
-            for i in range(0, len(final_answer), chunk_size):
-                token_chunk = final_answer[i:i+chunk_size]
+            # 4. Stream Progressive Token Stream
+            words = final_answer.split(" ")
+            for i, word in enumerate(words):
+                token_chunk = word + (" " if i < len(words) - 1 else "")
                 yield f"event: token\ndata: {json.dumps({'token': token_chunk})}\n\n"
-                await asyncio.sleep(0.015)
+                await asyncio.sleep(0.02)
 
-            # 5. Dimensional & Self-Consistency Verification
-            dim_verification = global_symbolic_verifier.verify_dimensional_invariants(
+            # 5. Build Complete Response Object for Cache & Done Event
+            dim_verification = get_symbolic_verifier().verify_dimensional_invariants(
                 domain=f"{q} {subject_hint}",
-                parameters={"hit_ratio": 0.9, "tlb_latency": 20.0, "memory_latency": 100.0, "levels": 2}
+                parameters={
+                    "hit_ratio": 0.9,
+                    "tlb_latency": 20.0,
+                    "memory_latency": 100.0,
+                    "levels": 2,
+                    "packet_size_bytes": 1000,
+                    "bandwidth_mbps": 10
+                }
             )
-
-            serialized_rerank = [
-                {"chunk_id": c.chunk_id, "source_file": c.source_file, "topic": c.topic, "rerank_score": c.rerank_score}
-                for c in state.get("rerank_results", [])
-            ]
-            serialized_retrieval = [
-                {"chunk_id": c.chunk_id, "source_file": c.source_file, "topic": c.topic, "rrf_score": c.rrf_score}
-                for c in state.get("retrieval_results", [])
-            ]
 
             full_resp = QueryResponse(
                 query=state.get("query", q),
@@ -388,9 +404,9 @@ async def stream_query_endpoint(request: QueryRequest):
                 subject_hint=subject_hint,
                 final_answer=final_answer,
                 citations=state.get("citations", []),
-                rerank_results=serialized_rerank,
-                retrieval_results=serialized_retrieval,
-                relevance_score=relevance_score,
+                rerank_results=[],
+                retrieval_results=[],
+                relevance_score=state.get("relevance_score", 0.0),
                 reformulation_count=state.get("reformulation_count", 0),
                 passed_gate=state.get("passed_gate", False),
                 is_low_confidence=state.get("is_low_confidence", False),
@@ -410,7 +426,8 @@ async def stream_query_endpoint(request: QueryRequest):
             )
 
             # Cache the response
-            global_semantic_cache.insert(query=q, query_embedding=q_emb, result=full_resp.model_dump())
+            get_semantic_cache().insert(query=q, query_embedding=q_emb, result=full_resp.model_dump())
+
 
             # 6. Final Done Event with complete metadata payload
             yield f"event: done\ndata: {json.dumps(full_resp.model_dump())}\n\n"
