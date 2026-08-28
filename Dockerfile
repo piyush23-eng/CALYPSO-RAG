@@ -33,11 +33,18 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-cache model weights during build time to avoid runtime HuggingFace downloads and 502 gateway timeouts
-ENV HF_HUB_ENABLE_HF_TRANSFER=0 \
-    TRANSFORMERS_OFFLINE=0 \
-    HF_DATASETS_OFFLINE=0
+ENV HF_HOME=/app/hf_cache \
+    HF_HUB_DISABLE_SYMLINKS_WARNING=1 \
+    HF_HUB_ENABLE_HF_TRANSFER=0
 
-RUN python -c "from sentence_transformers import SentenceTransformer, CrossEncoder; SentenceTransformer('BAAI/bge-small-en-v1.5'); CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+RUN mkdir -p /app/hf_cache && \
+    python -c "from sentence_transformers import SentenceTransformer, CrossEncoder; SentenceTransformer('BAAI/bge-small-en-v1.5'); CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+
+# Lock runtime to offline mode so it uses pre-cached weights and never contacts HF Hub
+ENV TRANSFORMERS_OFFLINE=1 \
+    HF_HUB_OFFLINE=1 \
+    HF_DATASETS_OFFLINE=1
+
 
 
 
