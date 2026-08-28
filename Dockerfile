@@ -32,6 +32,14 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pre-cache model weights during build time to avoid runtime HuggingFace downloads and 502 gateway timeouts
+ENV HF_HUB_ENABLE_HF_TRANSFER=0 \
+    TRANSFORMERS_OFFLINE=0 \
+    HF_DATASETS_OFFLINE=0
+
+RUN python -c "from sentence_transformers import SentenceTransformer, CrossEncoder; SentenceTransformer('BAAI/bge-small-en-v1.5'); CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+
+
 
 # Copy source code, data indices, and built frontend assets
 COPY src/ ./src/
