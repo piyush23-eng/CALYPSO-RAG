@@ -10,10 +10,6 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Processed Vector and Lexical Indexes (Generated via scripts/build_index.py)
-data/processed/chroma_db/
-data/processed/bm25_index.pkl
-data/processed/test_*
 
 # Frontend
 frontend/node_modules/

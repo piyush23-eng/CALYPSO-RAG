@@ -130,14 +130,27 @@ class DualIndexManager:
     def load_indices(self):
         """
         Loads pre-built BM25 and connects to persistent ChromaDB collection.
+        If the index files are not found (e.g., fresh container deploy), automatically builds them from data/raw.
         """
         if not self.bm25_persist_path.exists():
-            raise FileNotFoundError(f"BM25 index not found at {self.bm25_persist_path}. Run build_index.py first.")
+            print(f"Index not found at {self.bm25_persist_path}. Automatically building from data/raw...")
+            raw_dir = self.persist_dir.parent.parent / "raw"
+            if raw_dir.exists():
+                from src.ingestion.chunker import TopicAwareChunker
+                chunker = TopicAwareChunker(max_chars=2500, min_chars=80, overlap_chars=200)
+                all_chunks = []
+                for fpath in list(raw_dir.glob("*.md")) + list(raw_dir.glob("*.txt")):
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        all_chunks.extend(chunker.chunk_document(f.read(), source_file=fpath.name))
+                self.build_and_save(all_chunks)
+            else:
+                raise FileNotFoundError(f"Neither {self.bm25_persist_path} nor {raw_dir} were found.")
 
         with open(self.bm25_persist_path, "rb") as f:
             data = pickle.load(f)
             self._bm25 = data["bm25"]
             self._chunks = [DocumentChunk(**c) for c in data["chunks"]]
+
 
         # Ensure collection is loaded
         _ = self.collection
