@@ -192,27 +192,40 @@ class DualIndexManager:
         
         where_clause = {"topic": topic_filter} if topic_filter else None
         
-        results = self.collection.query(
-            query_embeddings=query_embedding,
-            n_results=top_k,
-            where=where_clause
-        )
-
         dense_results = []
-        if results and results["ids"] and len(results["ids"][0]) > 0:
-            for i in range(len(results["ids"][0])):
-                # Chroma cosine distance is in [0, 2], similarity = 1 - distance
-                dist = results["distances"][0][i]
-                sim_score = 1.0 - dist
-                meta = results["metadatas"][0][i]
+        try:
+            results = self.collection.query(
+                query_embeddings=query_embedding,
+                n_results=min(top_k, max(1, self.collection.count())),
+                where=where_clause
+            )
+            if results and results.get("ids") and len(results["ids"][0]) > 0:
+                for i in range(len(results["ids"][0])):
+                    dist = results["distances"][0][i] if results.get("distances") else 0.0
+                    sim_score = 1.0 - dist
+                    meta = results["metadatas"][0][i] if results.get("metadatas") else {}
+                    dense_results.append({
+                        "chunk_id": results["ids"][0][i],
+                        "content": results["documents"][0][i] if results.get("documents") else "",
+                        "topic": meta.get("topic", "General CS"),
+                        "subtopic": meta.get("subtopic", "General"),
+                        "source_type": meta.get("source_type", "notes"),
+                        "source_file": meta.get("source_file", "knowledge_base"),
+                        "score": float(sim_score)
+                    })
+        except Exception as e:
+            print(f"ChromaDB search warning: {e}. Falling back to BM25 lexical candidates...")
+            bm25_res = self.search_bm25(query=query, top_k=top_k, topic_filter=topic_filter)
+            for r in bm25_res:
                 dense_results.append({
-                    "chunk_id": results["ids"][0][i],
-                    "content": results["documents"][0][i],
-                    "topic": meta["topic"],
-                    "subtopic": meta["subtopic"],
-                    "source_type": meta["source_type"],
-                    "source_file": meta["source_file"],
-                    "score": float(sim_score)
+                    "chunk_id": r["chunk_id"],
+                    "content": r["content"],
+                    "topic": r["topic"],
+                    "subtopic": r["subtopic"],
+                    "source_type": r["source_type"],
+                    "source_file": r["source_file"],
+                    "score": 0.85
                 })
 
         return dense_results
+
