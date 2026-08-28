@@ -563,40 +563,6 @@ class LorcenClient:
         if ollama_ans:
             return ollama_ans
 
-        # 4. Try Dedicated Cloud Backend (Render) if online
-        payload = {
-            "question": prompt,
-            "subject": subject or (chunks[0].topic if chunks else "General CS"),
-            "topic": topic or (chunks[0].subtopic if chunks else "GATE Preparation")
-        }
-
-        for attempt in range(1, self.max_retries + 1):
-            try:
-                response = requests.post(
-                    f"{self.endpoint_url}/api/solve",
-                    json=payload,
-                    timeout=self.request_timeout_sec
-                )
-                if response.status_code == 200:
-                    data = response.json()
-                    ans = (
-                        data.get("solution_markdown") or
-                        data.get("solution_cot") or
-                        data.get("answer") or
-                        data.get("response") or
-                        ""
-                    ).strip()
-                    if ans and "Numerical Answer: 42" not in ans and "Numerical Answer**: **42" not in ans:
-                        return ans
-                    return self._generate_deterministic_fallback(query=query, chunks=chunks)
-                elif response.status_code in [502, 503, 504]:
-                    backoff = self.base_backoff_sec * (2 ** (attempt - 1))
-                    time.sleep(backoff)
-                else:
-                    break
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-                backoff = self.base_backoff_sec * (2 ** (attempt - 1))
-                time.sleep(backoff)
-
-        # 5. Local Pedagogical Extraction Fallback
+        # 4. Instant Pedagogical Mathematical Extraction & Verification
         return self._generate_deterministic_fallback(query=query, chunks=chunks)
+
